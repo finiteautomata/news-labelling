@@ -5,9 +5,12 @@ verify_ssl = true
 
 [dev-packages]
 pylint = "*"
+ipdb = "*"
 
 [packages]
 djangorestframework = "*"
+fire = "*"
+tqdm = "*"
 
 [requires]
 python_version = "3.8"

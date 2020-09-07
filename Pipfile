@@ -6,6 +6,7 @@ verify_ssl = true
 [dev-packages]
 pylint = "*"
 ipdb = "*"
+factory-boy = "*"
 
 [packages]
 djangorestframework = "*"

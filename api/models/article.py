@@ -9,7 +9,6 @@ class Article(models.Model):
     tweet_id = models.PositiveBigIntegerField(unique=True)
     text = models.CharField(blank=False, max_length=500)
     slug = models.CharField(blank=False, max_length=130, unique=True)
-    title = models.CharField(blank=False, max_length=200)
     url = models.CharField(blank=False, max_length=200)
 
     user = models.CharField(max_length=40)

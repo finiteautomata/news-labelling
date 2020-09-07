@@ -1,20 +1,27 @@
 import os
 import sys
-sys.path.append(".")
 import json
-import fire
-import pytz
-import django
 from datetime import datetime
+import fire
+import django
 from tqdm.auto import tqdm
 
+sys.path.append(".")
 os.environ['DJANGO_SETTINGS_MODULE'] = 'news_labelling.settings'
 print("Configuring django...")
 django.setup()
 print("Configuration ok")
 
-from api.models import Article
+from api.models import Article, Comment
 
+def parse_date(obj_dict):
+    """
+    Parse mongo date representation
+    """
+    return datetime.strptime(
+        f"{obj_dict['created_at']['$date']}-0300",
+        "%Y-%m-%dT%H:%M:%SZ%z",
+    )
 
 def create_article(art_dict):
     """
@@ -26,14 +33,24 @@ def create_article(art_dict):
         if k in ["title", "body", "text", "slug", "user", "tweet_id", "url"]
     }
 
-    args["created_at"] = datetime.strptime(
-        f"{art_dict['created_at']['$date']}-0300",
-        "%Y-%m-%dT%H:%M:%SZ%z",
-    )
+    args["created_at"] = parse_date(art_dict)
 
     art = Article(**args)
-
     art.save()
+
+    new_comments = []
+
+    for comm in art_dict["comments"]:
+        args = {
+            k:v for k, v in comm.items() if k in ["text", "user_id", "tweet_id"]
+        }
+        args["created_at"] = parse_date(comm)
+        comm = Comment(**args)
+        comm.article = art
+        new_comments.append(comm)
+
+    Comment.objects.bulk_create(new_comments)
+
 
 def load_articles(json_path):
     """

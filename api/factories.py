@@ -1,5 +1,5 @@
-import datetime
 import factory
+from django.utils import timezone
 from .models import Article
 
 
@@ -13,11 +13,11 @@ class ArticleFactory(factory.django.DjangoModelFactory):
         """
         model = Article
 
-    title = "Título de artículo"
+    title = factory.Sequence(lambda n: f"Artículo num {n}")
     tweet_id = factory.Sequence(lambda n: 1000 + n)
     text = "Este es el tweet"
     slug = factory.Sequence(lambda n: f"slug-{n}")
     url = "http://clarin.com"
     user = "clarincom"
     body = "Lorem ipsum pepe"
-    created_at = datetime.datetime.now()
+    created_at = timezone.now()

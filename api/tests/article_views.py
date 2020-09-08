@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 from .factories import ArticleFactory
-from .serializers import ArticleSerializer
+from ..serializers import ArticleSerializer
 
 
 class ArticleViewTest(APITestCase):

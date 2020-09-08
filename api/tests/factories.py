@@ -27,6 +27,10 @@ class ArticleFactory(factory.django.DjangoModelFactory):
     def create_comments(self, *args, **kwargs):
         """
         Create comments after initialization
+
+        If you want to change number of comments created, use something like this:
+
+        >> ArticleFactory(create_comments__num_comments=10)
         """
         num_comments = kwargs.get("num_comments", 2)
         CommentFactory.create_batch(num_comments, article=self)

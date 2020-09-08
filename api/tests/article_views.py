@@ -58,3 +58,16 @@ class ArticleViewTest(APITestCase, AuthenticationMixin):
             articles,
             [ArticleSerializer(art).data for art in [art1, art2]]
         )
+
+    def test_article_detail(self):
+        """
+        Test
+        """
+        self.login()
+        art = ArticleFactory()
+        url = reverse('article-detail', args=[art.id])
+
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        self.assertEqual(response.data["labels"], [])
+        self.assertEqual(response.data["title"], art.title)

@@ -1,8 +1,7 @@
 #from django.test import TestCase
 from django.urls import reverse
-from django.contrib.auth.models import User
 from rest_framework import status
-from rest_framework.test import APITestCase, APIClient
+from rest_framework.test import APITestCase
 from .factories import ArticleFactory, CommentFactory
 from .mixins import AuthenticationMixin
 
@@ -20,7 +19,7 @@ class LabelViewTest(APITestCase, AuthenticationMixin):
 
     def test_label_an_article_with_one_comment(self):
         """
-        Check we have to log in first
+        Check that after labelling it works ok
         """
 
         art = ArticleFactory()
@@ -29,10 +28,19 @@ class LabelViewTest(APITestCase, AuthenticationMixin):
         url = reverse("article-label", args=[art.id])
 
         req = {comm.id: {
-            "hateful": 1
+            "is_hateful": 1
         } for comm in art.comment_set.all()}
 
         resp = self.client.post(url, req, format='json')
 
+        assert resp.status_code == status.HTTP_201_CREATED
+
         for comment in comments:
             comment_url = reverse("comment-detail", args=[comment.id])
+            response = self.client.get(comment_url, format="json")
+
+            self.assertEqual(
+                response.data["labels"], [{
+                    "is_hateful": 1
+                }]
+            )

@@ -2,8 +2,9 @@ from django.urls import reverse
 from rest_framework import viewsets, permissions, status, mixins
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, action
+from django.db import transaction
 from .models import Article, Comment
-from .serializers import ArticleSerializer, CommentSerializer
+from .serializers import ArticleSerializer, CommentSerializer, CommentLabelSerializer
 
 @api_view(['GET'])
 def api_root(request, format=None):
@@ -25,6 +26,15 @@ class ArticleViewSet(viewsets.ReadOnlyModelViewSet):
     @action(methods=['post'], detail=True, url_path="label", url_name="label")
     def label(self, request, pk=None):
         article = self.get_object()
+
+        with transaction.atomic():
+            for comment_id, label_data in request.data.items():
+                comment = article.comment_set.get(id=comment_id)
+
+                serializer = CommentLabelSerializer(data=label_data)
+
+                if serializer.is_valid():
+                    serializer.save(comment=comment)
 
         return Response({}, status=status.HTTP_201_CREATED)
 

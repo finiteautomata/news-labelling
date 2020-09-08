@@ -24,12 +24,12 @@ class ArticleFactory(factory.django.DjangoModelFactory):
     created_at = timezone.now()
 
     @factory.post_generation
-    def create_comments(self, create, extracted, num_comments=2, **kwargs):
+    def create_comments(self, *args, **kwargs):
         """
         Create comments after initialization
         """
-        for i in range(num_comments):
-            CommentFactory.create(article=self)
+        num_comments = kwargs.get("num_comments", 2)
+        CommentFactory.create_batch(num_comments, article=self)
 
 class CommentFactory(factory.django.DjangoModelFactory):
     """

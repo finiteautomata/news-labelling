@@ -4,30 +4,19 @@ from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 from .factories import ArticleFactory, CommentFactory
+from .mixins import AuthenticationMixin
 
 
-class LabelViewTest(APITestCase):
+class LabelViewTest(APITestCase, AuthenticationMixin):
     """
     API Test
     """
 
     def setUp(self):
-        self.client = APIClient()
-        self.user = User.objects.create_user(
-            username="test",
-            password="test",
-        )
+        self.create_user_and_client()
 
         self.url = reverse("article-list")
         self.login()
-
-    def login(self):
-        """
-        Logs user in
-        """
-        resp = self.client.login(username="test", password="test")
-        assert resp
-
 
     def test_label_an_article_with_one_comment(self):
         """

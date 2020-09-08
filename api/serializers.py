@@ -1,6 +1,18 @@
 from rest_framework import serializers
-from .models import Article, Comment
+from .models import Article, Comment, CommentLabel
 
+
+class CommentLabelSerializer(serializers.ModelSerializer):
+    """
+    Serializer for comment label class
+    """
+
+    class Meta:
+        """
+        Meta class
+        """
+        model = CommentLabel
+        fields = ['is_hateful']
 
 class CommentSerializer(serializers.ModelSerializer):
     """
@@ -11,8 +23,9 @@ class CommentSerializer(serializers.ModelSerializer):
         Meta class
         """
         model = Comment
-        fields = ['text', 'user_id', 'tweet_id', 'created_at']
+        fields = ['text', 'user_id', 'tweet_id', 'created_at', 'labels']
 
+    labels = CommentLabelSerializer(many=True, read_only=True)
 
 class ArticleSerializer(serializers.ModelSerializer):
     """

@@ -1,32 +1,21 @@
 #from django.test import TestCase
 from django.urls import reverse
-from django.contrib.auth.models import User
 from rest_framework import status
-from rest_framework.test import APITestCase, APIClient
+from rest_framework.test import APITestCase
 from .factories import ArticleFactory
+from .mixins import AuthenticationMixin
 from ..serializers import ArticleSerializer
 
 
-class ArticleViewTest(APITestCase):
+class ArticleViewTest(APITestCase, AuthenticationMixin):
     """
     API Test
     """
 
     def setUp(self):
-        self.client = APIClient()
-        self.user = User.objects.create_user(
-            username="test",
-            password="test",
-        )
+        self.create_user_and_client()
 
         self.url = reverse("article-list")
-
-    def login(self):
-        """
-        Logs user in
-        """
-        resp = self.client.login(username="test", password="test")
-        assert resp
 
     def get_articles(self):
         """

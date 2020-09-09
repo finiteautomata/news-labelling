@@ -53,21 +53,45 @@
     </div>
   </div>
 
+  <div class="comment-labels">
   {% for comment in article.comment_set.all %}
+    <form>
+      <div class="row">
+        <div class="one column">
+            {{ forloop.counter }}
+        </div>
+        <div class="six columns">
+          <p>{{comment.text}}</p>
+        </div>
+        <input type="hidden" name="comment" value="{{comment.id}}"/>
+        <div class="two columns">
+          <label>
+            <input name="is_hateful" type="radio" value="1"/>
+            <span class="label-body" for="1"> Sí </span>
+          </label>
+          <label>
+            <input name="is_hateful" type="radio" value="0"/>
+            <span class="label-body" for="0"> No </span>
+          </label>
+        </div>
 
-    <div class="row" data-comment-id="{{comment.id}}">
-      <div class="one column">
-          {{ forloop.counter }}
       </div>
-      <div class="six columns">
-        <p>{{comment.text}}</p>
-      </div>
-    </div>
+    </form>
+    <hr/>
 
   {% endfor %}
-
+  </div>
 
 </div>
+
+<div class="row">
+    <a href="#" id="submit" class=" button button-primary u-full-width">
+      Enviar etiquetado
+    </a>
+</div>
+
+<hr/>
+
 
 <div class="row">
     <a href="#" id="not_interesting" class="button u-full-width" style="background-color:red; color:white">
@@ -107,7 +131,40 @@
       alert("Hubo un error con esto: "+ errors);
     });
 
-  })
+  });
+
+  document.getElementById("submit").addEventListener("click", (event) => {
+    event.preventDefault();
+
+    var forms = document.querySelectorAll('div.comment-labels > form');
+
+    var data = {
+      is_interesting: true,
+      comment_labels: [],
+    }
+    forms.forEach((form) => {
+      var formdata = new FormData(form);
+      data.comment_labels.push({
+        "comment": parseInt(formdata.get("comment")),
+        "is_hateful": Boolean(parseInt(formdata.get("is_hateful")))
+      })
+    });
+    debugger;
+
+    axios.post(
+      endpoint,
+      data,
+    )
+    .then( () => {
+      alert("Artículo correctamente etiquetado");
+    })
+    .catch( (errors) => {
+      alert("Hubo un error con esto: "+ errors);
+    });
+
+  });
+
+
 </script>
 
 {% block actions %}

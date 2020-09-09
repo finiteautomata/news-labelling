@@ -28,6 +28,9 @@ class ArticleLabelSerializerTest(TestCase):
         assert serializer.is_valid()
 
     def test_not_valid_if_not_interesting_and_has_labels(self):
+        """
+        Not valid if has labels and not interesting
+        """
         serializer = self.create_serializer({
             "is_interesting": False,
             "comment_labels": [
@@ -38,6 +41,9 @@ class ArticleLabelSerializerTest(TestCase):
         assert not serializer.is_valid()
 
     def test_valid_if_interesting_and_has_labels_for_every_comment(self):
+        """
+        Valid if interesting and labels for every comment
+        """
         serializer = self.create_serializer({
             "is_interesting": True,
             "comment_labels": [
@@ -49,6 +55,9 @@ class ArticleLabelSerializerTest(TestCase):
         assert serializer.is_valid()
 
     def test_not_valid_if_interesting_but_lacks_label_for_comment(self):
+        """
+        Not valid if lacks a label
+        """
         serializer = self.create_serializer({
             "is_interesting": True,
             "comment_labels": [

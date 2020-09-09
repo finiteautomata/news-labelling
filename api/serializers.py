@@ -45,7 +45,8 @@ class ArticleLabelSerializer(serializers.Serializer):
             if len(data.get("comment_labels", {})) > 0:
                 raise serializers.ValidationError("There must be no label if not interesting")
             return data
-        """ Now, is interesting and has labels
+        """
+        Now, it's interesting and has labels
 
         Check labels are assigned to each comment
         """
@@ -53,7 +54,9 @@ class ArticleLabelSerializer(serializers.Serializer):
         label_ids = {comment_label["comment"].id for comment_label in data['comment_labels']}
 
         if comment_ids != label_ids:
-            raise serializers.ValidationError("Wrong!")
+            raise serializers.ValidationError(
+                "Wrong comment ids -- every comment should have exactly one label"
+            )
 
         return data
 

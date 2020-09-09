@@ -3,8 +3,8 @@ from django.db import transaction
 from rest_framework import viewsets, permissions, status, mixins
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, action
-from .models import Article, Comment
-from .serializers import ArticleSerializer, CommentSerializer, CommentLabelSerializer
+from .models import Article, Comment, ArticleLabel
+from .serializers import ArticleSerializer, CommentSerializer, CommentLabelSerializer, ArticleLabelSerializer
 
 @api_view(['GET'])
 def api_root(request, format=None):
@@ -23,9 +23,20 @@ class ArticleViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = ArticleSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+
     @action(methods=['post'], detail=True, url_path="label", url_name="label")
     def label(self, request, pk=None):
+        """
+        Label an article and its comments
+        """
         article = self.get_object()
+        data = request.data
+
+        serializer = ArticleLabelSerializer(data=data)
+
+        if serializer.is_valid():
+            serializer.save()
+
 
         with transaction.atomic():
             for comment_id, label_data in request.data.items():

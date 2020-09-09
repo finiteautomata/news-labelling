@@ -32,7 +32,7 @@ class ArticleFactory(factory.django.DjangoModelFactory):
 
         >> ArticleFactory(create_comments__num_comments=10)
         """
-        num_comments = kwargs.get("num_comments", 2)
+        num_comments = kwargs.get("num_comments", 3)
         CommentFactory.create_batch(num_comments, article=self)
 
 class CommentFactory(factory.django.DjangoModelFactory):

@@ -2,8 +2,8 @@
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
-from .factories import ArticleFactory
 from .mixins import AuthenticationMixin
+from .factories import ArticleFactory
 from ..serializers import ArticleSerializer
 
 

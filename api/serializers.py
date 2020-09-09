@@ -14,17 +14,48 @@ class CommentLabelSerializer(serializers.ModelSerializer):
         model = CommentLabel
         fields = ['is_hateful']
 
-class ArticleLabelSerializer(serializers.ModelSerializer):
+
+class ArticleLabelSerializer(serializers.Serializer):
     """
     Serializer for comment
-    """
 
-    class Meta:
+    I don't use model serializer as it is fairly complex
+    """
+    class CommentLabelForCreationSerializer(serializers.ModelSerializer):
         """
-        Meta class
+        This is an ad hoc serializer for validation
         """
-        model = ArticleLabel
-        fields = ['is_interesting']
+
+        class Meta:
+            """
+            Meta class
+            """
+            model = CommentLabel
+            fields = ['is_hateful', 'comment']
+
+    is_interesting = serializers.BooleanField(required=True)
+    comment_labels = CommentLabelForCreationSerializer(many=True, required=False)
+
+
+    def validate(self, data, *args, **kwargs):
+        """
+        If not is_interesting => no labels
+        """
+        if not data["is_interesting"]:
+            if len(data.get("comment_labels", {})) > 0:
+                raise serializers.ValidationError("There must be no label if not interesting")
+            return data
+        """ Now, is interesting and has labels
+
+        Check labels are assigned to each comment
+        """
+        comment_ids = {comm.id for comm in self.context['article'].comment_set.all()}
+        label_ids = {comment_label["comment"].id for comment_label in data['comment_labels']}
+
+        if comment_ids != label_ids:
+            raise serializers.ValidationError("Wrong!")
+
+        return data
 
 class CommentSerializer(serializers.ModelSerializer):
     """

@@ -19,7 +19,10 @@
 
 <p> {{article.created_at}} -- TwId: {{article.tweet_id}} </p>
 
-<blockquote class="twitter-tweet"><p lang="es" dir="ltr"> {{article.text}} <a href="https://twitter.com/user/status/{{article.tweet_id}}?ref_src=twsrc%5Etfw">August 3, 2020</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<div class="row centering">
+  <blockquote class="twitter-tweet"><p lang="es" dir="ltr"> {{article.text}} <a href="https://twitter.com/user/status/{{article.tweet_id}}?ref_src=twsrc%5Etfw">August 3, 2020</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+</div>
 
 <h3> Noticia </h3>
 
@@ -37,21 +40,40 @@
 
 <h2> Comentarios </h2>
 
-<ul>
-{% for comment in article.comment_set.all %}
-  {% if comment.hateful_value > 0.5 %}
-      <li>
-        <strong>
-        {{ forloop.counter0 }} ({{comment.hateful_value|floatformat:-2}}) -- {{comment.text}}
-        </strong>
-      </li>
-  {% else %}
-  <li>
-    {{ forloop.counter0 }} ({{comment.hateful_value|floatformat:-2}}) -- {{comment.text}}
-  </li>
-  {% endif %}
-{% endfor %}
-</ul>
+<div class="">
+  <div class="row">
+    <div class="one column">
+      <b>Num</b>
+    </div>
+    <div class="six columns">
+      <b>Comentario</b>
+    </div>
+    <div class="three columns">
+      <b>¿Odio?</b>
+    </div>
+  </div>
+
+  {% for comment in article.comment_set.all %}
+
+    <div class="row" data-comment-id="{{comment.id}}">
+      <div class="one column">
+          {{ forloop.counter }}
+      </div>
+      <div class="six columns">
+        <p>{{comment.text}}</p>
+      </div>
+    </div>
+
+  {% endfor %}
+
+
+</div>
+
+<div class="row">
+    <a href="#" id="not_interesting" class="button u-full-width" style="background-color:red; color:white">
+      No es interesante
+    </a>
+</div>
 
 <script type="text/javascript">
   let myLabels = document.querySelectorAll('.lbl-toggle');
@@ -66,6 +88,26 @@
       };
     });
   });
+
+
+  axios.defaults.xsrfCookieName = 'csrftoken';
+  axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
+  var endpoint = "{% url 'api:article-label' article.id %}";
+  document.getElementById("not_interesting").addEventListener("click", (event) => {
+    event.preventDefault();
+
+    axios.post(
+      endpoint,
+      { is_interesting: false }
+    )
+    .then( () => {
+      alert("Artículo marcado como no interesante");
+    })
+    .catch( (errors) => {
+      alert("Hubo un error con esto: "+ errors);
+    });
+
+  })
 </script>
 
 {% block actions %}

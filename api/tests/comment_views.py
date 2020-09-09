@@ -17,7 +17,7 @@ class CommentViewTest(APITestCase, AuthenticationMixin):
         self.article = ArticleFactory(create_comments__num_comments=5)
         self.comment = self.article.comment_set.first()
         comment_id = self.comment.id
-        self.url = reverse("comment-detail", args=[comment_id])
+        self.url = reverse("api:comment-detail", args=[comment_id])
 
     def get_comment(self):
         """

@@ -15,7 +15,7 @@ class ArticleViewTest(APITestCase, AuthenticationMixin):
     def setUp(self):
         self.create_user_and_client()
 
-        self.url = reverse("article-list")
+        self.url = reverse("api:article-list")
 
     def get_articles(self):
         """
@@ -65,7 +65,7 @@ class ArticleViewTest(APITestCase, AuthenticationMixin):
         """
         self.login()
         art = ArticleFactory()
-        url = reverse('article-detail', args=[art.id])
+        url = reverse('api:article-detail', args=[art.id])
 
         response = self.client.get(url)
         assert response.status_code == status.HTTP_200_OK

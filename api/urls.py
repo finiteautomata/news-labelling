@@ -7,6 +7,8 @@ router = DefaultRouter()
 router.register(r'articles', views.ArticleViewSet)
 router.register(r'comments', views.CommentViewSet)
 
+app_name = "api"
+
 # The API URLs are now determined automatically by the router.
 urlpatterns = [
     path('', include(router.urls)),

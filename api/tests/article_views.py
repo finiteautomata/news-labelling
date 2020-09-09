@@ -1,32 +1,21 @@
 #from django.test import TestCase
 from django.urls import reverse
-from django.contrib.auth.models import User
 from rest_framework import status
-from rest_framework.test import APITestCase, APIClient
+from rest_framework.test import APITestCase
+from .mixins import AuthenticationMixin
 from .factories import ArticleFactory
-from .serializers import ArticleSerializer
+from ..serializers import ArticleSerializer
 
 
-class ArticleViewTest(APITestCase):
+class ArticleViewTest(APITestCase, AuthenticationMixin):
     """
     API Test
     """
 
     def setUp(self):
-        self.client = APIClient()
-        self.user = User.objects.create_user(
-            username="test",
-            password="test",
-        )
+        self.create_user_and_client()
 
         self.url = reverse("article-list")
-
-    def login(self):
-        """
-        Logs user in
-        """
-        resp = self.client.login(username="test", password="test")
-        assert resp
 
     def get_articles(self):
         """
@@ -69,3 +58,16 @@ class ArticleViewTest(APITestCase):
             articles,
             [ArticleSerializer(art).data for art in [art1, art2]]
         )
+
+    def test_article_detail(self):
+        """
+        Test
+        """
+        self.login()
+        art = ArticleFactory()
+        url = reverse('article-detail', args=[art.id])
+
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        self.assertEqual(response.data["labels"], [])
+        self.assertEqual(response.data["title"], art.title)

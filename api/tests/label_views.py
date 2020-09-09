@@ -34,7 +34,13 @@ class LabelViewTest(APITestCase, AuthenticationMixin):
 
         response = self.client.get(reverse('article-detail', args=[art.id]))
 
-        self.assertEqual(response.data["labels"], [{"is_interesting": False}])
+        self.assertEqual(
+            response.data["labels"],
+            [{
+                "is_interesting": False,
+                "comment_labels": []
+            }]
+        )
 
     def test_label_an_article_with_comments_create_comment_label(self):
         """
@@ -46,9 +52,9 @@ class LabelViewTest(APITestCase, AuthenticationMixin):
 
         req = {
             "is_interesting": True,
-            "labels": {
-                comm.id: { "is_hateful": True } for comm in art.comment_set.all()
-            }
+            "comment_labels": [{
+                "comment": comm.id, "is_hateful": True
+            } for comm in art.comment_set.all()]
         }
 
         resp = self.client.post(url, req, format='json')
@@ -61,6 +67,6 @@ class LabelViewTest(APITestCase, AuthenticationMixin):
 
             self.assertEqual(
                 response.data["labels"], [{
-                    "is_hateful": 1
+                    "is_hateful": True
                 }]
             )

@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import Article, Comment, CommentLabel, ArticleLabel
+from django.db import transaction
+from .models import Article, Comment, CommentLabel
 
 
 class CommentLabelSerializer(serializers.ModelSerializer):
@@ -74,15 +75,16 @@ class ArticleLabelSerializer(serializers.Serializer):
         """
         Create ArticleLabel
         """
-        comment_labels = validated_data.pop('comment_labels', [])
-        article = self.context['article']
-        user = self.context['user']
+        with transaction.atomic():
+            comment_labels = validated_data.pop('comment_labels', [])
+            article = self.context['article']
+            user = self.context['user']
 
-        article_label = article.labels.create(**validated_data, user=user)
-        for comment_label in comment_labels:
-            article_label.comment_labels.create(**comment_label)
+            article_label = article.labels.create(**validated_data, user=user)
+            for comment_label in comment_labels:
+                article_label.comment_labels.create(**comment_label)
 
-        return article_label
+            return article_label
 
 
 class CommentSerializer(serializers.ModelSerializer):

@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block  head %}
+
+<link rel="stylesheet" href="{% static 'articles/articles.css' %}">
+
+{% endblock %}
+
+{% block title %}
+{{article.title}}
+{% endblock %}
+
+{% block content %}
+
+
+<h4> @{{article.user}} - {{article.title}}  </h4>
+
+
+
+<p> {{article.created_at}} -- TwId: {{article.tweet_id}} </p>
+
+<div class="row centering">
+  <blockquote class="twitter-tweet"><p lang="es" dir="ltr"> {{article.text}} <a href="https://twitter.com/user/status/{{article.tweet_id}}?ref_src=twsrc%5Etfw">August 3, 2020</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+</div>
+
+<h3> Noticia </h3>
+
+<div class="wrap-collapsible">
+  <input id="collapsible" class="toggle" type="checkbox">
+  <label for="collapsible" class="lbl-toggle" tabindex="0">Mirar artículo</label>
+  <div class="collapsible-content">
+    <div class="content-inner">
+      <p> {{article.body | linebreaks }} </p>
+    </div>
+  </div>
+
+</div>
+
+
+<h2> Comentarios </h2>
+
+<div class="">
+  <div class="row">
+    <div class="one column">
+      <b>Num</b>
+    </div>
+    <div class="six columns">
+      <b>Comentario</b>
+    </div>
+    <div class="three columns">
+      <b>¿Odio?</b>
+    </div>
+  </div>
+
+  <div class="comment-labels">
+  {% for comment in article.comment_set.all %}
+    <form>
+      <div class="row">
+        <div class="one column">
+            {{ forloop.counter }}
+        </div>
+        <div class="six columns">
+          <p>{{comment.text}}</p>
+        </div>
+        <input type="hidden" name="comment" value="{{comment.id}}"/>
+        <div class="two columns">
+          <label>
+            <input name="is_hateful" type="radio" value="1"/>
+            <span class="label-body" for="1"> Sí </span>
+          </label>
+          <label>
+            <input name="is_hateful" type="radio" value="0"/>
+            <span class="label-body" for="0"> No </span>
+          </label>
+        </div>
+
+      </div>
+    </form>
+    <hr/>
+
+  {% endfor %}
+  </div>
+
+</div>
+
+<div class="row">
+    <a href="#" id="submit" class=" button button-primary u-full-width">
+      Enviar etiquetado
+    </a>
+</div>
+
+<hr/>
+
+
+<div class="row">
+    <a href="#" id="not_interesting" class="button u-full-width" style="background-color:red; color:white">
+      No es interesante
+    </a>
+</div>
+
+<script type="text/javascript">
+  let myLabels = document.querySelectorAll('.lbl-toggle');
+
+  Array.from(myLabels).forEach(label => {
+    label.addEventListener('keydown', e => {
+      // 32 === spacebar
+      // 13 === enter
+      if (e.which === 32 || e.which === 13) {
+        e.preventDefault();
+        label.click();
+      };
+    });
+  });
+
+
+  axios.defaults.xsrfCookieName = 'csrftoken';
+  axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
+  var endpoint = "{% url 'api:article-label' article.id %}";
+  document.getElementById("not_interesting").addEventListener("click", (event) => {
+    event.preventDefault();
+
+    axios.post(
+      endpoint,
+      { is_interesting: false }
+    )
+    .then( () => {
+      alert("Artículo marcado como no interesante");
+    })
+    .catch( (errors) => {
+      alert("Hubo un error con esto: "+ errors);
+    });
+
+  });
+
+  document.getElementById("submit").addEventListener("click", (event) => {
+    event.preventDefault();
+
+    var forms = document.querySelectorAll('div.comment-labels > form');
+
+    var data = {
+      is_interesting: true,
+      comment_labels: [],
+    };
+    forms.forEach((form) => {
+      debugger;
+      var formdata = new FormData(form);
+      var comment_label = {
+        comment: parseInt(formdata.get("comment"))
+      };
+      var is_hateful = formdata.get("is_hateful");
+
+      if (is_hateful != null) {
+        comment_label.is_hateful = true;
+      }
+      data.comment_labels.push(comment_label);
+    });
+
+    axios.post(
+      endpoint,
+      data,
+    )
+    .then( () => {
+      alert("Artículo correctamente etiquetado");
+    })
+    .catch( (errors) => {
+      alert("Hubo un error con esto: "+ errors);
+    });
+
+  });
+
+
+</script>
+
+{% block actions %}
+
+{% endblock %}
+
+{%endblock %}

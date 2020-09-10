@@ -41,6 +41,22 @@ class ArticleLabelSerializer(serializers.Serializer):
 
     def validate(self, data, *args, **kwargs):
         """
+        Check we have article and user
+        """
+
+        if not ('user' in self.context and 'article' in self.context):
+            raise serializers.ValidationError(
+            "Article and user must be set in context"
+            )
+        """
+        Check no label for article and user
+        """
+        article = self.context['article']
+        user = self.context['user']
+
+        if article.labels.filter(user=user).count() > 0:
+            raise serializers.ValidationError("Article already labeled by user")
+        """
         If not is_interesting => no labels
         """
         if not data["is_interesting"]:
@@ -52,21 +68,12 @@ class ArticleLabelSerializer(serializers.Serializer):
 
         Check labels are assigned to each comment
         """
-        comment_ids = {comm.id for comm in self.context['article'].comment_set.all()}
+        comment_ids = {comm.id for comm in article.comment_set.all()}
         label_ids = {comment_label["comment"].id for comment_label in data['comment_labels']}
 
         if comment_ids != label_ids:
             raise serializers.ValidationError(
                 "Wrong comment ids -- every comment should have exactly one label"
-            )
-
-        """
-        Check we have article and user
-        """
-
-        if not ('user' in self.context and 'article' in self.context):
-            raise serializers.ValidationError(
-                "Article and user must be set in context"
             )
 
         return data

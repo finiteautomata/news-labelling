@@ -141,15 +141,20 @@
     var data = {
       is_interesting: true,
       comment_labels: [],
-    }
+    };
     forms.forEach((form) => {
+      debugger;
       var formdata = new FormData(form);
-      data.comment_labels.push({
-        "comment": parseInt(formdata.get("comment")),
-        "is_hateful": Boolean(parseInt(formdata.get("is_hateful")))
-      })
+      var comment_label = {
+        comment: parseInt(formdata.get("comment"))
+      };
+      var is_hateful = formdata.get("is_hateful");
+
+      if (is_hateful != null) {
+        comment_label.is_hateful = true;
+      }
+      data.comment_labels.push(comment_label);
     });
-    debugger;
 
     axios.post(
       endpoint,

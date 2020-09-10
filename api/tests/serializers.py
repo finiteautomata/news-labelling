@@ -33,6 +33,25 @@ class ArticleLabelSerializerTest(TestCase):
 
         assert serializer.is_valid()
 
+    def test_not_valid_if_already_labeled(self):
+        """
+        If is not interesting, it should be valid
+        """
+        serializer = self.create_serializer({
+            "is_interesting": False,
+        })
+
+        another_serializer = self.create_serializer({
+            "is_interesting": False,
+        })
+
+        serializer.is_valid()
+        serializer.save()
+
+        assert not another_serializer.is_valid()
+
+
+
     def test_not_valid_if_not_interesting_and_has_labels(self):
         """
         Not valid if has labels and not interesting

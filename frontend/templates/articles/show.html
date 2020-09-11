@@ -117,6 +117,7 @@
   axios.defaults.xsrfCookieName = 'csrftoken';
   axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
   var endpoint = "{% url 'api:article-label' article.id %}";
+  var next_url = "{% url 'next' %}";
   document.getElementById("not_interesting").addEventListener("click", (event) => {
     event.preventDefault();
 
@@ -126,6 +127,7 @@
     )
     .then( () => {
       alert("Artículo marcado como no interesante");
+      location.href = next_url;
     })
     .catch( (errors) => {
       alert("Hubo un error con esto: "+ errors);
@@ -162,6 +164,7 @@
     )
     .then( () => {
       alert("Artículo correctamente etiquetado");
+      location.href = next_url;
     })
     .catch( (errors) => {
       alert("Hubo un error con esto: "+ errors);

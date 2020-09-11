@@ -1,7 +1,7 @@
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render, get_object_or_404
-from api.models import Article
+from django.shortcuts import render, get_object_or_404, redirect
+from api.models import Article, Assignment
 
 
 class Index(LoginRequiredMixin, View):
@@ -27,3 +27,18 @@ class ArticleView(LoginRequiredMixin, View):
         return render(request, 'articles/show.html', {
             "article": article,
         })
+
+class NextArticleView(LoginRequiredMixin, View):
+    """
+    View for next assignment
+    """
+
+    def get(self, request):
+        """
+        GET next view
+        """
+        next_assignment = Assignment.next_assignment_of(request.user)
+
+        if next_assignment:
+            # Ok, next assignment, redirect there
+            return redirect('article_view', pk=next_assignment.id)

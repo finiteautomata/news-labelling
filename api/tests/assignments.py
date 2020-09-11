@@ -1,6 +1,6 @@
 from django.test import TestCase
+from django.db import IntegrityError
 from django.contrib.auth.models import User
-from django.core.exceptions import ObjectDoesNotExist
 from .factories import ArticleFactory
 from ..models import Assignment
 
@@ -69,3 +69,14 @@ class AssignmentTest(TestCase):
 
         with self.assertRaises(ValueError):
             assignment.complete()
+
+
+    def test_two_assignments_to_same_article_and_user_are_invalid(self):
+        """
+        Test it raises if no next assignment
+        """
+        article = ArticleFactory()
+        Assignment.objects.create(user=self.user, article=article)
+
+        with self.assertRaises(IntegrityError):
+            Assignment.objects.create(user=self.user, article=article)

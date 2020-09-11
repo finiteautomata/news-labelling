@@ -32,3 +32,6 @@ class Assignment(models.Model):
             raise ValueError("Assignment already completed")
         self.done = True
         self.save()
+
+    class Meta:
+        unique_together = ('user', 'article')

@@ -25,6 +25,7 @@ class LabelViewTest(APITestCase, AuthenticationMixin):
         """
 
         art = ArticleFactory(create_comments__num_comments=5)
+        self.user.assignment_set.create(article=art)
         url = reverse("api:article-label", args=[art.id])
         req = { "is_interesting": False }
 
@@ -47,6 +48,7 @@ class LabelViewTest(APITestCase, AuthenticationMixin):
         """
 
         art = ArticleFactory(create_comments__num_comments=5)
+        self.user.assignment_set.create(article=art)
         url = reverse("api:article-label", args=[art.id])
 
         req = {

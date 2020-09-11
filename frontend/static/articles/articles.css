@@ -26,6 +26,17 @@ input[type='checkbox'] {
   transition: all 0.25s ease-out;
 }
 
+.submit-button {
+  display: block;
+
+  font-weight: bold;
+  font-family: monospace;
+  font-size: 1.7rem;
+  text-transform: uppercase;
+  text-align: center;
+
+}
+
 .lbl-toggle:hover {
   color: #7C5A0B;
 }

@@ -28,6 +28,17 @@ class ArticleView(LoginRequiredMixin, View):
             "article": article,
         })
 
+class CompletedView(LoginRequiredMixin, View):
+    """
+    You completed it all!
+    """
+
+    def get(self, request):
+        """
+        GET completed
+        """
+        return render(request, 'articles/completed.html')
+
 class NextArticleView(LoginRequiredMixin, View):
     """
     View for next assignment

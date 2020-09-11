@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.db import transaction
-from .models import Article, Comment, CommentLabel
+from .models import Article, Comment, CommentLabel, Assignment
 
 
 class CommentLabelSerializer(serializers.ModelSerializer):
@@ -49,10 +49,16 @@ class ArticleLabelSerializer(serializers.Serializer):
             "Article and user must be set in context"
             )
         """
-        Check no label for article and user
+        Check assignment
         """
         article = self.context['article']
         user = self.context['user']
+
+        if not Assignment.objects.filter(article=article, user=user).exists():
+            raise serializers.ValidationError("Assignment should exist")
+        """
+        Check no label for article and user
+        """
 
         if article.labels.filter(user=user).count() > 0:
             raise serializers.ValidationError("Article already labeled by user")
@@ -91,6 +97,7 @@ class ArticleLabelSerializer(serializers.Serializer):
             for comment_label in comment_labels:
                 article_label.comment_labels.create(**comment_label)
 
+            article.assignment_set.get(user=user).complete()
             return article_label
 
 

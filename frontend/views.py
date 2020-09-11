@@ -52,4 +52,6 @@ class NextArticleView(LoginRequiredMixin, View):
 
         if next_assignment:
             # Ok, next assignment, redirect there
-            return redirect('article_view', pk=next_assignment.id)
+            return redirect('article_view', pk=next_assignment.article.id)
+        else:
+            return redirect('completed')

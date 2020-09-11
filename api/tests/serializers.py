@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
+from ..models import Assignment
 from .factories import ArticleFactory
 from ..serializers import ArticleLabelSerializer
 
@@ -15,13 +16,35 @@ class ArticleLabelSerializerTest(TestCase):
         )
 
 
-    def create_serializer(self, data):
+    def create_serializer(self, data, assignment=False):
         """
         Create serializer with data and context
         """
+
+        if assignment:
+            self.create_assignment()
+
         return ArticleLabelSerializer(
             data=data, context={'article': self.article, 'user': self.user}
         )
+
+    def create_assignment(self):
+        """
+        Creates assignment for user and article
+        """
+        return self.user.assignment_set.create(article=self.article)
+
+    def test_is_not_valid_if_no_assignment(self):
+        """
+        If no assignment, then it is not valid
+        """
+
+        serializer = self.create_serializer({
+            "is_interesting": False,
+        })
+
+        assert not serializer.is_valid()
+
 
     def test_is_valid_if_not_interesting(self):
         """
@@ -29,7 +52,9 @@ class ArticleLabelSerializerTest(TestCase):
         """
         serializer = self.create_serializer({
             "is_interesting": False,
-        })
+        }, assignment=True)
+
+
 
         assert serializer.is_valid()
 
@@ -39,7 +64,7 @@ class ArticleLabelSerializerTest(TestCase):
         """
         serializer = self.create_serializer({
             "is_interesting": False,
-        })
+        }, assignment=True)
 
         another_serializer = self.create_serializer({
             "is_interesting": False,
@@ -61,7 +86,7 @@ class ArticleLabelSerializerTest(TestCase):
             "comment_labels": [
                 {"is_hateful": True, "comment": 1}
             ],
-        })
+        }, assignment=True)
 
         assert not serializer.is_valid()
 
@@ -75,7 +100,7 @@ class ArticleLabelSerializerTest(TestCase):
                 {"is_hateful": True, "comment": comm.id}
                 for comm in self.article.comment_set.all()
             ],
-        })
+        }, assignment=True)
 
         assert serializer.is_valid()
 
@@ -89,7 +114,7 @@ class ArticleLabelSerializerTest(TestCase):
                 {"is_hateful": True, "comment": comm.id}
                 for comm in self.article.comment_set.all()[:3]
             ],
-        })
+        }, assignment=True)
 
         assert not serializer.is_valid()
 
@@ -99,7 +124,7 @@ class ArticleLabelSerializerTest(TestCase):
         """
         serializer = self.create_serializer({
             "is_interesting": False,
-        })
+        }, assignment=True)
 
         assert serializer.is_valid()
         article_label = serializer.save()
@@ -116,7 +141,7 @@ class ArticleLabelSerializerTest(TestCase):
                 {"is_hateful": True, "comment": comm.id}
                 for comm in self.article.comment_set.all()
             ],
-        })
+        }, assignment=True)
 
         assert serializer.is_valid()
         article_label = serializer.save()
@@ -125,3 +150,22 @@ class ArticleLabelSerializerTest(TestCase):
             article_label.comment_labels.count(),
             self.article.comment_set.count()
         )
+
+    def test_assignment_is_done_after_creating(self):
+        """
+        Test creation for interesting article
+        """
+        serializer = self.create_serializer({
+            "is_interesting": True,
+            "comment_labels": [
+                {"is_hateful": True, "comment": comm.id}
+                for comm in self.article.comment_set.all()
+            ],
+        }, assignment=True)
+
+        assert serializer.is_valid()
+        serializer.save()
+
+        assignment = self.article.assignment_set.get(user=self.user)
+
+        assert assignment.done

@@ -38,7 +38,27 @@
 </div>
 
 
-<h2> Comentarios </h2>
+
+
+<div class="row">
+  <div class="eight columns">
+    <h3>Comentarios</h3>
+  </div>
+  <div class="four columns">
+    <b>Grupo para todos</b>
+  </div>
+
+</div>
+
+<div class="row">
+  <div class="offset-by-eight four columns">
+    <select id="select_type">
+      {% for type in hate_speech_types %}
+        <option value="{{type.0}}"> {{type.0}} </option>
+      {% endfor %}
+    </select>
+  </div>
+</div>
 
 <div class="">
   <div class="row">
@@ -78,7 +98,7 @@
           </label>
         </div>
         <div class="two columns">
-          <select name="type">
+          <select name="type" class="type-select">
             {% for type in hate_speech_types %}
               <option value="{{type.0}}"> {{type.0}} </option>
             {% endfor %}
@@ -123,11 +143,21 @@
     });
   });
 
-
-  axios.defaults.xsrfCookieName = 'csrftoken';
   axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
   var endpoint = "{% url 'api:article-label' article.id %}";
   var next_url = "{% url 'next' %}";
+  axios.defaults.xsrfCookieName = 'csrftoken';
+
+  document.getElementById("select_type").addEventListener('change', (event, ) => {
+    var value = event.target.value;
+
+    var selects = document.querySelectorAll('select.type-select');
+
+    for (let select of selects) {
+      select.value = value;
+    }
+  });
+
   document.getElementById("not_interesting").addEventListener("click", (event) => {
     event.preventDefault();
 
@@ -157,14 +187,19 @@
     forms.forEach((form) => {
       var formdata = new FormData(form);
       var comment_label = {
-        comment: parseInt(formdata.get("comment"))
+        comment: parseInt(formdata.get("comment")),
+        type: ""
       };
       var is_hateful = formdata.get("is_hateful");
       var type = formdata.get("type");
       if (is_hateful != null) {
         comment_label.is_hateful = Boolean(parseInt(is_hateful));
       }
-      comment_label.type = type;
+
+      /// Sólo pongo el type si es odioso
+      if (comment_label.is_hateful) {
+        comment_label.type = type;
+      }
       data.comment_labels.push(comment_label);
     });
 
@@ -185,8 +220,5 @@
 
 </script>
 
-{% block actions %}
-
-{% endblock %}
 
 {%endblock %}

@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from .factories import ArticleFactory
 from .mixins import AuthenticationMixin
-
+from api.models import CommentLabel
 
 class LabelViewTest(APITestCase, AuthenticationMixin):
     """
@@ -54,7 +54,7 @@ class LabelViewTest(APITestCase, AuthenticationMixin):
         req = {
             "is_interesting": True,
             "comment_labels": [{
-                "comment": comm.id, "is_hateful": True
+                "comment": comm.id, "is_hateful": True, "type": "RACISMO"
             } for comm in art.comment_set.all()]
         }
 
@@ -68,6 +68,7 @@ class LabelViewTest(APITestCase, AuthenticationMixin):
 
             self.assertEqual(
                 response.data["labels"], [{
-                    "is_hateful": True
+                    "is_hateful": True,
+                    "type": "RACISMO",
                 }]
             )

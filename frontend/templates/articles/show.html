@@ -38,18 +38,41 @@
 </div>
 
 
-<h2> Comentarios </h2>
+
+
+<div class="row">
+  <div class="eight columns">
+    <h3>Comentarios</h3>
+  </div>
+  <div class="four columns">
+    <b>Grupo para todos</b>
+  </div>
+
+</div>
+
+<div class="row">
+  <div class="offset-by-eight four columns">
+    <select id="select_type">
+      {% for type in hate_speech_types %}
+        <option value="{{type.0}}"> {{type.0}} </option>
+      {% endfor %}
+    </select>
+  </div>
+</div>
 
 <div class="">
   <div class="row">
     <div class="one column">
       <b>Num</b>
     </div>
-    <div class="six columns">
+    <div class="five columns">
       <b>Comentario</b>
     </div>
-    <div class="three columns">
+    <div class="two columns">
       <b>¿Odio?</b>
+    </div>
+    <div class="two columns">
+      <b>Grupo al que ataca</b>
     </div>
   </div>
 
@@ -60,7 +83,7 @@
         <div class="one column">
             {{ forloop.counter }}
         </div>
-        <div class="six columns">
+        <div class="five columns">
           <p>{{comment.text}}</p>
         </div>
         <input type="hidden" name="comment" value="{{comment.id}}"/>
@@ -73,6 +96,13 @@
             <input name="is_hateful" type="radio" value="0"/>
             <span class="label-body" for="0"> No </span>
           </label>
+        </div>
+        <div class="two columns">
+          <select name="type" class="type-select">
+            {% for type in hate_speech_types %}
+              <option value="{{type.0}}"> {{type.0}} </option>
+            {% endfor %}
+          </select>
         </div>
 
       </div>
@@ -113,11 +143,21 @@
     });
   });
 
-
-  axios.defaults.xsrfCookieName = 'csrftoken';
   axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
   var endpoint = "{% url 'api:article-label' article.id %}";
   var next_url = "{% url 'next' %}";
+  axios.defaults.xsrfCookieName = 'csrftoken';
+
+  document.getElementById("select_type").addEventListener('change', (event, ) => {
+    var value = event.target.value;
+
+    var selects = document.querySelectorAll('select.type-select');
+
+    for (let select of selects) {
+      select.value = value;
+    }
+  });
+
   document.getElementById("not_interesting").addEventListener("click", (event) => {
     event.preventDefault();
 
@@ -145,15 +185,20 @@
       comment_labels: [],
     };
     forms.forEach((form) => {
-      debugger;
       var formdata = new FormData(form);
       var comment_label = {
-        comment: parseInt(formdata.get("comment"))
+        comment: parseInt(formdata.get("comment")),
+        type: ""
       };
       var is_hateful = formdata.get("is_hateful");
-
+      var type = formdata.get("type");
       if (is_hateful != null) {
-        comment_label.is_hateful = true;
+        comment_label.is_hateful = Boolean(parseInt(is_hateful));
+      }
+
+      /// Sólo pongo el type si es odioso
+      if (comment_label.is_hateful) {
+        comment_label.type = type;
       }
       data.comment_labels.push(comment_label);
     });
@@ -175,8 +220,5 @@
 
 </script>
 
-{% block actions %}
-
-{% endblock %}
 
 {%endblock %}

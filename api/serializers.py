@@ -13,7 +13,7 @@ class CommentLabelSerializer(serializers.ModelSerializer):
         Meta class
         """
         model = CommentLabel
-        fields = ['is_hateful']
+        fields = ['is_hateful', 'type']
 
 class CommentLabelForCreationSerializer(serializers.ModelSerializer):
     """
@@ -25,8 +25,14 @@ class CommentLabelForCreationSerializer(serializers.ModelSerializer):
         Meta class
         """
         model = CommentLabel
-        fields = ['is_hateful', 'comment']
+        fields = ['is_hateful', 'comment', 'type']
 
+    def validate(self, data):
+        if data['is_hateful'] and data['type'] == '':
+            raise serializers.ValidationError("Type must be set if hateful")
+        if not data['is_hateful'] and data['type'] != '':
+            raise serializers.ValidationError("Type must be blank if not hateful")
+        return data
 
 class ArticleLabelSerializer(serializers.Serializer):
     """
@@ -81,6 +87,7 @@ class ArticleLabelSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 "Wrong comment ids -- every comment should have exactly one label"
             )
+
 
         return data
 

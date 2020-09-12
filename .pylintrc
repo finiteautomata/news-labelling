@@ -62,6 +62,7 @@ confidence=
 # --disable=W".
 disable=print-statement,
         arguments-differ,
+        unexpected-keyword-arg,
         pointless-string-statement,
         abstract-method,
         redefined-builtin,

@@ -10,6 +10,7 @@ class CommentLabel(models.Model):
     This represents a labelling from a user of a specific
     """
     HATE_SPEECH_TYPES = [
+        ('', 'Ninguno'),
         ('MUJER', 'Violencia contra las mujeres'),
         ('GENERO', 'Identidad de género u orientación sexual'),
         ('RACISMO', 'Racismo o xenofobia'),

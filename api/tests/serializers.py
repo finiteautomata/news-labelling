@@ -16,23 +16,26 @@ class ArticleLabelSerializerTest(TestCase):
         )
 
 
-    def create_serializer(self, data, assignment=False):
+    def create_serializer(self, data, assignment=False, article=None):
         """
         Create serializer with data and context
         """
 
+        if not article:
+            article = self.article
+
         if assignment:
-            self.create_assignment()
+            self.create_assignment(article)
 
         return ArticleLabelSerializer(
-            data=data, context={'article': self.article, 'user': self.user}
+            data=data, context={'article': article, 'user': self.user}
         )
 
-    def create_assignment(self):
+    def create_assignment(self, article):
         """
         Creates assignment for user and article
         """
-        return self.user.assignment_set.create(article=self.article)
+        return self.user.assignment_set.create(article=article)
 
     def test_is_not_valid_if_no_assignment(self):
         """
@@ -118,6 +121,49 @@ class ArticleLabelSerializerTest(TestCase):
 
         assert not serializer.is_valid()
 
+    def test_not_valid_if_type_empty_when_hateful(self):
+        """
+        Not valid if hateful but type is empty
+        """
+        serializer = self.create_serializer({
+            "is_interesting": True,
+            "comment_labels": [
+                {"is_hateful": True, "comment": comm.id, "type": ''}
+                for comm in self.article.comment_set.all()
+            ],
+        }, assignment=True)
+
+        assert not serializer.is_valid()
+
+    def test_not_valid_if_type_non_empty_when_not_hateful(self):
+        """
+        Not Valid if not hateful but non empty type
+        """
+        serializer = self.create_serializer({
+            "is_interesting": True,
+            "comment_labels": [
+                {"is_hateful": False, "comment": comm.id, "type": 'RACISMO'}
+                for comm in self.article.comment_set.all()
+            ],
+        }, assignment=True)
+
+        assert not serializer.is_valid()
+
+    def test_valid_with_two_different_comments(self):
+        """
+        Test for two comments
+        """
+        article = ArticleFactory(create_comments__num_comments=2)
+        comments = list(article.comment_set.all())
+
+        serializer = self.create_serializer({
+            "is_interesting": True,
+            "comment_labels": [
+                {"is_hateful": False, "comment": comments[0].id, "type": ''},
+                {"is_hateful": True, "comment": comments[1].id, "type": 'RACISMO'}
+            ],
+        }, assignment=True, article=article)
+        assert serializer.is_valid()
 
     def test_not_valid_if_interesting_but_lacks_label_for_comment(self):
         """

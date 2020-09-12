@@ -79,7 +79,6 @@
         </div>
         <div class="two columns">
           <select name="type">
-            <option> </option>
             {% for type in hate_speech_types %}
               <option value="{{type.0}}"> {{type.0}} </option>
             {% endfor %}
@@ -157,19 +156,15 @@
     };
     forms.forEach((form) => {
       var formdata = new FormData(form);
-      debugger;
       var comment_label = {
         comment: parseInt(formdata.get("comment"))
       };
       var is_hateful = formdata.get("is_hateful");
       var type = formdata.get("type");
-
       if (is_hateful != null) {
-        comment_label.is_hateful = true;
+        comment_label.is_hateful = Boolean(parseInt(is_hateful));
       }
-      if (type != null) {
-        comment_label.type = type;
-      }
+      comment_label.type = type;
       data.comment_labels.push(comment_label);
     });
 

@@ -1,7 +1,7 @@
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, get_object_or_404, redirect
-from api.models import Article, Assignment
+from api.models import Article, Assignment, CommentLabel
 
 
 class Index(LoginRequiredMixin, View):
@@ -26,6 +26,7 @@ class ArticleView(LoginRequiredMixin, View):
 
         return render(request, 'articles/show.html', {
             "article": article,
+            "hate_speech_types": CommentLabel.HATE_SPEECH_TYPES
         })
 
 class CompletedView(LoginRequiredMixin, View):

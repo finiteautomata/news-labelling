@@ -13,7 +13,7 @@ class CommentLabelSerializer(serializers.ModelSerializer):
         Meta class
         """
         model = CommentLabel
-        fields = ['is_hateful']
+        fields = ['is_hateful', 'type']
 
 class CommentLabelForCreationSerializer(serializers.ModelSerializer):
     """
@@ -25,7 +25,7 @@ class CommentLabelForCreationSerializer(serializers.ModelSerializer):
         Meta class
         """
         model = CommentLabel
-        fields = ['is_hateful', 'comment']
+        fields = ['is_hateful', 'comment', 'type']
 
 
 class ArticleLabelSerializer(serializers.Serializer):

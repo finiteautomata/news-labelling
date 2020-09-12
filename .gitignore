@@ -127,3 +127,5 @@ data/*
 config/*
 
 dumps/*
+
+*.sqlite3

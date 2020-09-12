@@ -97,12 +97,27 @@ class ArticleLabelSerializerTest(TestCase):
         serializer = self.create_serializer({
             "is_interesting": True,
             "comment_labels": [
-                {"is_hateful": True, "comment": comm.id}
+                {"is_hateful": True, "comment": comm.id, "type": "RACISMO"}
                 for comm in self.article.comment_set.all()
             ],
         }, assignment=True)
 
         assert serializer.is_valid()
+
+    def test_not_valid_if_lacks_type(self):
+        """
+        Valid if interesting and labels for every comment
+        """
+        serializer = self.create_serializer({
+            "is_interesting": True,
+            "comment_labels": [
+                {"is_hateful": True, "comment": comm.id}
+                for comm in self.article.comment_set.all()
+            ],
+        }, assignment=True)
+
+        assert not serializer.is_valid()
+
 
     def test_not_valid_if_interesting_but_lacks_label_for_comment(self):
         """
@@ -138,7 +153,7 @@ class ArticleLabelSerializerTest(TestCase):
         serializer = self.create_serializer({
             "is_interesting": True,
             "comment_labels": [
-                {"is_hateful": True, "comment": comm.id}
+                {"is_hateful": True, "comment": comm.id, "type": "MUJER"}
                 for comm in self.article.comment_set.all()
             ],
         }, assignment=True)
@@ -158,7 +173,7 @@ class ArticleLabelSerializerTest(TestCase):
         serializer = self.create_serializer({
             "is_interesting": True,
             "comment_labels": [
-                {"is_hateful": True, "comment": comm.id}
+                {"is_hateful": True, "comment": comm.id, "type": "RELIGION"}
                 for comm in self.article.comment_set.all()
             ],
         }, assignment=True)

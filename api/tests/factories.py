@@ -3,6 +3,24 @@ from django.utils import timezone
 from ..models import Article, Comment
 
 
+def comment_label(
+    comment_id, is_hateful=True, calls_for_action=False, type="RACISMO"):
+    """
+    'Factory' for comment_label
+    """
+
+    if not is_hateful:
+        calls_for_action = False
+        type = ""
+
+    return {
+        "comment": comment_id,
+        "is_hateful": is_hateful,
+        "type": type,
+        "calls_for_action": calls_for_action
+    }
+
+
 
 class ArticleFactory(factory.django.DjangoModelFactory):
     """

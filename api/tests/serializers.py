@@ -1,7 +1,9 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
-from .factories import ArticleFactory
+from .factories import ArticleFactory, comment_label
 from ..serializers import ArticleLabelSerializer
+
+
 
 class ArticleLabelSerializerTest(TestCase):
     """
@@ -56,8 +58,6 @@ class ArticleLabelSerializerTest(TestCase):
             "is_interesting": False,
         }, assignment=True)
 
-
-
         assert serializer.is_valid()
 
     def test_not_valid_if_already_labeled(self):
@@ -86,7 +86,7 @@ class ArticleLabelSerializerTest(TestCase):
         serializer = self.create_serializer({
             "is_interesting": False,
             "comment_labels": [
-                {"is_hateful": True, "comment": 1}
+                comment_label(comm.id) for comm in self.article.comment_set.all()
             ],
         }, assignment=True)
 
@@ -98,13 +98,32 @@ class ArticleLabelSerializerTest(TestCase):
         """
         serializer = self.create_serializer({
             "is_interesting": True,
-            "comment_labels": [
-                {"is_hateful": True, "comment": comm.id, "type": "RACISMO"}
-                for comm in self.article.comment_set.all()
+            "comment_labels": [{
+                    "is_hateful": True,
+                    "type": "RACISMO",
+                    "comment": comm.id,
+                    "calls_for_action": False
+                } for comm in self.article.comment_set.all()
             ],
         }, assignment=True)
 
         assert serializer.is_valid()
+
+    def test_not_valid_if_lacks_calls_for_action(self):
+        """
+        Valid if interesting and labels for every comment
+        """
+        serializer = self.create_serializer({
+            "is_interesting": True,
+            "comment_labels": [{
+                "is_hateful": True,
+                "comment": comm.id,
+                "type": "RACISMO",
+            } for comm in self.article.comment_set.all()
+            ],
+        }, assignment=True)
+
+        assert not serializer.is_valid()
 
     def test_not_valid_if_lacks_type(self):
         """
@@ -112,9 +131,11 @@ class ArticleLabelSerializerTest(TestCase):
         """
         serializer = self.create_serializer({
             "is_interesting": True,
-            "comment_labels": [
-                {"is_hateful": True, "comment": comm.id}
-                for comm in self.article.comment_set.all()
+            "comment_labels": [{
+                "is_hateful": True,
+                "comment": comm.id,
+                "calls_for_action": False,
+            } for comm in self.article.comment_set.all()
             ],
         }, assignment=True)
 
@@ -158,8 +179,8 @@ class ArticleLabelSerializerTest(TestCase):
         serializer = self.create_serializer({
             "is_interesting": True,
             "comment_labels": [
-                {"is_hateful": False, "comment": comments[0].id, "type": ''},
-                {"is_hateful": True, "comment": comments[1].id, "type": 'RACISMO'}
+                comment_label(comments[0].id, is_hateful=False),
+                comment_label(comments[1].id, is_hateful=True, type="RACISMO"),
             ],
         }, assignment=True, article=article)
         assert serializer.is_valid()
@@ -171,7 +192,7 @@ class ArticleLabelSerializerTest(TestCase):
         serializer = self.create_serializer({
             "is_interesting": True,
             "comment_labels": [
-                {"is_hateful": True, "comment": comm.id}
+                comment_label(comm.id)
                 for comm in self.article.comment_set.all()[:3]
             ],
         }, assignment=True)
@@ -198,8 +219,8 @@ class ArticleLabelSerializerTest(TestCase):
         serializer = self.create_serializer({
             "is_interesting": True,
             "comment_labels": [
-                {"is_hateful": True, "comment": comm.id, "type": "MUJER"}
-                for comm in self.article.comment_set.all()
+                comment_label(comm.id, is_hateful=bool(i % 2))
+                for i, comm in enumerate(self.article.comment_set.all())
             ],
         }, assignment=True)
 
@@ -218,8 +239,7 @@ class ArticleLabelSerializerTest(TestCase):
         serializer = self.create_serializer({
             "is_interesting": True,
             "comment_labels": [
-                {"is_hateful": True, "comment": comm.id, "type": "RELIGION"}
-                for comm in self.article.comment_set.all()
+                comment_label(comm.id) for comm in self.article.comment_set.all()
             ],
         }, assignment=True)
 

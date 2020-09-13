@@ -2,7 +2,7 @@
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
-from .factories import ArticleFactory
+from .factories import ArticleFactory, comment_label
 from .mixins import AuthenticationMixin
 
 class LabelViewTest(APITestCase, AuthenticationMixin):
@@ -50,24 +50,23 @@ class LabelViewTest(APITestCase, AuthenticationMixin):
         self.user.assignment_set.create(article=art)
         url = reverse("api:article-label", args=[art.id])
 
+        labels = [
+            comment_label(comm.id, is_hateful=bool(i % 2))
+            for i, comm in enumerate(art.comment_set.all())
+        ]
         req = {
             "is_interesting": True,
-            "comment_labels": [{
-                "comment": comm.id, "is_hateful": True, "type": "RACISMO"
-            } for comm in art.comment_set.all()]
+            "comment_labels": labels,
         }
 
         resp = self.client.post(url, req, format='json')
 
         assert resp.status_code == status.HTTP_201_CREATED
 
-        for comment in art.comment_set.all():
+        for exp_label, comment in zip(labels, art.comment_set.all()):
             comment_url = reverse("api:comment-detail", args=[comment.id])
             response = self.client.get(comment_url, format="json")
-
+            exp_label.pop('comment')
             self.assertEqual(
-                response.data["labels"], [{
-                    "is_hateful": True,
-                    "type": "RACISMO",
-                }]
+                response.data["labels"], [exp_label]
             )

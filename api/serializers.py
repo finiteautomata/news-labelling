@@ -13,7 +13,7 @@ class CommentLabelSerializer(serializers.ModelSerializer):
         Meta class
         """
         model = CommentLabel
-        fields = ['is_hateful', 'type']
+        fields = ['is_hateful', 'type', 'calls_for_action']
 
 class CommentLabelForCreationSerializer(serializers.ModelSerializer):
     """
@@ -25,13 +25,18 @@ class CommentLabelForCreationSerializer(serializers.ModelSerializer):
         Meta class
         """
         model = CommentLabel
-        fields = ['is_hateful', 'comment', 'type']
+        fields = ['is_hateful', 'comment', 'type', 'calls_for_action']
 
     def validate(self, data):
         if data['is_hateful'] and data['type'] == '':
             raise serializers.ValidationError("Type must be set if hateful")
         if not data['is_hateful'] and data['type'] != '':
             raise serializers.ValidationError("Type must be blank if not hateful")
+        if not data['is_hateful'] and data['calls_for_action']:
+            raise serializers.ValidationError(
+                "Calls for action can't be true for non hateful tweet"
+            )
+
         return data
 
 class ArticleLabelSerializer(serializers.Serializer):

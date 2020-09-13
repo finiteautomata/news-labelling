@@ -65,14 +65,18 @@
     <div class="one column">
       <b>Num</b>
     </div>
-    <div class="five columns">
+    <div class="four columns">
       <b>Comentario</b>
     </div>
     <div class="two columns">
       <b>¿Odio?</b>
     </div>
-    <div class="two columns">
+    <div class="three columns">
       <b>Grupo al que ataca</b>
+    </div>
+
+    <div class="two columns">
+      <b>¿Llama a la acción?</b>
     </div>
   </div>
 
@@ -83,10 +87,11 @@
         <div class="one column">
             {{ forloop.counter }}
         </div>
-        <div class="five columns">
+        <div class="four columns">
           <p>{{comment.text}}</p>
         </div>
         <input type="hidden" name="comment" value="{{comment.id}}"/>
+        <!-- Odio  -->
         <div class="two columns">
           <label>
             <input name="is_hateful" type="radio" value="1"/>
@@ -97,14 +102,25 @@
             <span class="label-body" for="0"> No </span>
           </label>
         </div>
-        <div class="two columns">
+        <!-- Tipo  -->
+        <div class="three columns">
           <select name="type" class="type-select">
             {% for type in hate_speech_types %}
               <option value="{{type.0}}"> {{type.0}} </option>
             {% endfor %}
           </select>
         </div>
-
+        <!-- Llama a la acción  -->
+        <div class="two columns">
+          <label>
+            <input name="calls_for_action" type="radio" value="1"/>
+            <span class="label-body" for="1"> Sí </span>
+          </label>
+          <label>
+            <input name="calls_for_action" type="radio" value="0"/>
+            <span class="label-body" for="0"> No </span>
+          </label>
+        </div>
       </div>
     </form>
     <hr/>
@@ -188,10 +204,12 @@
       var formdata = new FormData(form);
       var comment_label = {
         comment: parseInt(formdata.get("comment")),
-        type: ""
+        type: "",
+        calls_for_action: null,
       };
       var is_hateful = formdata.get("is_hateful");
       var type = formdata.get("type");
+
       if (is_hateful != null) {
         comment_label.is_hateful = Boolean(parseInt(is_hateful));
       }
@@ -199,7 +217,14 @@
       /// Sólo pongo el type si es odioso
       if (comment_label.is_hateful) {
         comment_label.type = type;
+        var calls_for_action = formdata.get("calls_for_action");
+        if (calls_for_action != null) {
+          comment_label.calls_for_action = Boolean(parseInt(calls_for_action));
+        }
+      } else {
+        comment_label.calls_for_action = false;
       }
+
       data.comment_labels.push(comment_label);
     });
 

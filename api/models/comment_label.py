@@ -20,12 +20,15 @@ class CommentLabel(models.Model):
     ]
 
     is_hateful = models.BooleanField(blank=False, null=False)
+    calls_for_action = models.BooleanField(blank=False, null=False)
+
     comment = models.ForeignKey(
         Comment, on_delete=models.CASCADE, related_name="labels"
     )
     article_label = models.ForeignKey(
         ArticleLabel, on_delete=models.CASCADE, related_name="comment_labels"
     )
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     type = models.CharField(max_length=15, choices=HATE_SPEECH_TYPES)

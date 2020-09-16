@@ -8,11 +8,44 @@
 {% block content %}
 
 <div class="row">
-  <p>
-    En este sitio, etiquetaremos noticias para posteriormente ser etiquetadas
-  </p>
 
-  <p>Describir un poco el criterio de selección</p>
+<h2> Instrucciones y manual de etiquetado </h2>
+
+<h3> ¡Hola {{request.user.username }}!</h3>
+
+<div class="row">
+  <h3>¿Qué es el discurso de odio? </h3>
+
+  Su presencia se definirá de acuerdo a una definición que se armará en función de las presentadas por el Center for Studies on Freedom of Expression and Access to Information (CELE) [1] y por la Inter-American Commission on Human Rights (CIDH) [2].
+</div>
+
+<div class="row">
+  <h3> ¿Qué vamos a etiquetar? </h3>
+
+  <ol>
+    <li> ¿Existe discurso de odio o discriminatorio en el tweet respectivo? </li>
+    <li> Si hay discurso de odio ¿cuál es el motivo discriminatorio? (se deberá elegir uno de la lista de motivos discriminatorios del INADI [3])
+      <ul>
+        <li> Violencia contra las mujeres </li>
+        <li> Identidad de género, orientación sexual </li>
+        <li> Racismo, Xenofobia </li>
+        <li> Pobreza, situación socioeconómica, barrio de residencia. </li>
+        <li> Religión </li>
+        <li> Discapacidad o salud mental   </li>
+      </ul>
+
+    </li>
+
+    <li> Si hay discurso de odio ¿el tweet llama a la acción violenta contra un individuo o contra el grupo en cuestión? </li>
+  </ol>
+
+
+
+</div>
+
+
+
+
 </div>
 
 <div class="row">

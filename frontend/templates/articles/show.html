@@ -44,9 +44,9 @@
   <div class="eight columns">
     <h3>Comentarios</h3>
   </div>
-  <div class="four columns">
+  <!-- <div class="four columns">
     <b>Grupo para todos</b>
-  </div>
+  </div> -->
 
 </div>
 
@@ -164,6 +164,10 @@
   var next_url = "{% url 'next' %}";
   axios.defaults.xsrfCookieName = 'csrftoken';
 
+  //
+  // Setear para todes => esto ya no lo usamos más
+
+  /*
   document.getElementById("select_type").addEventListener('change', (event, ) => {
     var value = event.target.value;
 
@@ -172,7 +176,7 @@
     for (let select of selects) {
       select.value = value;
     }
-  });
+  }); */
 
   document.getElementById("not_interesting").addEventListener("click", (event) => {
     event.preventDefault();

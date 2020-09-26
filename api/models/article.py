@@ -6,7 +6,7 @@ class Article(models.Model):
     Article class
     """
     title = models.CharField(max_length=300, blank=False)
-    tweet_id = models.PositiveBigIntegerField(unique=True)
+    tweet_id = models.PositiveBigIntegerField(unique=True, db_index=True)
     text = models.CharField(blank=False, max_length=500)
     slug = models.CharField(blank=False, max_length=130, unique=True)
     url = models.CharField(blank=False, max_length=200)

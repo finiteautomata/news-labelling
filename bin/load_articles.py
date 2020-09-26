@@ -1,6 +1,8 @@
 import os
 import sys
 import json
+import random
+import re
 from datetime import datetime
 import fire
 import django
@@ -14,6 +16,13 @@ print("Configuration ok")
 
 from api.models import Article, Comment
 
+url_regex = re.compile(
+r"((?<=[^a-zA-Z0-9])(?:https?\:\/\/|[a-zA-Z0-9]{1,}\.{1}|\b)"
+r"(?:\w{1,}\.{1}){1,5}"
+r"(?:com|co|org|edu|gov|uk|net|ca|de|es|mil|iq|io|ac|ly|sm){1}"
+r"(?:\/[a-zA-Z0-9]{1,})*)"
+)
+
 def parse_date(obj_dict):
     """
     Parse mongo date representation
@@ -23,7 +32,21 @@ def parse_date(obj_dict):
         "%Y-%m-%dT%H:%M:%SZ%z",
     )
 
-def create_article(art_dict):
+def get_elligible_comments(comment_list):
+    """
+    Get comments that meet some criteria to be labelled
+
+    For instance: they have no URLs
+    """
+
+    elligible_comments = []
+
+    for comment in comment_list:
+        if not url_regex.search(comment["text"]):
+            elligible_comments.append(comment)
+    return comment_list
+
+def create_article(art_dict, max_comments):
     """
     Create article and comments from article json
     """
@@ -40,7 +63,13 @@ def create_article(art_dict):
 
     new_comments = []
 
-    for comm in art_dict["comments"]:
+    elligible_comments = get_elligible_comments(art_dict["comments"])
+
+    sampled_comments = random.sample(
+        elligible_comments,
+        min(max_comments, len(elligible_comments))
+    )
+    for comm in sampled_comments:
         args = {
             k:v for k, v in comm.items() if k in ["text", "user_id", "tweet_id"]
         }
@@ -52,13 +81,15 @@ def create_article(art_dict):
     Comment.objects.bulk_create(new_comments)
 
 
-def load_articles(json_path):
+def load_articles(json_path, max_comments=50, random_seed=2020):
     """
     Load articles and comments
 
     json_path: path
         path to json containing articles and comments
     """
+
+    random.seed(random_seed)
 
     print(f"Loading articles from {json_path}")
     with open(json_path) as json_file:
@@ -67,7 +98,7 @@ def load_articles(json_path):
     print(f"Loaded {len(articles)} articles")
 
     for art_dict in tqdm(articles):
-        create_article(art_dict)
+        create_article(art_dict, max_comments=max_comments)
 
     print(f"Now we have {Article.objects.count()} articles")
 

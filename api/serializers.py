@@ -15,29 +15,32 @@ class CommentLabelSerializer(serializers.ModelSerializer):
         model = CommentLabel
         fields = ['is_hateful', 'type', 'calls_for_action']
 
-class CommentLabelForCreationSerializer(serializers.ModelSerializer):
+class CommentLabelForCreationSerializer(serializers.Serializer):
     """
     This is an ad hoc serializer for validation
     """
 
-    class Meta:
-        """
-        Meta class
-        """
-        model = CommentLabel
-        fields = ['is_hateful', 'comment', 'type', 'calls_for_action']
+    is_hateful = serializers.BooleanField(required=True)
+    calls_for_action = serializers.BooleanField(required=True)
+    types = serializers.ListField(allow_empty=True, max_length=6)
+    comment = serializers.IntegerField(required=True)
 
     def validate(self, data):
-        if data['is_hateful'] and data['type'] == '':
-            raise serializers.ValidationError("Type must be set if hateful")
-        if not data['is_hateful'] and data['type'] != '':
-            raise serializers.ValidationError("Type must be blank if not hateful")
+        if data['is_hateful'] and not data['types']:
+            raise serializers.ValidationError("Types must be set if hateful")
+        if not data['is_hateful'] and data['types']:
+            raise serializers.ValidationError("Types must be blank if not hateful")
         if not data['is_hateful'] and data['calls_for_action']:
             raise serializers.ValidationError(
                 "Calls for action can't be true for non hateful tweet"
             )
 
+        if any(type not in CommentLabel.type_mapping.keys() for type in data['types']):
+            raise serializers.ValidationError(
+                f"types must be in {CommentLabel.type_mapping.keys()}"
+            )
         return data
+
 
 class ArticleLabelSerializer(serializers.Serializer):
     """
@@ -86,7 +89,7 @@ class ArticleLabelSerializer(serializers.Serializer):
         Check labels are assigned to each comment
         """
         comment_ids = {comm.id for comm in article.comment_set.all()}
-        label_ids = {comment_label["comment"].id for comment_label in data['comment_labels']}
+        label_ids = {comment_label["comment"] for comment_label in data['comment_labels']}
 
         if comment_ids != label_ids:
             raise serializers.ValidationError(
@@ -95,6 +98,7 @@ class ArticleLabelSerializer(serializers.Serializer):
 
 
         return data
+
 
     def create(self, validated_data):
         """
@@ -107,10 +111,25 @@ class ArticleLabelSerializer(serializers.Serializer):
 
             article_label = article.labels.create(**validated_data, user=user)
             for comment_label in comment_labels:
-                article_label.comment_labels.create(**comment_label)
+                article_label.comment_labels.create(
+                    **get_comment_data(comment_label)
+                )
 
             article.assignment_set.get(user=user).complete()
             return article_label
+
+def get_comment_data(comment_label):
+    """
+    Returns data for label to be created
+    """
+    data = {
+        "is_hateful": comment_label['is_hateful'],
+        "calls_for_action": comment_label['is_hateful'],
+        "comment_id": comment_label["comment"],
+    }
+    for type in comment_label['types']:
+        data[CommentLabel.type_mapping[type]] = True
+    return data
 
 
 class CommentSerializer(serializers.ModelSerializer):

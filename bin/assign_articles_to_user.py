@@ -16,8 +16,7 @@ from api.models import Article, Assignment
 
 
 def assign_articles(
-    username, number_of_articles=None,
-    ids_file=None, random_seed=2020):
+    username, ids_file=None, number_of_articles=None, random_seed=2020):
     """
     Load articles and comments
 

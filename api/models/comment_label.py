@@ -47,3 +47,25 @@ class CommentLabel(models.Model):
     against_poor = models.BooleanField(default=False)
     against_religion = models.BooleanField(default=False)
     against_disabled = models.BooleanField(default=False)
+
+    def hateful_against(self):
+        """
+        Returns hateful against communities
+        """
+        return [t for t, field in CommentLabel.type_mapping.items() if getattr(self, field)]
+
+    def __repr__(self):
+        user = self.article_label.user
+        article = self.article_label.article
+        ret = f"Label of {user.username} to '{self.comment.text}'\n"
+        ret += f"Article: {article.text}\n\n"
+        if self.is_hateful:
+            if self.calls_for_action:
+                calls = "and violent"
+            else:
+                calls = "but not violent"
+
+            ret += f"Hateful {calls} towards {self.hateful_against()}"
+        else:
+            ret += "Not hateful"
+        return ret

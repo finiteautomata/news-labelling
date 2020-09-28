@@ -27,6 +27,8 @@ class CommentLabel(models.Model):
         "DISCAPACIDAD": "against_disabled",
     }
 
+    inverse_type_mapping = {v:k for k, v in type_mapping.items()}
+
     is_hateful = models.BooleanField(blank=False, null=False)
     calls_for_action = models.BooleanField(blank=False, null=False)
 

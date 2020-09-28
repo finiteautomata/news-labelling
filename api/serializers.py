@@ -13,7 +13,16 @@ class CommentLabelSerializer(serializers.ModelSerializer):
         Meta class
         """
         model = CommentLabel
-        fields = ['is_hateful', 'type', 'calls_for_action']
+        fields = ['is_hateful', 'calls_for_action']
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        ret["types"] = []
+
+        for field, ret_value in CommentLabel.inverse_type_mapping.items():
+            if getattr(instance, field):
+                ret["types"].append(ret_value)
+        return ret
 
 class CommentLabelForCreationSerializer(serializers.Serializer):
     """
@@ -124,7 +133,7 @@ def get_comment_data(comment_label):
     """
     data = {
         "is_hateful": comment_label['is_hateful'],
-        "calls_for_action": comment_label['is_hateful'],
+        "calls_for_action": comment_label['calls_for_action'],
         "comment_id": comment_label["comment"],
     }
     for type in comment_label['types']:

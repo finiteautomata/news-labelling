@@ -231,6 +231,33 @@ class ArticleLabelSerializerTest(TestCase):
             self.article.comment_set.count()
         )
 
+    def test_check_types(self):
+        """
+        Test creation for interesting article
+        """
+        serializer = self.create_serializer({
+            "is_interesting": True,
+            "comment_labels": [
+                comment_label(comm.id, is_hateful=bool(i % 2), types=["MUJER", "LGBTI"])
+                for i, comm in enumerate(self.article.comment_set.all())
+            ],
+        }, assignment=True)
+
+        serializer.is_valid()
+        article_label = serializer.save()
+        # reload
+        article_label = self.article.labels.first()
+
+        for label in article_label.comment_labels.all():
+            if not label.is_hateful:
+                continue
+            assert label.against_women
+            assert label.against_lgbti
+            assert not label.against_race
+            assert not label.against_poor
+            assert not label.against_religion
+            assert not label.against_disabled
+
     def test_assignment_is_done_after_creating(self):
         """
         Test creation for interesting article

@@ -10,14 +10,22 @@ class CommentLabel(models.Model):
     This represents a labelling from a user of a specific
     """
     HATE_SPEECH_TYPES = [
-        ('', 'Ninguno'),
         ('MUJER', 'Violencia contra las mujeres'),
-        ('GENERO', 'Identidad de género u orientación sexual'),
+        ('LGBTI', 'Identidad de género u orientación sexual'),
         ('RACISMO', 'Racismo o xenofobia'),
         ('POBREZA', 'Pobreza, situación socioeconómica, barrio de residencia'),
         ('RELIGION', 'Religión'),
         ('DISCAPACIDAD', 'Discapacidad o Salud Mental'),
     ]
+
+    type_mapping = {
+        "MUJER": "against_women",
+        "LGBTI": "against_lgbti",
+        "RACISMO": "against_race",
+        "POBREZA": "against_poor",
+        "RELIGION": "against_religion",
+        "DISCAPACIDAD": "against_disabled",
+    }
 
     is_hateful = models.BooleanField(blank=False, null=False)
     calls_for_action = models.BooleanField(blank=False, null=False)
@@ -31,4 +39,9 @@ class CommentLabel(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
 
-    type = models.CharField(max_length=15, choices=HATE_SPEECH_TYPES)
+    against_women = models.BooleanField(default=False)
+    against_lgbti = models.BooleanField(default=False)
+    against_race = models.BooleanField(default=False)
+    against_poor = models.BooleanField(default=False)
+    against_religion = models.BooleanField(default=False)
+    against_disabled = models.BooleanField(default=False)

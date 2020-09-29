@@ -44,7 +44,7 @@ def get_elligible_comments(comment_list):
     for comment in comment_list:
         if not url_regex.search(comment["text"]):
             elligible_comments.append(comment)
-    return comment_list
+    return elligible_comments
 
 def create_article(art_dict, max_comments):
     """

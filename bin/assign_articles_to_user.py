@@ -16,7 +16,7 @@ from api.models import Article, Assignment
 
 
 def assign_articles(
-    username, ids_file=None, number_of_articles=None, random_seed=2020):
+    username, ids_file=None,number_of_articles=None,  random_seed=2020, shuffle=True):
     """
     Load articles and comments
 
@@ -53,6 +53,10 @@ def assign_articles(
             articles,
             min(len(articles), number_of_articles)
         )
+
+    if shuffle:
+        random.shuffle(articles)
+
 
     for art in articles:
         user.assignment_set.create(article=art)

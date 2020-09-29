@@ -1,0 +1,199 @@
+<div class="">
+  <div class="row">
+    <div class="four columns">
+      <b>Comentario</b>
+    </div>
+    <div class="two columns">
+      <b>¿Odio?</b>
+    </div>
+
+    <div class="two columns">
+      <b>¿Llama a la acción?</b>
+    </div>
+    <div class="four columns">
+      <b>Grupo al que ataca</b>
+    </div>
+  </div>
+
+  <div class="comment-labels">
+  {% for comment in article.comment_set.all %}
+    <form>
+      <div class="row">
+        <div class="four columns">
+          <p>{{comment.text}}</p>
+        </div>
+        <input type="hidden" name="comment" value="{{comment.id}}"/>
+        <!-- Odio  -->
+        <div class="two columns switch-field">
+          <div class="switch-field">
+            <input type="radio" id="hateful-one-{{forloop.counter}}" name="is_hateful" value="0"/>
+            <label class="not-hateful" for="hateful-one-{{forloop.counter}}"> No  </label>
+            <input type="radio" id="hateful-two-{{forloop.counter}}" name="is_hateful" value="1" />
+            <label class="hateful" for="hateful-two-{{forloop.counter}}"> Sí</label>
+          </div>
+        </div>
+        <!-- <div class="two columns">
+          <label>
+            <input name="is_hateful" type="radio" value="1"/>
+            <span class="label-body" for="1"> Sí </span>
+          </label>
+          <label>
+            <input name="is_hateful" type="radio" value="0"/>
+            <span class="label-body" for="0"> No </span>
+          </label>
+        </div> -->
+        <!-- Llama a la acción  -->
+        <div class="two columns switch-field">
+          <div class="switch-field">
+            <input type="radio" id="action-one-{{forloop.counter}}" name="calls_for_action" value="0"/>
+            <label class="not-hateful" for="action-one-{{forloop.counter}}"> No  </label>
+            <input type="radio" id="action-two-{{forloop.counter}}" name="calls_for_action" value="1" />
+            <label class="hateful" for="action-two-{{forloop.counter}}"> Sí</label>
+          </div>
+        </div>
+
+        <!-- <div class="two columns">
+          <label>
+            <input name="calls_for_action" type="radio" value="1"/>
+            <span class="label-body" for="1"> Sí </span>
+          </label>
+          <label>
+            <input name="calls_for_action" type="radio" value="0"/>
+            <span class="label-body" for="0"> No </span>
+          </label>
+        </div> -->
+        <!-- Tipo  -->
+        <div class="two columns">
+          {% with my_var=hate_speech_types|slice:"0:3" %}
+          {% for type in my_var %}
+            <label>
+              <input type="checkbox" name="{{type.0}}" value="{{type.0}}">
+              <span class="label-body" for="{{type.0}}"> {{type.0}} </span>
+            </label>
+          {% endfor %}
+          {% endwith %}
+        </div>
+        <div class="two columns">
+          {% with my_var=hate_speech_types|slice:"3:" %}
+          {% for type in my_var %}
+            <label>
+              <input type="checkbox" name="{{type.0}}" value="{{type.0}}">
+              <span class="label-body" for="{{type.0}}"> {{type.0|slice:8}} </span>
+            </label>
+          {% endfor %}
+          {% endwith %}
+        </div>
+      </div>
+    </form>
+    <hr/>
+
+  {% endfor %}
+  </div>
+
+
+
+</div>
+
+<div class="row">
+    <a href="#" id="submit" class=" button button-primary u-full-width submit-button">
+      Enviar etiquetado
+    </a>
+</div>
+
+<hr/>
+
+
+<div class="row">
+    <a href="#" id="not_interesting" class="button u-full-width submit-button" style="background-color:red; color:white">
+      No es interesante
+    </a>
+</div>
+
+
+<script type="text/javascript">
+  axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
+  var endpoint = "{% url 'api:article-label' article.id %}";
+  var next_url = "{% url 'next' %}";
+  axios.defaults.xsrfCookieName = 'csrftoken';
+
+  document.getElementById("not_interesting").addEventListener("click", (event) => {
+    event.preventDefault();
+
+    axios.post(
+      endpoint,
+      { is_interesting: false }
+    )
+    .then( () => {
+      alert("Artículo marcado como no interesante");
+      location.href = next_url;
+    })
+    .catch( (errors) => {
+      alert("Hubo un error con esto: "+ errors);
+    });
+
+  });
+
+  document.getElementById("submit").addEventListener("click", (event) => {
+    event.preventDefault();
+
+    var forms = document.querySelectorAll('div.comment-labels > form');
+
+    var data = {
+      is_interesting: true,
+      comment_labels: [],
+    };
+    forms.forEach((form) => {
+
+      var formdata = new FormData(form);
+
+      var comment_label = {
+        comment: parseInt(formdata.get("comment")),
+        types: [],
+        calls_for_action: null,
+      };
+      var is_hateful = formdata.get("is_hateful");
+
+      if (is_hateful != null) {
+        comment_label.is_hateful = Boolean(parseInt(is_hateful));
+      }
+
+      /// Sólo pongo el type si es odioso
+      if (comment_label.is_hateful) {
+        var types = [
+          {% for type in hate_speech_types %}
+            "{{type.0}}",
+          {% endfor %}
+        ];
+
+        for (type of types) {
+          if (formdata.get(type)) {
+            comment_label.types.push(type);
+          }
+        }
+        var calls_for_action = formdata.get("calls_for_action");
+        if (calls_for_action != null) {
+          comment_label.calls_for_action = Boolean(parseInt(calls_for_action));
+        }
+      } else {
+        comment_label.calls_for_action = false;
+      }
+
+      data.comment_labels.push(comment_label);
+    });
+
+    axios.post(
+      endpoint,
+      data,
+    )
+    .then( () => {
+      alert("Artículo correctamente etiquetado");
+      location.href = next_url;
+    })
+    .catch( (errors) => {
+      alert("Hubo un error con esto: "+ errors);
+    });
+
+  });
+
+
+</script>

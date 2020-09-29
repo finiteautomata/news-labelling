@@ -4,19 +4,21 @@ from ..models import Article, Comment
 
 
 def comment_label(
-    comment_id, is_hateful=True, calls_for_action=False, type="RACISMO"):
+    comment_id, is_hateful=True, calls_for_action=False, types=None):
     """
     'Factory' for comment_label
     """
 
     if not is_hateful:
         calls_for_action = False
-        type = ""
+        types = []
+    else:
+        types = types or ["RACISMO"]
 
     return {
         "comment": comment_id,
         "is_hateful": is_hateful,
-        "type": type,
+        "types": types,
         "calls_for_action": calls_for_action
     }
 

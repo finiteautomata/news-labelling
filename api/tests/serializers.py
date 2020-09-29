@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
 from .factories import ArticleFactory, comment_label
-from ..serializers import ArticleLabelSerializer
+from ..serializers import ArticleLabelSerializer, CommentLabelForCreationSerializer
 
 
 
@@ -21,7 +21,6 @@ class ArticleLabelSerializerTest(TestCase):
         """
         Create serializer with data and context
         """
-
         if not article:
             article = self.article
 
@@ -100,7 +99,7 @@ class ArticleLabelSerializerTest(TestCase):
             "is_interesting": True,
             "comment_labels": [{
                     "is_hateful": True,
-                    "type": "RACISMO",
+                    "types": ["MUJER"],
                     "comment": comm.id,
                     "calls_for_action": False
                 } for comm in self.article.comment_set.all()
@@ -118,7 +117,7 @@ class ArticleLabelSerializerTest(TestCase):
             "comment_labels": [{
                 "is_hateful": True,
                 "comment": comm.id,
-                "type": "RACISMO",
+                "types": ["LGBTI"],
             } for comm in self.article.comment_set.all()
             ],
         }, assignment=True)
@@ -148,7 +147,7 @@ class ArticleLabelSerializerTest(TestCase):
         serializer = self.create_serializer({
             "is_interesting": True,
             "comment_labels": [
-                {"is_hateful": True, "comment": comm.id, "type": ''}
+                {"is_hateful": True, "comment": comm.id, "types": []}
                 for comm in self.article.comment_set.all()
             ],
         }, assignment=True)
@@ -162,7 +161,7 @@ class ArticleLabelSerializerTest(TestCase):
         serializer = self.create_serializer({
             "is_interesting": True,
             "comment_labels": [
-                {"is_hateful": False, "comment": comm.id, "type": 'RACISMO'}
+                {"is_hateful": False, "comment": comm.id, "types": ['RACISMO']}
                 for comm in self.article.comment_set.all()
             ],
         }, assignment=True)
@@ -180,7 +179,7 @@ class ArticleLabelSerializerTest(TestCase):
             "is_interesting": True,
             "comment_labels": [
                 comment_label(comments[0].id, is_hateful=False),
-                comment_label(comments[1].id, is_hateful=True, type="RACISMO"),
+                comment_label(comments[1].id, is_hateful=True, types=["RACISMO"]),
             ],
         }, assignment=True, article=article)
         assert serializer.is_valid()
@@ -232,6 +231,33 @@ class ArticleLabelSerializerTest(TestCase):
             self.article.comment_set.count()
         )
 
+    def test_check_types(self):
+        """
+        Test creation for interesting article
+        """
+        serializer = self.create_serializer({
+            "is_interesting": True,
+            "comment_labels": [
+                comment_label(comm.id, is_hateful=bool(i % 2), types=["MUJER", "LGBTI"])
+                for i, comm in enumerate(self.article.comment_set.all())
+            ],
+        }, assignment=True)
+
+        serializer.is_valid()
+        article_label = serializer.save()
+        # reload
+        article_label = self.article.labels.first()
+
+        for label in article_label.comment_labels.all():
+            if not label.is_hateful:
+                continue
+            assert label.against_women
+            assert label.against_lgbti
+            assert not label.against_race
+            assert not label.against_poor
+            assert not label.against_religion
+            assert not label.against_disabled
+
     def test_assignment_is_done_after_creating(self):
         """
         Test creation for interesting article
@@ -249,3 +275,106 @@ class ArticleLabelSerializerTest(TestCase):
         assignment = self.article.assignment_set.get(user=self.user)
 
         assert assignment.done
+
+
+class CommentLabelForCreationSerializerTest(TestCase):
+    """
+    Tests for validation and save of ArticleLabelSerializer
+    """
+    def setUp(self):
+        self.article = ArticleFactory(create_comments__num_comments=5)
+        self.user = User.objects.create_user(
+            username="test",
+            password="test",
+        )
+
+    def test_if_not_hateful_is_valid(self):
+        """
+        Test if comment label is not hateful
+        """
+        serializer = CommentLabelForCreationSerializer(
+            data={
+                "comment": 1,
+                "is_hateful": False,
+                "calls_for_action": False,
+                "types": []
+            }
+        )
+
+        assert serializer.is_valid()
+
+    def test_if_not_hateful_and_type_not_empty_is_not_valid(self):
+        """
+        Test if comment label is not hateful and type is not empty
+        """
+        serializer = CommentLabelForCreationSerializer(
+            data={
+                "comment": 1,
+                "is_hateful": False,
+                "calls_for_action": False,
+                "types": ["RACISMO"]
+            }
+        )
+
+        assert not serializer.is_valid()
+
+    def test_if_not_hateful_calls_for_action_must_be_false(self):
+        """
+        Test if comment label is not hateful and type is not empty
+        """
+        serializer = CommentLabelForCreationSerializer(
+            data={
+                "comment": 1,
+                "is_hateful": False,
+                "calls_for_action": True,
+                "types": []
+            }
+        )
+
+        assert not serializer.is_valid()
+
+    def test_if_hateful_and_type_is_set_it_is_valid(self):
+        """
+        Test if comment label is not hateful and type is not empty
+        """
+        serializer = CommentLabelForCreationSerializer(
+            data={
+                "comment": 1,
+                "is_hateful": True,
+                "calls_for_action": False,
+                "types": ["RACISMO"]
+            }
+        )
+
+        assert serializer.is_valid()
+
+    def test_if_hateful_and_type_is_invalid_it_is_not_valid(self):
+        """
+        Test if comment label is not hateful and type is not empty
+        """
+        serializer = CommentLabelForCreationSerializer(
+            data={
+                "comment": 1,
+                "is_hateful": True,
+                "calls_for_action": False,
+                "types": ["INVALID"]
+            }
+        )
+
+        assert not serializer.is_valid()
+
+
+    def test_if_hateful_with_many_types(self):
+        """
+        Test if comment label is not hateful and type is not empty
+        """
+        serializer = CommentLabelForCreationSerializer(
+            data={
+                "comment": 1,
+                "is_hateful": True,
+                "calls_for_action": False,
+                "types": ["RACISMO", "LGBTI"]
+            }
+        )
+
+        assert serializer.is_valid()

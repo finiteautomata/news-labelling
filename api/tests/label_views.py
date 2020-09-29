@@ -51,7 +51,12 @@ class LabelViewTest(APITestCase, AuthenticationMixin):
         url = reverse("api:article-label", args=[art.id])
 
         labels = [
-            comment_label(comm.id, is_hateful=bool(i % 2))
+            comment_label(
+                comm.id,
+                is_hateful=bool(i % 2 == 0),
+                types=["RACISMO", "POBREZA"],
+                calls_for_action=bool(i % 4 == 0),
+            )
             for i, comm in enumerate(art.comment_set.all())
         ]
         req = {
@@ -67,6 +72,7 @@ class LabelViewTest(APITestCase, AuthenticationMixin):
             comment_url = reverse("api:comment-detail", args=[comment.id])
             response = self.client.get(comment_url, format="json")
             exp_label.pop('comment')
+
             self.assertEqual(
                 response.data["labels"], [exp_label]
             )

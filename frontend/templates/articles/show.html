@@ -224,7 +224,11 @@
 
       /// Sólo pongo el type si es odioso
       if (comment_label.is_hateful) {
-        var types = ["MUJER", "GENERO", "RACISMO", "POBREZA", "RELIGION", "DISCAPACIDAD"];
+        var types = [
+          {% for type in hate_speech_types %}
+            "{{type.0}}",
+          {% endfor %}
+        ];
 
         for (type of types) {
           if (formdata.get(type)) {

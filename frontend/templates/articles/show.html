@@ -111,16 +111,20 @@
         <div class="two columns">
           {% with my_var=hate_speech_types|slice:"0:3" %}
           {% for type in my_var %}
-            <input type="checkbox" name="{{type.0}}" value="{{type.0}}">
-            <label for="{{type.0}}"> {{type.0}} </label>
+            <label>
+              <input type="checkbox" name="{{type.0}}" value="{{type.0}}">
+              <span class="label-body" for="{{type.0}}"> {{type.0}} </span>
+            </label>
           {% endfor %}
           {% endwith %}
         </div>
         <div class="two columns">
           {% with my_var=hate_speech_types|slice:"3:" %}
           {% for type in my_var %}
-            <input type="checkbox" name="{{type.0}}" value="{{type.0}}"> </input>
-            <label for="{{type.0}}"> {{type.0}} </label>
+            <label>
+              <input type="checkbox" name="{{type.0}}" value="{{type.0}}">
+              <span class="label-body" for="{{type.0}}"> {{type.0|slice:10}} </span>
+            </label>
           {% endfor %}
           {% endwith %}
         </div>

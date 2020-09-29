@@ -3,7 +3,7 @@
 {% block  head %}
 
 <link rel="stylesheet" href="{% static 'articles/articles.css' %}">
-
+<link rel="stylesheet" href="{% static 'articles/switches.css' %}">
 {% endblock %}
 
 {% block title %}
@@ -86,7 +86,16 @@
         </div>
         <input type="hidden" name="comment" value="{{comment.id}}"/>
         <!-- Odio  -->
-        <div class="two columns">
+        <div class="two columns switch-field">
+          <div class="switch-field">
+            <input type="radio" id="radio-one-{{forloop.counter}}" name="is_hateful" value="0"/>
+            <label class="not-hateful" for="radio-one-{{forloop.counter}}"> No  </label>
+            <input type="radio" id="radio-two-{{forloop.counter}}" name="is_hateful" value="1" />
+            <label class="hateful" for="radio-two-{{forloop.counter}}"> Sí</label>
+          </div>
+
+        </div>
+        <!-- <div class="two columns">
           <label>
             <input name="is_hateful" type="radio" value="1"/>
             <span class="label-body" for="1"> Sí </span>
@@ -95,7 +104,7 @@
             <input name="is_hateful" type="radio" value="0"/>
             <span class="label-body" for="0"> No </span>
           </label>
-        </div>
+        </div> -->
         <!-- Llama a la acción  -->
         <div class="two columns">
           <label>
@@ -171,20 +180,6 @@
   var next_url = "{% url 'next' %}";
   axios.defaults.xsrfCookieName = 'csrftoken';
 
-  //
-  // Setear para todes => esto ya no lo usamos más
-
-  /*
-  document.getElementById("select_type").addEventListener('change', (event, ) => {
-    var value = event.target.value;
-
-    var selects = document.querySelectorAll('select.type-select');
-
-    for (let select of selects) {
-      select.value = value;
-    }
-  }); */
-
   document.getElementById("not_interesting").addEventListener("click", (event) => {
     event.preventDefault();
 
@@ -239,7 +234,6 @@
             comment_label.types.push(type);
           }
         }
-        debugger;
         var calls_for_action = formdata.get("calls_for_action");
         if (calls_for_action != null) {
           comment_label.calls_for_action = Boolean(parseInt(calls_for_action));

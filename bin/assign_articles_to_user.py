@@ -33,7 +33,7 @@ def assign_articles(
     try:
         user = User.objects.get(username=username)
     except ObjectDoesNotExist:
-        print(u"{username} is not a valid username")
+        print(f"{username} is not a valid username")
         return
 
     if ids_file:

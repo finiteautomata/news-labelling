@@ -38,6 +38,11 @@
 	background-color: #eb4646;
 	box-shadow: none;
 }
+
+.switch-field input:disabled + label {
+	background-color: #787878;
+	box-shadow: none;
+}
 .switch-field label:first-of-type {
 	border-radius: 4px 0 0 4px;
 }

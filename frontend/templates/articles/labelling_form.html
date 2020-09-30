@@ -28,7 +28,7 @@
         </div>
         <input type="hidden" name="comment" value="{{comment.id}}"/>
         <!-- Odio  -->
-        <div class="two columns switch-field">
+        <div class="two columns switch-field hateful">
           <div class="switch-field">
             <input required type="radio" id="hateful-one-{{forloop.counter}}" name="is_hateful" value="0"/>
             <label class="not-hateful" for="hateful-one-{{forloop.counter}}"> No  </label>
@@ -37,35 +37,37 @@
           </div>
         </div>
         <!-- Llama a la acción  -->
-        <div class="two columns switch-field">
+        <div class="two columns switch-field calls-for-action">
           <div class="switch-field">
             <input type="radio" id="action-one-{{forloop.counter}}" name="calls_for_action" value="0"/>
-            <label class="not-hateful" for="action-one-{{forloop.counter}}"> No  </label>
+            <label for="action-one-{{forloop.counter}}"> No  </label>
             <input type="radio" id="action-two-{{forloop.counter}}" name="calls_for_action" value="1" />
-            <label class="hateful" for="action-two-{{forloop.counter}}"> Sí</label>
+            <label for="action-two-{{forloop.counter}}"> Sí</label>
           </div>
         </div>
 
         <!-- Tipo  -->
-        <div class="two columns">
-          {% with my_var=hate_speech_types|slice:"0:3" %}
-          {% for type in my_var %}
-            <label>
-              <input data-parsley-group="group-{{forloop.parentloop.counter}}" type="checkbox" name="{{type.0}}"  value="{{type.0}}">
-              <span class="label-body" for="{{type.0}}"> {{type.0}} </span>
-            </label>
-          {% endfor %}
-          {% endwith %}
-        </div>
-        <div class="two columns">
-          {% with my_var=hate_speech_types|slice:"3:" %}
-          {% for type in my_var %}
-            <label>
-              <input data-parsley-group="group-{{forloop.parentloop.counter}}" type="checkbox" name="{{type.0}}" value="{{type.0}}">
-              <span class="label-body" for="{{type.0}}"> {{type.0|slice:8}} </span>
-            </label>
-          {% endfor %}
-          {% endwith %}
+        <div class="groups">
+          <div class="two columns">
+            {% with my_var=hate_speech_types|slice:"0:3" %}
+            {% for type in my_var %}
+              <label>
+                <input data-parsley-group="group-{{forloop.parentloop.counter}}" type="checkbox" name="{{type.0}}"  value="{{type.0}}">
+                <span class="label-body" for="{{type.0}}"> {{type.0}} </span>
+              </label>
+            {% endfor %}
+            {% endwith %}
+          </div>
+          <div class="two columns">
+            {% with my_var=hate_speech_types|slice:"3:" %}
+            {% for type in my_var %}
+              <label>
+                <input data-parsley-group="group-{{forloop.parentloop.counter}}" type="checkbox" name="{{type.0}}" value="{{type.0}}">
+                <span class="label-body" for="{{type.0}}"> {{type.0|slice:8}} </span>
+              </label>
+            {% endfor %}
+            {% endwith %}
+          </div>
         </div>
       </div>
     </form>
@@ -96,6 +98,36 @@
   var endpoint = "{% url 'api:article-label' article.id %}";
   var next_url = "{% url 'next' %}";
   axios.defaults.xsrfCookieName = 'csrftoken';
+
+  function onHatefulRadioChange(radio) {
+    var row = radio.parentElement.parentElement.parentElement;
+    var callsForActionDiv = row.querySelector('div.calls-for-action');
+    var groupsDiv = row.querySelector('div.groups');
+
+    if (radio.value == "0") {
+      // hateful => disable everything else
+      callsForActionDiv.querySelectorAll('input').forEach(input => {
+        input.checked = false;
+        input.disabled = true;
+      });
+      groupsDiv.querySelectorAll('input').forEach(input => {
+        input.checked = false;
+        input.disabled = true;
+      });
+    } else {
+      // hateful => enable everything else
+      callsForActionDiv.querySelectorAll('input').forEach(input => {
+        input.disabled = false;
+      });
+      groupsDiv.querySelectorAll('input').forEach(input => {
+        input.disabled = false;
+      });
+    }
+  }
+
+  document.querySelectorAll('input[name="is_hateful"]').forEach(
+    (radio) => radio.addEventListener('change', () => onHatefulRadioChange(radio))
+  );
 
   document.getElementById("not_interesting").addEventListener("click", (event) => {
     event.preventDefault();

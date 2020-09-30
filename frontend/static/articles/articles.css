@@ -3,8 +3,12 @@
 }
 input#collapsible[type='checkbox'] {
   display: none;
-} 
+}
 
+.error-messages {
+  color: red;
+  font-weight: bold;
+}
 .lbl-toggle {
   display: block;
 

@@ -19,6 +19,10 @@
   {% for comment in article.comment_set.all %}
     <form>
       <div class="row">
+        <p class="error-messages">
+        </p>
+      </div>
+      <div class="row">
         <div class="four columns">
           <p>{{comment.text}}</p>
         </div>
@@ -123,11 +127,14 @@
     var isValid = true;
     var isHateful = formdata.get("is_hateful");
     form.style.background = "";
+    form.querySelector('.error-messages').textContent = "";
+    var messages = [];
 
     // Ok, this could be done with boolean operators, but I think it is more
     // understandable this way
     if (isHateful == null) {
       isValid = false;
+      messages.push("Debe marcar si es odioso");
     } else if (isHateful == "1") {
       // Hateful
       var callsForAction = formdata.get("calls_for_action");
@@ -138,11 +145,19 @@
         }
       }
 
+      if (callsForAction == null) {
+        messages.push("Debe marcar si llama a la acción");
+      }
+      if (count == 0) {
+        messages.push("Debe marcar al menos un grupo");
+      }
+
       isValid = (callsForAction != null) && (count > 0);
     }
 
     if (!isValid) {
       form.style.background = "#ffcccb";
+      form.querySelector('.error-messages').textContent = messages.join(' - ');
     }
 
     return isValid;

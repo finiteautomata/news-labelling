@@ -51,9 +51,9 @@
           <div class="two columns">
             {% with my_var=hate_speech_types|slice:"0:3" %}
             {% for type in my_var %}
-              <label>
-                <input data-parsley-group="group-{{forloop.parentloop.counter}}" type="checkbox" name="{{type.0}}"  value="{{type.0}}">
-                <span class="label-body" for="{{type.0}}"> {{type.0}} </span>
+              <label class="group-button">
+                <input style="display:none" type="checkbox" name="{{type.0}}"  value="{{type.0}}">
+                <span class="button label-body u-full-width" for="{{type.0}}"> {{type.0|slice:8}} </span>
               </label>
             {% endfor %}
             {% endwith %}
@@ -61,9 +61,9 @@
           <div class="two columns">
             {% with my_var=hate_speech_types|slice:"3:" %}
             {% for type in my_var %}
-              <label>
-                <input data-parsley-group="group-{{forloop.parentloop.counter}}" type="checkbox" name="{{type.0}}" value="{{type.0}}">
-                <span class="label-body" for="{{type.0}}"> {{type.0|slice:8}} </span>
+              <label class="group-button">
+                <input style="display:none" type="checkbox" name="{{type.0}}"  value="{{type.0}}">
+                <span class="button label-body u-full-width" for="{{type.0}}"> {{type.0|slice:8}} </span>
               </label>
             {% endfor %}
             {% endwith %}

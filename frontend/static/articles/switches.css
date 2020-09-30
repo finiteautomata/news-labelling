@@ -51,6 +51,26 @@
 	border-radius: 0 4px 4px 0;
 }
 
+.group-button span {
+	font-weight: bolder;
+}
+
+
+
+.group-button input:hover + span {
+    background-color:#F0F0F0;
+}
+
+.group-button input:checked + span {
+    background-color:#eb4646;
+    color:#fff;
+}
+
+.group-button .button {
+	margin: 0 0 0 0;
+}
+
+
 /* This is just for CodePen. */
 
 /* .form {

@@ -12,7 +12,10 @@ class Index(LoginRequiredMixin, View):
         """
         GET index
         """
-        return render(request, "index.html")
+        completed_articles = request.user.assignment_set.filter(done=True).count()
+        return render(request, "index.html", {
+            "completed_articles": completed_articles
+        })
 
 class ArticleView(LoginRequiredMixin, View):
     """
@@ -26,7 +29,8 @@ class ArticleView(LoginRequiredMixin, View):
 
         return render(request, 'articles/show.html', {
             "article": article,
-            "hate_speech_types": CommentLabel.HATE_SPEECH_TYPES
+            "hate_speech_types": CommentLabel.HATE_SPEECH_TYPES,
+
         })
 
 class CompletedView(LoginRequiredMixin, View):

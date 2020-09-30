@@ -8,19 +8,21 @@
 {% block content %}
 
 <div class="row">
+<h2> ¡Hola {{request.user.username }}!</h2>
 
+<p> Te asignaron <b>{{request.user.assignment_set.count}} artículos </b>  para etiquetar <p>
+<p> Ya completaste <b>{{completed_articles}} artículos </b><p>
 <h2> Instrucciones y manual de etiquetado </h2>
 
-<h3> ¡Hola {{request.user.username }}!</h3>
 
 <div class="row">
-  <h3>¿Qué es el discurso de odio? </h3>
+  <h4>¿Qué es el discurso de odio? </h4>
 
   Su presencia se definirá de acuerdo a una definición que se armará en función de las presentadas por el Center for Studies on Freedom of Expression and Access to Information (CELE) [1] y por la Inter-American Commission on Human Rights (CIDH) [2].
 </div>
 
 <div class="row">
-  <h3> ¿Qué vamos a etiquetar? </h3>
+  <h4> ¿Qué vamos a etiquetar? </h4>
 
   <ol>
     <li> ¿Existe discurso de odio o discriminatorio en el tweet respectivo? </li>

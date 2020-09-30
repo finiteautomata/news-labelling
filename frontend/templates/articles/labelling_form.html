@@ -126,8 +126,6 @@
 
     // Ok, this could be done with boolean operators, but I think it is more
     // understandable this way
-
-    debugger;
     if (isHateful == null) {
       isValid = false;
     } else if (isHateful == "1") {
@@ -141,10 +139,6 @@
       }
 
       isValid = (callsForAction != null) && (count > 0);
-    } else {
-      // Not hateful
-      // Nothing to be done here
-
     }
 
     if (!isValid) {
@@ -154,74 +148,61 @@
     return isValid;
   }
 
-
-  document.getElementById("submit").addEventListener("click", (event) => {
-    event.preventDefault();
-
-    var forms = document.querySelectorAll('div.comment-labels > form');
-
+  function submit(forms) {
     var data = {
       is_interesting: true,
       comment_labels: [],
     };
 
+    forms.forEach((form) => {
+      var formdata = new FormData(form);
+
+      var comment_label = {
+        comment: parseInt(formdata.get("comment")),
+        types: [],
+        calls_for_action: false
+      };
+      var isHateful = formdata.get("is_hateful");
+      comment_label.is_hateful = Boolean(parseInt(isHateful));
+
+      /// Sólo pongo el type si es odioso
+      if (comment_label.is_hateful) {
+        for (type of hateSpeechTypes) {
+          if (formdata.get(type)) {
+            comment_label.types.push(type);
+          }
+        }
+        var callsForAction = formdata.get("calls_for_action");
+        comment_label.calls_for_action = Boolean(parseInt(callsForAction));
+      }
+
+      data.comment_labels.push(comment_label);
+    });
+
+    axios.post(
+      endpoint,
+      data,
+    )
+    .then( () => {
+      alert("Artículo correctamente etiquetado");
+      location.href = next_url;
+    })
+    .catch( (errors) => {
+      alert("Hubo un error con esto: "+ errors);
+    });
+  }
+
+  document.getElementById("submit").addEventListener("click", (event) => {
+    event.preventDefault();
+
+    var forms = document.querySelectorAll('div.comment-labels > form');
     var areValid = Array.from(forms).map( form => validateForm(form));
 
     /// Check every subform is valid
     var allFormsValid = areValid.every(e => e);
 
     if (allFormsValid) {
-      forms.forEach((form) => {
-
-      var formdata = new FormData(form);
-      validateForm(form, formdata);
-
-      var comment_label = {
-        comment: parseInt(formdata.get("comment")),
-        types: [],
-        calls_for_action: null,
-      };
-      var is_hateful = formdata.get("is_hateful");
-
-      if (is_hateful != null) {
-        comment_label.is_hateful = Boolean(parseInt(is_hateful));
-      }
-
-      /// Sólo pongo el type si es odioso
-      if (comment_label.is_hateful) {
-        var types = [
-          {% for type in hate_speech_types %}
-            "{{type.0}}",
-          {% endfor %}
-        ];
-
-        for (type of types) {
-          if (formdata.get(type)) {
-            comment_label.types.push(type);
-          }
-        }
-        var calls_for_action = formdata.get("calls_for_action");
-        if (calls_for_action != null) {
-          comment_label.calls_for_action = Boolean(parseInt(calls_for_action));
-        }
-      } else {
-        comment_label.calls_for_action = false;
-      }
-
-      data.comment_labels.push(comment_label);
-    });
-
-      axios.post(
-        endpoint,
-        data,
-      )
-      .then( () => {
-        alert("Artículo correctamente etiquetado");
-        location.href = next_url;
-      })
-      .catch( (errors) => {
-        alert("Hubo un error con esto: "+ errors);
-      });
+      submit(forms);
     }
   });
 

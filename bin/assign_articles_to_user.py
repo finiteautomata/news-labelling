@@ -36,6 +36,10 @@ def assign_articles(
         print(f"{username} is not a valid username")
         return
 
+    already_assigned_ids = [
+        assignment.article_id for assignment in user.assignment_set.all()
+    ]
+
     if ids_file:
         with open(ids_file) as f:
             tweet_ids = json.load(f)
@@ -45,6 +49,9 @@ def assign_articles(
         print(f"Found {articles.count()} articles in database")
     else:
         articles = Article.objects.all()
+
+
+    articles = articles.exclude(id__in=already_assigned_ids)
 
     # Convert to list to sample
     articles = list(articles)

@@ -64,6 +64,9 @@ class CommentLabel(models.Model):
         return [t for t, field in CommentLabel.type_mapping.items() if getattr(self, field)]
 
     def __repr__(self):
+        """
+        Representation
+        """
         user = self.article_label.user
         article = self.article_label.article
         ret = f"Label of {user.username} to '{self.comment.text}'\n"
@@ -78,3 +81,9 @@ class CommentLabel(models.Model):
         else:
             ret += "Not hateful"
         return ret
+
+    def __str__(self):
+        """
+        String representation
+        """
+        return self.__repr__()

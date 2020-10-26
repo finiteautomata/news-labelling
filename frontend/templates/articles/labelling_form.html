@@ -1,16 +1,23 @@
+{% with tweet_width="two" hate_width="two" group_width="two" %}
+<style>
+.group-column {
+  margin-left: 2%;
+}
+
+</style>
 <div class="">
   <div class="row">
-    <div class="four columns">
+    <div class="{{tweet_width}} columns">
       <b>Comentario</b>
     </div>
-    <div class="two columns">
+    <div class="{{hate_width}} columns">
       <b>¿Odio?</b>
     </div>
 
-    <div class="two columns">
+    <div class="two columns group-column">
       <b>¿Llama a la acción?</b>
     </div>
-    <div class="four columns">
+    <div class="six columns">
       <b>Grupo al que ataca</b>
     </div>
   </div>
@@ -23,12 +30,12 @@
         </p>
       </div>
       <div class="row">
-        <div class="four columns">
+        <div class="{{tweet_width}} columns">
           <p>{{comment.text}}</p>
         </div>
         <input type="hidden" name="comment" value="{{comment.id}}"/>
         <!-- Odio  -->
-        <div class="two columns switch-field hateful">
+        <div class="{{hate_width}} columns switch-field hateful">
           <div class="switch-field">
             <input required type="radio" id="hateful-one-{{forloop.counter}}" name="is_hateful" value="0"/>
             <label class="not-hateful" for="hateful-one-{{forloop.counter}}"> No  </label>
@@ -37,7 +44,7 @@
           </div>
         </div>
         <!-- Llama a la acción  -->
-        <div class="two columns switch-field calls-for-action">
+        <div class="{{hate_width}} columns switch-field calls-for-action group-column">
           <div class="switch-field">
             <input type="radio" id="action-one-{{forloop.counter}}" name="calls_for_action" value="0"/>
             <label class="not-hateful" for="action-one-{{forloop.counter}}"> No  </label>
@@ -48,7 +55,7 @@
 
         <!-- Tipo  -->
         <div class="groups">
-          <div class="two columns">
+          <div class="{{group_width}} columns group-column">
             {% with my_var=hate_speech_types|slice:"0:3" %}
             {% for type in my_var %}
               <label class="group-button">
@@ -58,8 +65,8 @@
             {% endfor %}
             {% endwith %}
           </div>
-          <div class="two columns">
-            {% with my_var=hate_speech_types|slice:"3:" %}
+          <div class="{{group_width}} columns group-column">
+            {% with my_var=hate_speech_types|slice:"3:6" %}
             {% for type in my_var %}
               <label class="group-button">
                 <input style="display:none" type="checkbox" name="{{type.0}}"  value="{{type.0}}">
@@ -68,6 +75,17 @@
             {% endfor %}
             {% endwith %}
           </div>
+          <div class="{{group_width}} columns group-column">
+            {% with my_var=hate_speech_types|slice:"6:9" %}
+            {% for type in my_var %}
+              <label class="group-button">
+                <input style="display:none" type="checkbox" name="{{type.0}}"  value="{{type.0}}">
+                <span class="button label-body u-full-width" for="{{type.0}}"> {{type.0|slice:8}} </span>
+              </label>
+            {% endfor %}
+            {% endwith %}
+          </div>
+
         </div>
       </div>
     </form>
@@ -257,3 +275,4 @@
 
 
 </script>
+{% endwith %}

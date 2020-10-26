@@ -4,6 +4,39 @@
   margin-left: 2%;
 }
 
+.tweet {
+  width: 33%;
+}
+
+.hate {
+  width: 17%;
+
+  margin-left:2%;
+}
+
+.group-column {
+  width: 13%;
+  margin-left: 1%;
+  margin-top:18px;
+}
+
+span.button {
+  padding: 0px;
+}
+
+.caption {
+  font-size: 0.8em;
+}
+
+form {
+  margin-bottom:0px;
+}
+
+hr {
+  margin-top: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
 </style>
 <div class="">
   <div class="row">
@@ -29,33 +62,65 @@
         <p class="error-messages">
         </p>
       </div>
+      <hr>
       <div class="row">
-        <div class="{{tweet_width}} columns">
+
+        <!--      -->
+        <!--      -->
+        <!--Texto -->
+        <!--      -->
+        <!--      -->
+        <!--      -->
+
+        <div class="tweet columns">
           <p>{{comment.text}}</p>
         </div>
         <input type="hidden" name="comment" value="{{comment.id}}"/>
-        <!-- Odio  -->
-        <div class="{{hate_width}} columns switch-field hateful">
-          <div class="switch-field">
-            <input required type="radio" id="hateful-one-{{forloop.counter}}" name="is_hateful" value="0"/>
-            <label class="not-hateful" for="hateful-one-{{forloop.counter}}"> No  </label>
-            <input type="radio" id="hateful-two-{{forloop.counter}}" name="is_hateful" value="1" />
-            <label class="hateful" for="hateful-two-{{forloop.counter}}"> Sí</label>
-          </div>
-        </div>
-        <!-- Llama a la acción  -->
-        <div class="{{hate_width}} columns switch-field calls-for-action group-column">
-          <div class="switch-field">
-            <input type="radio" id="action-one-{{forloop.counter}}" name="calls_for_action" value="0"/>
-            <label class="not-hateful" for="action-one-{{forloop.counter}}"> No  </label>
-            <input type="radio" id="action-two-{{forloop.counter}}" name="calls_for_action" value="1" />
-            <label class="hateful" for="action-two-{{forloop.counter}}"> Sí</label>
-          </div>
-        </div>
 
-        <!-- Tipo  -->
+        <!--      -->
+        <!--      -->
+        <!-- Odio -->
+        <!--      -->
+        <!--      -->
+        <!--      -->
+
+        <div class="hate columns">
+          <div class="row caption">
+            ¿Odio?
+          </div>
+          <div class="row hateful">
+
+            <div class="switch-field">
+              <input required type="radio" id="hateful-one-{{forloop.counter}}" name="is_hateful" value="0"/>
+              <label class="not-hateful" for="hateful-one-{{forloop.counter}}"> No  </label>
+              <input type="radio" id="hateful-two-{{forloop.counter}}" name="is_hateful" value="1" />
+              <label class="hateful" for="hateful-two-{{forloop.counter}}"> Sí</label>
+            </div>
+          </div>
+
+          <!-- Llama a la acción  -->
+          <div class="row caption">
+            ¿Llama a acción?
+          </div>
+          <div class="row calls-for-action">
+
+            <div class="switch-field">
+              <input type="radio" id="action-one-{{forloop.counter}}" name="calls_for_action" value="0"/>
+              <label class="not-hateful" for="action-one-{{forloop.counter}}"> No  </label>
+              <input type="radio" id="action-two-{{forloop.counter}}" name="calls_for_action" value="1" />
+              <label class="hateful" for="action-two-{{forloop.counter}}"> Sí</label>
+            </div>
+          </div>
+        </div>
+        <!--      -->
+        <!--      -->
+        <!-- Tipo -->
+        <!--      -->
+        <!--      -->
+        <!--      -->
+
         <div class="groups">
-          <div class="{{group_width}} columns group-column">
+          <div class="group-column columns">
             {% with my_var=hate_speech_types|slice:"0:3" %}
             {% for type in my_var %}
               <label class="group-button">
@@ -65,7 +130,7 @@
             {% endfor %}
             {% endwith %}
           </div>
-          <div class="{{group_width}} columns group-column">
+          <div class="group-column columns">
             {% with my_var=hate_speech_types|slice:"3:6" %}
             {% for type in my_var %}
               <label class="group-button">
@@ -75,7 +140,7 @@
             {% endfor %}
             {% endwith %}
           </div>
-          <div class="{{group_width}} columns group-column">
+          <div class="group-column columns">
             {% with my_var=hate_speech_types|slice:"6:9" %}
             {% for type in my_var %}
               <label class="group-button">
@@ -118,7 +183,7 @@
   axios.defaults.xsrfCookieName = 'csrftoken';
 
   function onHatefulRadioChange(radio) {
-    var row = radio.parentElement.parentElement.parentElement;
+    var row = radio.parentElement.parentElement.parentElement.parentElement;
     var callsForActionDiv = row.querySelector('div.calls-for-action');
     var groupsDiv = row.querySelector('div.groups');
 

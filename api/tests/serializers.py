@@ -238,7 +238,8 @@ class ArticleLabelSerializerTest(TestCase):
         serializer = self.create_serializer({
             "is_interesting": True,
             "comment_labels": [
-                comment_label(comm.id, is_hateful=bool(i % 2), types=["MUJER", "LGBTI"])
+                comment_label(comm.id, is_hateful=bool(i % 2), types=[
+                    "MUJER", "LGBTI", "POLITICA"])
                 for i, comm in enumerate(self.article.comment_set.all())
             ],
         }, assignment=True)
@@ -253,9 +254,9 @@ class ArticleLabelSerializerTest(TestCase):
                 continue
             assert label.against_women
             assert label.against_lgbti
+            assert label.against_political
             assert not label.against_race
             assert not label.against_poor
-            assert not label.against_religion
             assert not label.against_disabled
 
     def test_assignment_is_done_after_creating(self):

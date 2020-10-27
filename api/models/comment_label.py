@@ -12,10 +12,13 @@ class CommentLabel(models.Model):
     HATE_SPEECH_TYPES = [
         ('MUJER', 'Violencia contra las mujeres'),
         ('LGBTI', 'Identidad de género u orientación sexual'),
-        ('RACISMO', 'Racismo o xenofobia'),
+        ('RACISMO', 'Racismo, xenofobia, religión'),
         ('POBREZA', 'Pobreza, situación socioeconómica, barrio de residencia'),
-        ('RELIGION', 'Religión'),
         ('DISCAPACIDAD', 'Discapacidad o Salud Mental'),
+        ('POLITICA', 'Contra grupos políticos'),
+        ('ASPECTO', 'Edad o aspecto físico'),
+        ('CRIMINAL', 'Delincuencia o sujetos privados de libertad'),
+        ('OTROS', 'Otros')
     ]
 
     type_mapping = {
@@ -23,8 +26,11 @@ class CommentLabel(models.Model):
         "LGBTI": "against_lgbti",
         "RACISMO": "against_race",
         "POBREZA": "against_poor",
-        "RELIGION": "against_religion",
+        "POLITICA": "against_political",
         "DISCAPACIDAD": "against_disabled",
+        "ASPECTO": "against_aspect",
+        "CRIMINAL": "against_criminals",
+        "OTROS": "against_others",
     }
 
     inverse_type_mapping = {v:k for k, v in type_mapping.items()}
@@ -45,8 +51,11 @@ class CommentLabel(models.Model):
     against_lgbti = models.BooleanField(default=False)
     against_race = models.BooleanField(default=False)
     against_poor = models.BooleanField(default=False)
-    against_religion = models.BooleanField(default=False)
+    against_political = models.BooleanField(default=False)
     against_disabled = models.BooleanField(default=False)
+    against_aspect = models.BooleanField(default=False)
+    against_criminals = models.BooleanField(default=False)
+    against_others = models.BooleanField(default=False)
 
     def hateful_against(self):
         """
@@ -55,6 +64,9 @@ class CommentLabel(models.Model):
         return [t for t, field in CommentLabel.type_mapping.items() if getattr(self, field)]
 
     def __repr__(self):
+        """
+        Representation
+        """
         user = self.article_label.user
         article = self.article_label.article
         ret = f"Label of {user.username} to '{self.comment.text}'\n"
@@ -69,3 +81,9 @@ class CommentLabel(models.Model):
         else:
             ret += "Not hateful"
         return ret
+
+    def __str__(self):
+        """
+        String representation
+        """
+        return self.__repr__()

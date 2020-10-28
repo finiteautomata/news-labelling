@@ -1,4 +1,7 @@
 # CHANGELOG
+## 0.1.3
+
+- Nuevas categorías de etiquetado
 
 ## 0.1.2
 

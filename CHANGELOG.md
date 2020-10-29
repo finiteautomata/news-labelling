@@ -1,4 +1,8 @@
 # CHANGELOG
+## 0.1.4
+
+- Agrego ranking
+
 ## 0.1.3
 
 - Nuevas categorías de etiquetado

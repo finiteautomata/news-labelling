@@ -10,14 +10,14 @@ class CommentLabel(models.Model):
     This represents a labelling from a user of a specific
     """
     HATE_SPEECH_TYPES = [
-        ('MUJER', 'Violencia contra las mujeres'),
+        ('MUJER', 'Sexo (mujeres)'),
         ('LGBTI', 'Identidad de género u orientación sexual'),
-        ('RACISMO', 'Racismo, xenofobia, religión'),
+        ('RACISMO', 'Racismo, xenofobia, religión, lengua, país de origen'),
         ('POBREZA', 'Pobreza, situación socioeconómica, barrio de residencia'),
-        ('DISCAPACIDAD', 'Discapacidad o Salud Mental'),
-        ('POLITICA', 'Contra grupos políticos'),
-        ('ASPECTO', 'Edad o aspecto físico'),
-        ('CRIMINAL', 'Delincuencia o sujetos privados de libertad'),
+        ('DISCAPACIDAD', 'Discapacidad, problema de salud mental o adicciones'),
+        ('POLITICA', 'Opinión o ideología política'),
+        ('ASPECTO', 'Edad o aspecto físico (gordofobia)'),
+        ('CRIMINAL', 'Situación penal, antecedentes, o privación de la libertad'),
         ('OTROS', 'Otros')
     ]
 

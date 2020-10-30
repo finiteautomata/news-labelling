@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block  head %}
+{% endblock %}
+
+
+{% block content %}
+
+
+<div class="row">
+  <div class="nine columns">
+    
+  </div>
+
+  <div class="three columns">
+    <h3> Ranking </h3>
+
+    <table>
+
+      <tr>
+        <th>Usuario</th>
+        <th>Comentarios</th>
+        <th>Artículos</th>
+      </tr>
+
+      {% for username, values in ranking %}
+
+      <tr>
+        <td>{{username}}</td>
+        <td>{{values.comments}}</td>
+        <td>{{values.articles}}</td>
+      </tr>
+      {% endfor %}
+
+    </table>
+
+  </div>
+
+</div>
+{% endblock %}

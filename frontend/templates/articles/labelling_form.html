@@ -122,7 +122,7 @@ hr {
           <div class="group-column columns">
             {% with my_var=hate_speech_types|slice:"0:3" %}
             {% for type in my_var %}
-              <label class="group-button">
+              <label class="group-button" title="{{type.1}}">
                 <input style="display:none" type="checkbox" name="{{type.0}}"  value="{{type.0}}">
                 <span class="button label-body u-full-width" for="{{type.0}}"> {{type.0|slice:8}} </span>
               </label>
@@ -132,7 +132,7 @@ hr {
           <div class="group-column columns">
             {% with my_var=hate_speech_types|slice:"3:6" %}
             {% for type in my_var %}
-              <label class="group-button">
+              <label class="group-button" title="{{type.1}}">
                 <input style="display:none" type="checkbox" name="{{type.0}}"  value="{{type.0}}">
                 <span class="button label-body u-full-width" for="{{type.0}}"> {{type.0|slice:8}} </span>
               </label>
@@ -142,7 +142,7 @@ hr {
           <div class="group-column columns">
             {% with my_var=hate_speech_types|slice:"6:9" %}
             {% for type in my_var %}
-              <label class="group-button">
+              <label class="group-button" title="{{type.1}}">
                 <input style="display:none" type="checkbox" name="{{type.0}}"  value="{{type.0}}">
                 <span class="button label-body u-full-width" for="{{type.0}}"> {{type.0|slice:8}} </span>
               </label>

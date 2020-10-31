@@ -1,4 +1,11 @@
 # CHANGELOG
+## 0.1.5
+
+- Mido tiempos de anotado
+- Agrego textos alternativos
+- Cambio levemente home
+- Ranking trucho
+
 ## 0.1.4
 
 - Agrego ranking

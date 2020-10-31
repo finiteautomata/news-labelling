@@ -180,6 +180,10 @@ hr {
   var endpoint = "{% url 'api:article-label' article.id %}";
   var next_url = "{% url 'next' %}";
   axios.defaults.xsrfCookieName = 'csrftoken';
+  var metadata = {
+    start_time: new Date(),
+    opened_article: false,
+  }
 
   function onHatefulRadioChange(radio) {
     var row = radio.parentElement.parentElement.parentElement.parentElement;
@@ -213,10 +217,11 @@ hr {
 
   document.getElementById("not_interesting").addEventListener("click", (event) => {
     event.preventDefault();
+    metadata.end_time = new Date();
 
     axios.post(
       endpoint,
-      { is_interesting: false }
+      { is_interesting: false, metadata: metadata }
     )
     .then( () => {
       alert("Artículo marcado como no interesante");
@@ -278,9 +283,12 @@ hr {
   }
 
   function submit(forms) {
+    metadata.end_time = new Date();
+
     var data = {
       is_interesting: true,
       comment_labels: [],
+      metadata: metadata
     };
 
     forms.forEach((form) => {

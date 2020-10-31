@@ -1,3 +1,4 @@
+import json
 from django.urls import reverse
 from rest_framework import viewsets, permissions, status, mixins
 from rest_framework.response import Response
@@ -30,7 +31,7 @@ class ArticleViewSet(viewsets.ReadOnlyModelViewSet):
         """
         article = self.get_object()
         data = request.data
-
+        data["metadata"] = json.dumps(data["metadata"]) if "metadata" in data else ""
         serializer = ArticleLabelSerializer(data=data, context={
             'article': article,
             'user': request.user,

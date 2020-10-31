@@ -57,11 +57,11 @@ hr {
   <div class="comment-labels">
   {% for comment in article.comment_set.all %}
     <form>
+      <hr>
       <div class="row">
         <p class="error-messages">
         </p>
       </div>
-      <hr>
       <div class="row">
 
         <!--      -->
@@ -329,10 +329,16 @@ hr {
     event.preventDefault();
 
     var forms = document.querySelectorAll('div.comment-labels > form');
-    var areValid = Array.from(forms).map( form => validateForm(form));
+    var allFormsValid = true;
+    for (form of forms) {
+      var isValid = validateForm(form);
 
-    /// Check every subform is valid
-    var allFormsValid = areValid.every(e => e);
+      if (allFormsValid && !isValid) {
+        allFormsValid = false;
+        // Scroll to first error
+        form.scrollIntoView();
+      }
+    }
 
     if (allFormsValid) {
       submit(forms);

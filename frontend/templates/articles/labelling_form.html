@@ -180,10 +180,6 @@ hr {
   var endpoint = "{% url 'api:article-label' article.id %}";
   var next_url = "{% url 'next' %}";
   axios.defaults.xsrfCookieName = 'csrftoken';
-  var metadata = {
-    start_time: new Date(),
-    opened_article: false,
-  }
 
   function onHatefulRadioChange(radio) {
     var row = radio.parentElement.parentElement.parentElement.parentElement;

@@ -17,6 +17,7 @@ class ArticleLabel(models.Model):
         Article, on_delete=models.CASCADE, related_name="labels"
     )
     created_at = models.DateTimeField(auto_now_add=True)
+    metadata = models.TextField()
 
     class Meta:
         unique_together = ('user', 'article')

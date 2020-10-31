@@ -213,10 +213,11 @@ hr {
 
   document.getElementById("not_interesting").addEventListener("click", (event) => {
     event.preventDefault();
+    metadata.end_time = new Date();
 
     axios.post(
       endpoint,
-      { is_interesting: false }
+      { is_interesting: false, metadata: metadata }
     )
     .then( () => {
       alert("Artículo marcado como no interesante");
@@ -278,9 +279,12 @@ hr {
   }
 
   function submit(forms) {
+    metadata.end_time = new Date();
+
     var data = {
       is_interesting: true,
       comment_labels: [],
+      metadata: metadata
     };
 
     forms.forEach((form) => {

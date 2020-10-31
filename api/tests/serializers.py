@@ -1,3 +1,5 @@
+import json
+import datetime
 from django.test import TestCase
 from django.contrib.auth.models import User
 from .factories import ArticleFactory, comment_label
@@ -26,6 +28,14 @@ class ArticleLabelSerializerTest(TestCase):
 
         if assignment:
             self.create_assignment(article)
+
+        now = datetime.datetime.now()
+        before = now - datetime.timedelta(minutes=5)
+
+        data["metadata"] = data.get("metadata", None) or json.dumps({
+            "start_time": str(before),
+            "end_time": str(now),
+        })
 
         return ArticleLabelSerializer(
             data=data, context={'article': article, 'user': self.user}
@@ -230,6 +240,20 @@ class ArticleLabelSerializerTest(TestCase):
             article_label.comment_labels.count(),
             self.article.comment_set.count()
         )
+
+    def test_check_metadata_is_saved(self):
+        """
+        Test metadata
+        """
+        serializer = self.create_serializer({
+            "is_interesting": False,
+            "metadata": "{some_random: 'metadata'}"
+        }, assignment=True)
+
+        assert serializer.is_valid()
+        article_label = serializer.save()
+
+        assert article_label.metadata == "{some_random: 'metadata'}"
 
     def test_check_types(self):
         """

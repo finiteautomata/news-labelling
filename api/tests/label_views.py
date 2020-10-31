@@ -1,4 +1,6 @@
 #from django.test import TestCase
+import datetime
+import json
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -26,7 +28,16 @@ class LabelViewTest(APITestCase, AuthenticationMixin):
         art = ArticleFactory(create_comments__num_comments=5)
         self.user.assignment_set.create(article=art)
         url = reverse("api:article-label", args=[art.id])
-        req = { "is_interesting": False }
+
+        now = datetime.datetime.utcnow()
+        before = now - datetime.timedelta(hours=1)
+        req = {
+            "is_interesting": False,
+            "metadata": {
+                "start_time": str(before),
+                "end_time": str(now)
+            }
+        }
 
         resp = self.client.post(url, req, format='json')
         assert resp.status_code == status.HTTP_201_CREATED
@@ -37,7 +48,8 @@ class LabelViewTest(APITestCase, AuthenticationMixin):
             response.data["labels"],
             [{
                 "is_interesting": False,
-                "comment_labels": []
+                "comment_labels": [],
+                "metadata": json.dumps(req["metadata"]),
             }]
         )
 
@@ -59,9 +71,16 @@ class LabelViewTest(APITestCase, AuthenticationMixin):
             )
             for i, comm in enumerate(art.comment_set.all())
         ]
+
+        now = datetime.datetime.utcnow()
+        before = now - datetime.timedelta(hours=1)
         req = {
             "is_interesting": True,
             "comment_labels": labels,
+            "metadata": {
+                "start_time": str(before),
+                "end_time": str(now)
+            }
         }
 
         resp = self.client.post(url, req, format='json')

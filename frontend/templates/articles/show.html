@@ -38,6 +38,15 @@
 </div>
 
 <script type="text/javascript">
+  var metadata = {
+    start_time: new Date(),
+    opened_article: false,
+  };
+
+  document.getElementById("collapsible").addEventListener(
+    "click", () => {
+      metadata.opened_article = true;
+  })
   let myLabels = document.querySelectorAll('.lbl-toggle');
 
   Array.from(myLabels).forEach(label => {

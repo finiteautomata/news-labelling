@@ -6,10 +6,27 @@ from api.models import Article, Assignment, CommentLabel, ArticleLabel
 from .ranking import RankingCalculator
 
 
-class Index(LoginRequiredMixin, RankingCalculator, View):
+class RankingMixin:
+    def ranking(self):
+        ranking = {u.username: {"articles": 0, "comments": 0} for u in User.objects.all()}
+
+        for article_label in ArticleLabel.objects.select_related('user'):
+            username = article_label.user.username
+            ranking[username]["articles"] += 1
+
+        for comment_label in CommentLabel.objects.select_related('article_label'):
+            # N+1, replace!
+            username = comment_label.article_label.user.username
+            ranking[username]["comments"] += 1
+
+        return sorted(list(ranking.items()), key=lambda x: x[1]["comments"], reverse=True)
+
+
+class Index(LoginRequiredMixin, RankingMixin, View):
     """
     Base index page
     """
+
 
     def get(self, request):
         """
@@ -20,6 +37,20 @@ class Index(LoginRequiredMixin, RankingCalculator, View):
             "completed_articles": completed_articles,
             "ranking": self.fake_ranking_for(request.user),
         })
+
+class StatisticsView(LoginRequiredMixin, RankingMixin, View):
+    """
+    Statistics
+    """
+
+    def get(self, request):
+        """
+        GET stats
+        """
+        return render(request, 'stats.html', {
+            "ranking": self.ranking(),
+        })
+
 
 class ArticleView(LoginRequiredMixin, View):
     """

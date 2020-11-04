@@ -8,11 +8,14 @@ pylint = "*"
 ipdb = "*"
 factory-boy = "*"
 pylint-django = "*"
+jupyterlab = "*"
+pandas = "*"
 
 [packages]
 djangorestframework = "*"
 fire = "*"
 tqdm = "*"
+nltk = "*"
 
 [requires]
 python_version = "3.8"

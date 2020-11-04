@@ -7,4 +7,5 @@ urlpatterns = [
     path('articles/<int:pk>/', views.ArticleView.as_view(), name='article_view'),
     path('next', views.NextArticleView.as_view(), name="next"),
     path('completed', views.CompletedView.as_view(), name="completed"),
+    path('stats', views.StatisticsView.as_view(), name="stats")
 ]

@@ -10,6 +10,7 @@ factory-boy = "*"
 pylint-django = "*"
 jupyterlab = "*"
 pandas = "*"
+seaborn = "*"
 
 [packages]
 djangorestframework = "*"

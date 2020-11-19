@@ -1,4 +1,8 @@
 # CHANGELOG
+## 0.1.6
+
+- Cambio de 'odio' a 'discriminación'
+
 ## 0.1.5
 
 - Mido tiempos de anotado

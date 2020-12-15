@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404, redirect
 from api.models import Article, Assignment, CommentLabel, ArticleLabel
 from .ranking import RankingCalculator
-
+import markdown
 
 class Index(LoginRequiredMixin, RankingCalculator, View):
     """
@@ -16,9 +16,14 @@ class Index(LoginRequiredMixin, RankingCalculator, View):
         """
         GET index
         """
+        with open("GUIDELINES.md") as f:
+            text = f.read()
+            guideline = markdown.markdown(text)
+
         completed_articles = request.user.assignment_set.filter(done=True).count()
         return render(request, "index.html", {
             "completed_articles": completed_articles,
+            "guideline": guideline,
             "ranking": self.fake_ranking_for(request.user),
         })
 

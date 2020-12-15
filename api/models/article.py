@@ -16,3 +16,9 @@ class Article(models.Model):
     created_at = models.DateTimeField()
 
     metadata = models.TextField()
+
+    def __repr__(self):
+        return f"@{self.user}: {self.title}"
+
+    def __str__(self):
+        return self.__repr__()

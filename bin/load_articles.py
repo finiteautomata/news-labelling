@@ -24,6 +24,17 @@ r"(?:com|co|org|edu|gov|uk|net|ca|de|es|mil|iq|io|ac|ly|sm){1}"
 r"(?:\/[a-zA-Z0-9]{1,})*)"
 )
 
+user_regex = re.compile(r"@[a-zA-Z0-9_]{0,15}")
+
+def preprocess_tweet(text):
+    """
+    Basic preprocessing
+    """
+    text = user_regex.sub("@usuario", text)
+    text = url_regex.sub("url", text)
+
+    return text
+
 def parse_date(obj_dict):
     """
     Parse mongo date representation
@@ -59,7 +70,7 @@ def create_article(art_dict, max_comments):
 
     args["created_at"] = parse_date(art_dict)
     args["metadata"] = art_dict["description"]
-    
+
     art = Article(**args)
     art.save()
 
@@ -76,6 +87,7 @@ def create_article(art_dict, max_comments):
             k:v for k, v in comm.items() if k in ["text", "user_id", "tweet_id"]
         }
         args["created_at"] = parse_date(comm)
+        args["text"] = preprocess_tweet(comm["text"])
         comm = Comment(**args)
         comm.article = art
         new_comments.append(comm)

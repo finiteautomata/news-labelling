@@ -14,3 +14,5 @@ class Article(models.Model):
     user = models.CharField(max_length=40)
     body = models.TextField()
     created_at = models.DateTimeField()
+
+    metadata = models.TextField()

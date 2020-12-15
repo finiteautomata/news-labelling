@@ -58,7 +58,8 @@ def create_article(art_dict, max_comments):
     }
 
     args["created_at"] = parse_date(art_dict)
-
+    args["metadata"] = art_dict["description"]
+    
     art = Article(**args)
     art.save()
 

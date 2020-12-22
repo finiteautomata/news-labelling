@@ -124,7 +124,6 @@ class ArticleLabelSerializer(serializers.Serializer):
                     **get_comment_data(comment_label)
                 )
 
-            article.assignment_set.get(user=user).complete()
             return article_label
 
 def get_comment_data(comment_label):

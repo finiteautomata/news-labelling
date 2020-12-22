@@ -1,6 +1,8 @@
 from django.contrib.auth.models import User
 from django.db import models
 from .article import Article
+from .article_label import ArticleLabel
+from django.db.models.signals import post_delete, post_save
 
 # Create your models here.
 class Assignment(models.Model):
@@ -33,5 +35,38 @@ class Assignment(models.Model):
         self.done = True
         self.save()
 
+    def undo(self):
+        """
+        Undo!
+        """
+        if not self.done:
+            # Raise if already completed
+            raise ValueError("Assignment not done")
+        self.done = False
+        self.save()
+
+
     class Meta:
         unique_together = ('user', 'article')
+
+
+def undo_assignment_on_label_delete(sender, instance, **kwargs):
+    user = instance.user
+    article = instance.article
+    assignment = Assignment.objects.get(user=user, article=article)
+
+    assignment.undo()
+
+
+
+def complete_assignment(sender, instance, created, **kwargs):
+    if created:
+        user = instance.user
+        article = instance.article
+        assignment = Assignment.objects.get(user=user, article=article)
+
+        assignment.complete()
+
+
+post_save.connect(complete_assignment, sender=ArticleLabel)
+post_delete.connect(undo_assignment_on_label_delete, sender=ArticleLabel)

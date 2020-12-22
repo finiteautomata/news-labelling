@@ -1,7 +1,14 @@
 import factory
 from django.utils import timezone
-from ..models import Article, Comment
+from django.contrib.auth.models import User
+from ..models import Article, Comment, ArticleLabel, CommentLabel
 
+class UserFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = User
+
+    first_name = factory.Sequence(lambda n: "Agent %03d" % n)
+    username = factory.Faker('user_name')
 
 def comment_label(
     comment_id, is_hateful=True, calls_for_action=False, types=None):
@@ -70,3 +77,49 @@ class CommentFactory(factory.django.DjangoModelFactory):
     tweet_id = factory.Sequence(lambda n: 2000 + n)
     article = factory.SubFactory(ArticleFactory)
     created_at = timezone.now()
+
+class CommentLabelFactory(factory.django.DjangoModelFactory):
+    """
+    Comment Label Factory
+    """
+
+    is_hateful = True
+    calls_for_action = False
+
+    class Meta:
+        """
+        Meta class
+        """
+        model = CommentLabel
+
+    comment = factory.SubFactory(CommentFactory)
+    against_women = True
+    against_lgbti = False
+    against_race = False
+    against_poor = False
+    against_political = False
+    against_disabled = False
+    against_aspect = False
+    against_criminals = False
+    against_others = False
+
+class ArticleLabelFactory(factory.django.DjangoModelFactory):
+    """
+    Article Label Factory
+    """
+    class Meta:
+        """
+        Meta class
+        """
+        model = ArticleLabel
+    is_interesting = True
+    user = factory.SubFactory(UserFactory)
+
+    @factory.post_generation
+    def create_comment_labels(self, *args, **kwargs):
+        """
+        Create comments labels after initialization
+        """
+        article = self.article
+        for comment in article.comment_set.all():
+            CommentLabelFactory(comment=comment, article_label=self)

@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.db import IntegrityError
 from django.contrib.auth.models import User
-from .factories import ArticleFactory
+from .factories import ArticleFactory, ArticleLabelFactory, UserFactory, ArticleLabel
 from ..models import Assignment
 
 
@@ -80,3 +80,37 @@ class AssignmentTest(TestCase):
 
         with self.assertRaises(IntegrityError):
             Assignment.objects.create(user=self.user, article=article)
+
+    def test_assignment_completed_after_article_label_created(self):
+        """
+        Assignment must be completed on creation of ArticleLabel
+        """
+
+        article = ArticleFactory()
+        assignment = Assignment.objects.create(user=self.user, article=article)
+
+        # Stimulus
+
+        ArticleLabelFactory(article=article, user=self.user)
+
+        assignment.refresh_from_db()
+
+        self.assertIs(assignment.done, True)
+
+    def test_assignment_returns_to_undone_if_label_deleted(self):
+        """
+        Assignment must be completed on creation of ArticleLabel
+        """
+
+        article = ArticleFactory()
+        assignment = Assignment.objects.create(user=self.user, article=article)
+
+        # Stimulus
+        article_label = ArticleLabelFactory(article=article, user=self.user)
+        article_label.delete()
+
+        assignment.refresh_from_db()
+
+        self.assertIs(assignment.done, False)
+
+

@@ -2,6 +2,8 @@
 ## 0.1.6
 
 - Cambio de 'odio' a 'discriminación'
+- Agrego guidelines
+- Anonimización de tweets
 
 ## 0.1.5
 

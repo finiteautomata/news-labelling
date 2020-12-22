@@ -12,26 +12,20 @@
 <div class="row">
   <div class="nine columns">
     <div class="row">
-
-    <h2> ¡Hola {{request.user.username }}!</h2>
-
-
-
-    <p> Te asignaron <b>{{request.user.assignment_set.count}} artículos </b>  para etiquetar <p>
-    <p> Ya completaste <b>{{completed_articles}} artículos </b><p>
-    <h2> Instrucciones y manual de etiquetado </h2>
-
-    <div class="row">
-      {{guideline | safe}}
-    </div>
+      <h2> ¡Hola {{request.user.username }}!</h2>
+      <p> Te asignaron <b>{{request.user.assignment_set.count}} artículos </b>  para etiquetar <p>
+      <p> Ya completaste <b>{{completed_articles}} artículos </b><p>
 
 
+      <div class="row">
+        <a class="button button-primary" href="{% url 'next' %}">Seguir etiquetando</a>
+      </div>
 
+      <h2> Instrucciones y manual de etiquetado </h2>
 
-    </div>
-
-    <div class="row">
-      <a class="button button-primary" href="{% url 'next' %}">Seguir etiquetando</a>
+      <div class="row">
+        {% include 'guidelines.html' %}
+      </div>
     </div>
   </div>
 

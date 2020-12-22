@@ -1,0 +1,15 @@
+ul.menu > li {
+  float: left;
+};
+
+li.menu-optons a {
+  display: block;
+  padding: 8px;
+  background-color: #eeeeee;
+};
+
+div.row > ul.menu {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+};

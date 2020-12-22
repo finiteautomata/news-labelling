@@ -1,0 +1,7 @@
+name: run-tests
+on: [push]
+jobs:
+  ls:
+    runs-on: ubuntu-latest
+    steps:
+      - run: ls -alh

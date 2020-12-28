@@ -59,8 +59,8 @@ def undo_assignment_on_label_delete(sender, instance, **kwargs):
 
 
 
-def complete_assignment(sender, instance, created, **kwargs):
-    if created:
+def complete_assignment(sender, instance, created, raw, **kwargs):
+    if not raw and created:
         user = instance.user
         article = instance.article
         assignment = Assignment.objects.get(user=user, article=article)

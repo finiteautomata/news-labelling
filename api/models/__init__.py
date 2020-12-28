@@ -3,3 +3,4 @@ from .article_label import ArticleLabel
 from .assignment import Assignment
 from .comment import Comment
 from .comment_label import CommentLabel
+from .batch import Batch

@@ -3,6 +3,8 @@ from django.db import models
 from .article import Article
 from .article_label import ArticleLabel
 from django.db.models.signals import post_delete, post_save
+from django.core.exceptions import ObjectDoesNotExist
+
 
 # Create your models here.
 class Assignment(models.Model):
@@ -51,11 +53,19 @@ class Assignment(models.Model):
 
 
 def undo_assignment_on_label_delete(sender, instance, **kwargs):
+    """
+    If label is deleted => undo the assignment
+    """
     user = instance.user
     article = instance.article
-    assignment = Assignment.objects.get(user=user, article=article)
-
-    assignment.undo()
+    try:
+        assignment = Assignment.objects.get(user=user, article=article)
+        assignment.undo()
+    except ObjectDoesNotExist:
+        # For some reason, assignment was already deleted
+        # This happens, for instance, when deleting articles!
+        # TODO: change this
+        print("Warning: Assignment deleted before ArticleLabel")
 
 
 

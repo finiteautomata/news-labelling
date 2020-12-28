@@ -18,6 +18,7 @@ fire = "*"
 tqdm = "*"
 nltk = "*"
 markdown = "*"
+krippendorff = "*"
 
 [requires]
 python_version = "3.8"

@@ -4,10 +4,10 @@ from .article import Article
 from .article_label import ArticleLabel
 from django.db.models.signals import post_delete, post_save
 from django.core.exceptions import ObjectDoesNotExist
-
+from .mixins import Completable
 
 # Create your models here.
-class Assignment(models.Model):
+class Assignment(models.Model, Completable):
     """
     Object linking user to articles
 
@@ -26,26 +26,6 @@ class Assignment(models.Model):
         Returns next assignment of user
         """
         return cls.objects.filter(user=user, done=False).first()
-
-    def complete(self):
-        """
-        Set as done
-        """
-        if self.done:
-            # Raise if already completed
-            raise ValueError("Assignment already completed")
-        self.done = True
-        self.save()
-
-    def undo(self):
-        """
-        Undo!
-        """
-        if not self.done:
-            # Raise if already completed
-            raise ValueError("Assignment not done")
-        self.done = False
-        self.save()
 
 
     class Meta:

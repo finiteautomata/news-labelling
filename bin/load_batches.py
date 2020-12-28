@@ -39,24 +39,26 @@ def load_batch_from_file(path, batch_name):
     print(f"Created {batch.name} batch with {articles.count()} articles")
 
 
-def load_batches(random_seed=2020, remove_batches=False):
+def load_batches(random_seed=2020, remove_batches=False, demo=False):
     random.seed(random_seed)
 
     article_ids = [art.tweet_id for art in Article.objects.all().only('tweet_id')]
 
-    print(f"Calculando batches de {len(article_ids)} artículos")
+    print(f"{len(article_ids)} articles")
 
     if remove_batches:
-        print("Borrar lotes anteriores?")
-        confirmation = input("Escribir SI para confirmar: ")
-        if confirmation.upper() != "SI":
-            print("Abortando")
+        print("Remove existent batches?")
+        confirmation = input("Write YES to confirm: ")
+        if confirmation.upper() != "YES":
+            print("Exiting")
             sys.exit(1)
         out = Batch.objects.all().delete()
-        print(f"Borrados: {out}")
+        print(f"Deleted: {out}")
 
-    load_batch_from_file("data/demo_ids.json", "demo")
-    load_batch_from_file("data/interview_ids.json", "interview")
+    if demo:
+        load_batch_from_file("data/demo_ids.json", "demo")
+    else:
+        load_batch_from_file("data/interview_ids.json", "interview")
 
 
 

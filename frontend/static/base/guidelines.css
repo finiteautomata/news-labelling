@@ -1,0 +1,39 @@
+/* summary {
+  display: flex;
+  align-items: center;
+  content: "+";
+} */
+
+summary::-webkit-details-marker {
+  display: none;
+}
+
+summary {
+    display: flex;
+    align-items: center;
+    font-size: large;
+    font-weight: bold;
+}
+
+summary:before {
+    float: left;
+    height: 40px;
+    width: 40px;
+    font-size:x-large;
+    font-family:sans-serif;
+    font-weight: bold;
+    content: "+";
+}
+
+details[open] > summary:before {
+    content: "-";
+}
+
+blockquote{
+    background-color: lightgray;
+    font-weight: bold;
+}
+
+/* summary::after {
+    content: " ";
+} */

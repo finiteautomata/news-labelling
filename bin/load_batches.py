@@ -9,7 +9,7 @@ sys.path.append(".")
 os.environ['DJANGO_SETTINGS_MODULE'] = 'news_labelling.settings'
 django.setup()
 
-from django.contrib.auth.models import User
+from django.db import transaction
 from django.core.exceptions import ObjectDoesNotExist
 from api.models import Article, Assignment, Batch
 
@@ -34,9 +34,10 @@ def load_batch_from_file(path, batch_name):
 
     batch = Batch.create_from_articles(name=batch_name, articles=articles)
     print(f"Created {batch.name} batch with {articles.count()} articles")
+    return tweet_ids
 
 
-def load_batches(random_seed=2020, remove=False, demo=False):
+def load_batches(random_seed=2020, remove=False, demo=False, batch_size=50):
     random.seed(random_seed)
 
     article_ids = [art.tweet_id for art in Article.objects.all().only('tweet_id')]
@@ -55,7 +56,29 @@ def load_batches(random_seed=2020, remove=False, demo=False):
     if demo:
         load_batch_from_file("data/demo_ids.json", "demo")
     else:
-        load_batch_from_file("data/interview_ids.json", "interview")
+        interview_ids = load_batch_from_file("data/interview_ids.json", "interview")
+        print("Creating other batches")
+        print(f"Batch size {batch_size}")
+        remaining_ids = [art_id for art_id in article_ids if art_id not in interview_ids]
+
+        random.shuffle(remaining_ids)
+        """
+        Create batch ids
+        """
+        batch_ids = [remaining_ids[i:i+batch_size] for i in remaining_ids[::batch_size]]
+
+        batches = []
+
+        with transaction.atomic():
+            for i, ids in enumerate(batch_ids):
+                articles = Article.objects.filter(tweet_id__in=ids)
+                assert articles.count() == len(ids)
+                batch = Batch.create_from_articles(str(i+1), articles)
+
+                print(f"Batch {batch.name} created")
+                batches.append(batch)
+
+        print(f"{len(batches)} batches created for {len(remaining_ids)} articles")
 
 
 

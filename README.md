@@ -32,17 +32,18 @@ pipenv sync
 python bin/load_articles.py <json>
 ```
 
-5. Asignar artículos
+5. Crear batches
 
 ```
-python bin/assign_articles_to_user.py <username> --ids_file <json>
-
-o
-
-python bin/assign_articles_to_user.py <username> --number_of_articles 50
+python bin/load_batches.py --remove # Use --remove if need to remove previous batches
 ```
 
-La primera opción asigna los artículos listados en el json. En el segundo caso asigna 50 artículos al azar de todos los disponibles
+
+6. Asignar artículos
+
+```
+python bin/assign_batch.py <username> <batch_name>
+```
 
 ## Problemas?
 

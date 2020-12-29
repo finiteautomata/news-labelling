@@ -1,4 +1,13 @@
 # CHANGELOG
+
+## 0.2.0
+
+
+- Agrego batches
+- Mejoro estilo de manual de anotación
+- Uso signals para marcar cosas que se van completando
+
+
 ## 0.1.6
 
 - Cambio de 'odio' a 'discriminación'

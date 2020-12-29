@@ -50,6 +50,9 @@ def undo_assignment_on_label_delete(sender, instance, **kwargs):
 
 
 def complete_assignment(sender, instance, created, raw, **kwargs):
+    """
+    After article label is created => complete assignment
+    """
     if not raw and created:
         user = instance.user
         article = instance.article

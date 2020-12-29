@@ -49,6 +49,9 @@ class BatchArticle(models.Model):
     batch = models.ForeignKey(Batch, on_delete=models.CASCADE)
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
 
+    class Meta:
+        unique_together = ('article', 'batch')
+
 
 class BatchAssignment(models.Model, Completable):
     """
@@ -60,3 +63,5 @@ class BatchAssignment(models.Model, Completable):
     done = models.BooleanField(default=False)
 
 
+    class Meta:
+        unique_together = ('user', 'batch')

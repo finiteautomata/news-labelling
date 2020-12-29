@@ -30,6 +30,14 @@ def assign_articles(
         print("Must bring number_of_articles or ids_file")
         return
 
+    print("LEGACY METHOD")
+    print("Use assign_batch instead!")
+    confirmation = input("Do you really want to use this? Type YES: ")
+
+    if confirmation.upper() != "YES":
+        print("Exiting")
+        sys.exit(1)
+
     try:
         user = User.objects.get(username=username)
     except ObjectDoesNotExist:

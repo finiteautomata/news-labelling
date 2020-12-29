@@ -110,10 +110,8 @@ def load_articles(json_path, max_comments=50, random_seed=2020):
     with open(json_path) as json_file:
         articles = ijson.items(json_file, 'item')
 
-        for i, art_dict in enumerate(articles):
+        for art_dict in tqdm(articles):
             create_article(art_dict, max_comments=max_comments)
-            if i > 0 and (i+1) % 500 == 0:
-                print(f"{i+1} articles processed")
 
     print(f"Now we have {Article.objects.count()} articles")
 

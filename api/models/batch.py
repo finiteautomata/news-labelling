@@ -1,5 +1,5 @@
-from django.db import models
-from api.models import Article
+from django.db import models, transaction
+from api.models import Article, Assignment
 from django.contrib.auth.models import User
 from .mixins import Completable
 
@@ -23,6 +23,23 @@ class Batch(models.Model):
         batch.articles.set(articles)
 
         return batch
+
+    def assign_to(self, user):
+        """
+        Assign batch to user
+        """
+        with transaction.atomic():
+            BatchAssignment.objects.create(batch=self, user=user)
+            for art in self.articles.all():
+                Assignment.objects.create(user=user, article=art)
+
+    def is_assigned_to(self, user):
+        """
+        Checks is assigned
+        """
+        return BatchAssignment.objects.filter(batch=self, user=user).exists()
+
+
 
 class BatchArticle(models.Model):
     """

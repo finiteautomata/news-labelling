@@ -1,10 +1,13 @@
 from django.contrib.auth.models import User
 from django.db import models
+import django.dispatch
 from .article import Article
 from .article_label import ArticleLabel
 from django.db.models.signals import post_delete, post_save
 from django.core.exceptions import ObjectDoesNotExist
 from .mixins import Completable
+
+assignment_done = django.dispatch.Signal()
 
 # Create your models here.
 class Assignment(models.Model, Completable):
@@ -30,6 +33,12 @@ class Assignment(models.Model, Completable):
 
     class Meta:
         unique_together = ('user', 'article')
+
+    def after_complete(self):
+        """
+        Send signal after completion
+        """
+        assignment_done.send(sender=self.__class__, assignment=self)
 
 
 def undo_assignment_on_label_delete(sender, instance, **kwargs):

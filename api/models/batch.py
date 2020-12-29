@@ -1,5 +1,5 @@
 from django.db import models, transaction
-from api.models import Article, Assignment
+from api.models import Article, Assignment, assignment_done
 from django.contrib.auth.models import User
 from .mixins import Completable
 
@@ -9,7 +9,6 @@ class Batch(models.Model):
     Batch model
     """
     name = models.CharField(max_length=300, blank=False, unique=True)
-    articles = models.ManyToManyField(Article, through="BatchArticle")
     users = models.ManyToManyField(User, through="BatchAssignment")
 
     @classmethod
@@ -17,10 +16,13 @@ class Batch(models.Model):
         """
         Convenience method for creating batch
         """
-        batch = cls(name=name)
-        batch.save()
+        with transaction.atomic():
+            batch = cls(name=name)
+            batch.save()
 
-        batch.articles.set(articles)
+            for art in articles:
+                art.batch = batch
+                art.save()
 
         return batch
 
@@ -29,9 +31,11 @@ class Batch(models.Model):
         Assign batch to user
         """
         with transaction.atomic():
-            BatchAssignment.objects.create(batch=self, user=user)
+            batch_assignment = BatchAssignment.objects.create(batch=self, user=user)
             for art in self.articles.all():
                 Assignment.objects.create(user=user, article=art)
+
+        return batch_assignment
 
     def is_assigned_to(self, user):
         """
@@ -39,18 +43,6 @@ class Batch(models.Model):
         """
         return BatchAssignment.objects.filter(batch=self, user=user).exists()
 
-
-
-class BatchArticle(models.Model):
-    """
-    Batch to article relationship model
-    """
-
-    batch = models.ForeignKey(Batch, on_delete=models.CASCADE)
-    article = models.ForeignKey(Article, on_delete=models.CASCADE)
-
-    class Meta:
-        unique_together = ('article', 'batch')
 
 
 class BatchAssignment(models.Model, Completable):
@@ -65,3 +57,14 @@ class BatchAssignment(models.Model, Completable):
 
     class Meta:
         unique_together = ('user', 'batch')
+
+def check_batch_completed(sender, assignment, **kwargs):
+    """
+    Check batch is complete after
+    """
+    user = assignment.user
+    article = assignment.article
+    # TODO: Fix this
+
+
+assignment_done.connect(check_batch_completed, sender=Assignment)

@@ -11,6 +11,10 @@ class Article(models.Model):
     slug = models.CharField(blank=False, max_length=130, unique=True)
     url = models.CharField(blank=False, max_length=200)
 
+    batch = models.ForeignKey(
+        "Batch", null=True, on_delete=models.SET_NULL,
+        related_name="articles",
+    )
     user = models.CharField(max_length=40)
     body = models.TextField()
     created_at = models.DateTimeField()

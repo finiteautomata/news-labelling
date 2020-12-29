@@ -7,7 +7,7 @@ from ..models import Batch
 
 class BatchTest(TestCase):
     """
-    Tests for validation and save of ArticleLabelSerializer
+    Tests for validation and save of Batch
     """
     def setUp(self):
         self.user = User.objects.create_user(
@@ -71,3 +71,49 @@ class BatchTest(TestCase):
 
         with self.assertRaises(IntegrityError):
             batch.assign_to(self.user)
+
+
+class BatchAssignmentTest(TestCase):
+
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="test",
+            password="test",
+        )
+        self.articles = ArticleFactory.create_batch(5)
+        self.batch = Batch.create_from_articles(name="batch name", articles=self.articles)
+
+
+
+    def test_batch_assignment_not_done_after_creation(self):
+        """
+        Check assignment not done after creation
+        """
+
+        batch_assignment = self.batch.assign_to(self.user)
+
+        self.assertIs(batch_assignment.done, False)
+
+    def test_batch_assignment_not_done_after_just_one_label(self):
+        """
+        Check assignment not done after creation
+        """
+        batch_assignment = self.batch.assign_to(self.user)
+        ArticleLabelFactory(article=self.articles[0], user=self.user)
+
+        batch_assignment.refresh_from_db()
+
+        self.assertIs(batch_assignment.done, False)
+
+    def test_batch_assignment_done_after_just_all_labels(self):
+        """
+        Check assignment not done after creation
+        """
+        batch_assignment = self.batch.assign_to(self.user)
+
+        for art in self.articles:
+            ArticleLabelFactory(article=art, user=self.user)
+
+        batch_assignment.refresh_from_db()
+
+        self.assertIs(batch_assignment.done, True)

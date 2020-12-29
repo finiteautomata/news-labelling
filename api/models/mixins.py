@@ -13,6 +13,14 @@ class Completable:
         self.done = True
         self.save()
 
+        self.after_complete()
+
+    def after_complete(self):
+        """
+        Abstract method. Override!
+        """
+        pass
+
     def undo(self):
         """
         Undo!

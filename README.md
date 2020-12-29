@@ -1,5 +1,8 @@
 # Hatespeech news labelling
 
+![example workflow name](https://github.com/finiteautomata/news-labelling/workflows/run_tests/badge.svg)
+
+
 Repositorio de etiquetador de discurso de odio en notas periodísticas
 
 ## Instrucciones

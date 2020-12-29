@@ -1,6 +1,7 @@
 from django.db import models, transaction
 from api.models import Article, Assignment, assignment_done
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 from .mixins import Completable
 
 # Create your models here.
@@ -65,6 +66,23 @@ def check_batch_completed(sender, assignment, **kwargs):
     user = assignment.user
     article = assignment.article
     # TODO: Fix this
+    batch = article.batch
+
+    try:
+        batch_assignment = BatchAssignment.objects.get(user=user, batch=batch)
+
+        done_assignments = Assignment.objects.filter(
+            done=True,
+            article__in=batch.articles.all(),
+            user=user
+        ).count()
+
+        if done_assignments == batch.articles.count():
+            batch_assignment.complete()
+
+    except ObjectDoesNotExist:
+
+        print(f"No batch assignment of {user.username} and {batch}")
 
 
 assignment_done.connect(check_batch_completed, sender=Assignment)

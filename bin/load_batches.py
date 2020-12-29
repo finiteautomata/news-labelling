@@ -26,27 +26,24 @@ def load_batch_from_file(path, batch_name):
     with open(path) as f:
         tweet_ids = json.load(f)
 
-    batch = Batch(name=batch_name)
-    batch.save()
-
     articles = Article.objects.filter(tweet_id__in=tweet_ids)
 
     if articles.count() != len(tweet_ids):
         diff = len(tweet_ids) - articles.count()
         print(f"WARNING: There are {diff} tweet ids not present in {path}")
 
-    batch.articles.set(articles)
+    batch = Batch.create_from_articles(name=batch_name, articles=articles)
     print(f"Created {batch.name} batch with {articles.count()} articles")
 
 
-def load_batches(random_seed=2020, remove_batches=False, demo=False):
+def load_batches(random_seed=2020, remove=False, demo=False):
     random.seed(random_seed)
 
     article_ids = [art.tweet_id for art in Article.objects.all().only('tweet_id')]
 
     print(f"{len(article_ids)} articles")
 
-    if remove_batches:
+    if remove:
         print("Remove existent batches?")
         confirmation = input("Write YES to confirm: ")
         if confirmation.upper() != "YES":

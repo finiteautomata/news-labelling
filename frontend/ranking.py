@@ -11,7 +11,11 @@ class RankingCalculator:
         """
         Calculates ranking
         """
-        ranking = {u.username: {"articles": 0, "comments": 0} for u in User.objects.all()}
+
+        ranking = {
+            u.username: {"articles": 0, "comments": 0}
+            for u in User.objects.filter(assignment__isnull=False)
+        }
 
         for article_label in ArticleLabel.objects.select_related('user'):
             username = article_label.user.username

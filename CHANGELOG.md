@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.2.2
+
+- Cambio ranking para que no muestre los que no tienen asignaciones
+
 ## 0.2.1
 
 - Agrego archivos de ids para prueba

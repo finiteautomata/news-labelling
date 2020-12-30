@@ -45,6 +45,12 @@ python bin/load_batches.py --remove # Use --remove if need to remove previous ba
 python bin/assign_batch.py <username> <batch_name>
 ```
 
+
+## Running
+
+```
+uwsgi --http :8001 --module news_labelling.wsgi --logto logs/labelling.log
+```
 ## Problemas?
 
 Ante cualquier bug o consulta, usar el [issue tracker](https://github.com/finiteautomata/news-labelling/issues) de este repositorio haciendo una descripción del problema/mejora.

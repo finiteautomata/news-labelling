@@ -51,6 +51,17 @@ python bin/assign_batch.py <username> <batch_name>
 ```
 uwsgi --http :8001 --module news_labelling.wsgi --logto logs/labelling.log
 ```
+
+## Create demo database
+
+```
+python bin/clean_database.py
+python bin/load_articles <json> --max_comments 10
+python bin/load_batches
+
+```
 ## Problemas?
 
 Ante cualquier bug o consulta, usar el [issue tracker](https://github.com/finiteautomata/news-labelling/issues) de este repositorio haciendo una descripción del problema/mejora.
+
+

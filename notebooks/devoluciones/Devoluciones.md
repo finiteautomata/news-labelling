@@ -24,12 +24,14 @@ Por ejemplo "Che mirate los dos globos de plástico que tiene XXXXX" => MUJER
 
 - Acusaciones del estilo "China hizo el virus y lo diseminó" o de asociar rasgos a una población/nacionalidad ("lo chino es todo una mierda") las marcamos como racistas. Eso no aplica a acusaciones al Gobierno chino, por ejemplo
 
+- Cuando vemos comentarios del estilo "negro hdp/de mierda/etc", marquemos como RACISTA y también si hay otra clase que corresponda. Por ejemplo, si es una nota sobre senegaleses, sólo esa; si habla de movimientos sociales, podemos poner POBREZA; si es sobre un motín en la carcel, CRIMINAL.
+
 
 
 ## Aclaraciones particulares
 
 
-### glerici
+## glerici
 
 Marcaste en la nota
 
@@ -85,6 +87,12 @@ Este a lo sumo es gerontofobia, que lo marcaste bien. No marcar como MUJER
 
 A priori sí POLITICA, no veo la parte LGBTI. De hecho parece bastante disconexo del
 
+
+>  @usuario La rabina ,si es que eso existe,deberá estudiar en el Toráh la opinión que tiene yaveh acerca de la sodomía.....hagan lo que se les cante pero no sé metan con creencias milenarias.....dios no ama a los promiscuos
+
+Marcado como RACISMO, no veo que lo haya acá
+
+
 ## Thelma Fardin contó cómo sigue la causa contra Juan Darthés: “Brasil le permite la impunidad”
 
 
@@ -104,10 +112,32 @@ Idem, no queda claro si lo relaciona a la denuncia
 
 No tiene nada que ver y es polémico, pero habla de que Fardin tiene acusaciones de copiar contenido. No lo marcamos como discriminatorio
 
+>  @usuario Fardin deja la merca,te hace mal.
+> le cagaste la vida a un tipo para tener cámara y te cagaste en las víctimas reales.
 
-## Escándalo en España: fallan los tests de coronavirus que le compró a China
+Acá te faltó marcar DISCAPACIDAD porque la acusa de drogadicta
 
->
+
+# lprats
+
+
+> @usuario Pasarte de merca durante años, es una verdadera irresponsabilidad sanitaria
+
+
+
+## Thelma Fardin contó cómo sigue la causa contra Juan Darthés: “Brasil le permite la impunidad”
+
+
+>  @usuario Fardin deja la merca,te hace mal.
+> le cagaste la vida a un tipo para tener cámara y te cagaste en las víctimas reales.
+
+Acá te faltó marcar DISCAPACIDAD porque la acusa de drogadicta
+
+
+
+
+
+
 
  ### dvalado
 

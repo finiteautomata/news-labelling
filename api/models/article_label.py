@@ -12,7 +12,7 @@ class ArticleLabel(models.Model):
     (depending on whether they are interesting or not)
     """
     is_interesting = models.BooleanField(blank=False, null=False)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="article_labels")
     article = models.ForeignKey(
         Article, on_delete=models.CASCADE, related_name="labels"
     )

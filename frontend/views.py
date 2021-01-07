@@ -2,6 +2,7 @@ from django.views import View
 from django.utils.decorators import method_decorator
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404, redirect
 from api.models import Article, Assignment, CommentLabel, ArticleLabel
 from .ranking import RankingCalculator
@@ -71,6 +72,20 @@ class LabelView(LoginRequiredMixin, View):
             "article": article,
             "article_label": label,
             "hate_speech_types": hate_speech_types,
+        })
+
+class UserView(LoginRequiredMixin, View):
+    """
+    User view for annotators
+    """
+    @method_decorator(staff_member_required)
+    def get(self, request, username):
+        user = get_object_or_404(User, username=username)
+        article_labels = user.article_labels.all()
+
+        return render(request, 'users/show.html', {
+            "user": user,
+            "article_labels": article_labels,
         })
 
 

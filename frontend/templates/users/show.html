@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block  head %}
+
+<link rel="stylesheet" href="{% static 'articles/articles.css' %}">
+<link rel="stylesheet" href="{% static 'articles/switches.css' %}">
+{% endblock %}
+
+{% block title %}
+{{user.username}}
+{% endblock %}
+
+{% block content %}
+
+
+<h2>Anotador: {{user.username }}</h2>
+
+<p> <b>{{request.user.assignment_set.count}} artículos asignados</b> </p>
+<p> Ya completaste <b>{{completed_articles}} artículos </b><p>
+
+<div class="row">
+
+    <h3>Artículos completados</h3>
+
+    <ol>
+        {% for article_label in article_labels %}
+            <li>
+                <a href="{% url 'label_view' user.username article_label.article.id %}">
+                    {{article_label.article.title|truncatechars:50}}
+                </a>
+            </li>
+        {% endfor %}
+
+    </ol>
+
+</div>
+
+{%endblock %}

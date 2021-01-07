@@ -1,7 +1,9 @@
 from django.views import View
+from django.utils.decorators import method_decorator
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, get_object_or_404, redirect
-from api.models import Article, Assignment, CommentLabel
+from api.models import Article, Assignment, CommentLabel, ArticleLabel
 from .ranking import RankingCalculator
 
 class Index(LoginRequiredMixin, RankingCalculator, View):
@@ -50,6 +52,27 @@ class ArticleView(LoginRequiredMixin, View):
             "hate_speech_types": CommentLabel.HATE_SPEECH_TYPES,
 
         })
+
+class LabelView(LoginRequiredMixin, View):
+    """
+    Show user labels
+    """
+    @method_decorator(staff_member_required)
+    def get(self, request, username, article_pk):
+        article = get_object_or_404(Article, pk=article_pk)
+        label = get_object_or_404(ArticleLabel,
+            user__username=username,
+            article=article,
+        )
+
+        hate_speech_types = [t[0] for t in CommentLabel.HATE_SPEECH_TYPES]
+
+        return render(request, 'labels/show.html', {
+            "article": article,
+            "article_label": label,
+            "hate_speech_types": hate_speech_types,
+        })
+
 
 class CompletedView(LoginRequiredMixin, View):
     """

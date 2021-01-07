@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block  head %}
+
+<link rel="stylesheet" href="{% static 'articles/articles.css' %}">
+<link rel="stylesheet" href="{% static 'articles/switches.css' %}">
+{% endblock %}
+
+{% block title %}
+{{article.title}}
+{% endblock %}
+
+{% block content %}
+
+
+<div class="row centering">
+  <blockquote class="twitter-tweet"><p lang="es" dir="ltr"> {{article.text}} <a href="https://twitter.com/user/status/{{article.tweet_id}}?ref_src=twsrc%5Etfw">August 3, 2020</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+</div>
+
+
+<div class="row">
+  <div class="eight columns">
+    <h3>Comentarios</h3>
+  </div>
+
+</div>
+
+
+
+{% include 'labels/labelling_form.html' %}
+
+
+
+{%endblock %}

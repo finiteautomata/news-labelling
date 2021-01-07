@@ -1,0 +1,165 @@
+<style>
+.group-column {
+  margin-left: 2%;
+}
+
+.tweet {
+  width: 35%;
+  margin-top:18px;
+}
+
+.hate {
+  width: 17%;
+
+  margin-left:3%;
+}
+
+
+.group-column {
+  width: 13%;
+  margin-left: 1%;
+  margin-top:18px;
+}
+
+span.button {
+  padding: 0px;
+}
+
+.caption {
+  font-size: 0.8em;
+}
+
+form {
+  margin-bottom:0px;
+}
+
+.hateful {
+    color: red;
+}
+
+.non-hateful {
+    color: green;
+}
+
+<!--
+hr {
+  margin-top: 1.5rem;
+  margin-bottom: 2.5rem;
+} -->
+
+{% load label_extras %}
+
+
+</style>
+<div class="">
+  <div class="row">
+    <div class="tweet columns">
+      <b>Comentario</b>
+    </div>
+    <div class="hate columns">
+      <b>Etiquetas</b>
+    </div>
+
+    <div class="group-column columns">
+      <b>Tipos</b>
+    </div>
+  </div>
+
+  <div class="comment-labels">
+  {% for comment_label in article_label.comment_labels.all %}
+    <form>
+      <hr>
+      <div class="row">
+        <p class="error-messages">
+        </p>
+      </div>
+      <div class="row">
+
+        <!--      -->
+        <!--      -->
+        <!--Texto -->
+        <!--      -->
+        <!--      -->
+        <!--      -->
+
+        <div class="tweet columns">
+          <p>{{comment_label.comment.text}}</p>
+        </div>
+        <input type="hidden" name="comment" value="{{comment.id}}"/>
+
+        <!--      -->
+        <!--      -->
+        <!-- Odio -->
+        <!--      -->
+        <!--      -->
+        <!--      -->
+
+        <div class="hate columns">
+          <div class="row caption">
+            ¿Discriminación?
+          </div>
+          <div class="row hateful">
+
+            {% if comment_label.is_hateful %}
+            <p class="hateful"> Odioso </p>
+            {% else %}
+            <p class="non-hateful"> No odioso </p>
+            {% endif %}
+          </div>
+
+          <!-- Llama a la acción  -->
+          <div class="row calls-for-action">
+            {% if comment_label.calls_for_action %}
+            <p class="hateful"> Llama a la acción </p>
+            {% else %}
+            <p class="non-hateful"> No llama a la acción </p>
+            {% endif %}
+          </div>
+        </div>
+        <!--      -->
+        <!--      -->
+        <!-- Tipo -->
+        <!--      -->
+        <!--      -->
+        <!--      -->
+
+        <div class="groups">
+          <div class="group-column columns">
+            {% with my_var=hate_speech_types|slice:"0:3" %}
+            {% for type in my_var %}
+                <label class="group-button">
+                    <input style="display:none" type="checkbox" name="{{type}}" {{comment_label|is_type_checked:type}}>
+                    <span class="button label-body u-full-width" for="{{type}}"> {{type|slice:8}} </span>
+                </label>
+            {% endfor %}
+            {% endwith %}
+          </div>
+          <div class="group-column columns">
+            {% with my_var=hate_speech_types|slice:"3:6" %}
+            {% for type in my_var %}
+                <label class="group-button">
+                    <input style="display:none" type="checkbox" name="{{type}}" {{comment_label|is_type_checked:type}}>
+                    <span class="button label-body u-full-width" for="{{type}}"> {{type|slice:8}} </span>
+                </label>
+            {% endfor %}
+            {% endwith %}
+          </div>
+          <div class="group-column columns">
+            {% with my_var=hate_speech_types|slice:"6:9" %}
+            {% for type in my_var %}
+            <label class="group-button">
+                <input style="display:none" type="checkbox" name="{{type}}" {{comment_label|is_type_checked:type}}>
+                <span class="button label-body u-full-width" for="{{type}}"> {{type|slice:8}} </span>
+            </label>
+            {% endfor %}
+            {% endwith %}
+          </div>
+
+        </div>
+      </div>
+    </form>
+
+  {% endfor %}
+  </div>
+  <hr/>
+</div>

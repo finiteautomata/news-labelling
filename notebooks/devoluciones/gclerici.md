@@ -7,11 +7,11 @@
 -  @usuario Kuka
 Este comentario lo marcaste como "MUJER". No es discriminatorio a la mujer (en todo caso, es sólo POLITICA)
 
->  @usuario que se calle es cómplice del saqueo hijos de puta
->  @usuario Jajaja cuánto le habrán pagado por declarar esta boludez?
->  @usuario Realmente a quien mierda le importa lo que diga esta???
->  @usuario Y vos me parecés una pelotuda a rosca
->  @usuario Me importa un choto lo que diga esta estúpida
+> - @usuario que se calle es cómplice del saqueo hijos de puta
+> - @usuario Jajaja cuánto le habrán pagado por declarar esta boludez?
+> - @usuario Realmente a quien mierda le importa lo que diga esta???
+> - @usuario Y vos me parecés una pelotuda a rosca
+> - @usuario Me importa un choto lo que diga esta estúpida
 
 Estos comentarios se los podrían hacer tranquilamente a un hombre. Bajo nuestros criterios de anotación, no son discriminatorio
 
@@ -101,7 +101,7 @@ Acá creo que habla de violadores y criminales...pero no está discriminándolos
  Este no es un llamado a la acción
 
 
->  @usuario Pero miren a esta criatura de belcebú, con la cría de asesino en brazos para dar lástima. Ay! ay! Cobras y leones hambrientos" Problema solucionado.
->  @usuario Napal y tema solucionado
+> - @usuario Pero miren a esta criatura de belcebú, con la cría de asesino en brazos para dar lástima. Ay! ay! Cobras y leones hambrientos" Problema solucionado.
+> - @usuario Napal y tema solucionado
 
 Estos, más o menos reales, hablan de "matarlos"

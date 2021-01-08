@@ -1,7 +1,5 @@
 # lprats
 
-
-
 ## Cecilia Roth: “La marcha anticuarentena me pareció una irresponsabilidad sanitaria”*
 
 

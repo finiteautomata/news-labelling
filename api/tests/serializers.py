@@ -214,11 +214,13 @@ class ArticleLabelSerializerTest(TestCase):
         """
         serializer = self.create_serializer({
             "is_interesting": False,
+            "feedback": "Esto apesta",
         }, assignment=True)
 
         assert serializer.is_valid()
         article_label = serializer.save()
 
+        self.assertEqual(article_label.feedback, "Esto apesta")
         assert article_label.comment_labels.count() == 0
 
     def test_create_for_interesting(self):
@@ -227,6 +229,7 @@ class ArticleLabelSerializerTest(TestCase):
         """
         serializer = self.create_serializer({
             "is_interesting": True,
+            "feedback": "Esto apesta",
             "comment_labels": [
                 comment_label(comm.id, is_hateful=bool(i % 2))
                 for i, comm in enumerate(self.article.comment_set.all())
@@ -236,6 +239,7 @@ class ArticleLabelSerializerTest(TestCase):
         assert serializer.is_valid()
         article_label = serializer.save()
 
+        self.assertEqual(article_label.feedback, "Esto apesta")
         self.assertEqual(
             article_label.comment_labels.count(),
             self.article.comment_set.count()

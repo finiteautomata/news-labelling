@@ -160,6 +160,13 @@ hr {
 </div>
 
 <div class="row">
+  <label for="feedback">Feedback</label>
+  <textarea name="" id="feedback" cols="80" rows="7">
+  </textarea>
+
+</div>
+
+<div class="row">
     <a href="#" id="submit" class=" button button-primary u-full-width submit-button">
       Enviar etiquetado
     </a>
@@ -280,11 +287,12 @@ hr {
 
   function submit(forms) {
     metadata.end_time = new Date();
-
+    var feedback = document.getElementById("feedback").value.trim();
     var data = {
       is_interesting: true,
       comment_labels: [],
-      metadata: metadata
+      metadata: metadata,
+      feedback: feedback
     };
 
     forms.forEach((form) => {

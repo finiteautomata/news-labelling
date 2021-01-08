@@ -18,6 +18,7 @@ class ArticleLabel(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     metadata = models.TextField()
+    feedback = models.TextField(default="")
 
     class Meta:
         unique_together = ('user', 'article')

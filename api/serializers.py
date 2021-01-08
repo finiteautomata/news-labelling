@@ -61,6 +61,7 @@ class ArticleLabelSerializer(serializers.Serializer):
     is_interesting = serializers.BooleanField(required=True)
     comment_labels = CommentLabelForCreationSerializer(many=True, required=False)
     metadata = serializers.CharField()
+    feedback = serializers.CharField(allow_blank=True, required=False)
 
     def validate(self, data, *args, **kwargs):
         """

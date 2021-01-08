@@ -37,7 +37,7 @@ def load_batch_from_file(path, batch_name):
     return tweet_ids
 
 
-def load_batches(random_seed=2020, remove=False, demo=False, batch_size=50):
+def load_batches(random_seed=2020, remove=False, demo=False, interview=False, batch_size=50):
     random.seed(random_seed)
 
     article_ids = [art.tweet_id for art in Article.objects.all().only('tweet_id')]
@@ -55,11 +55,13 @@ def load_batches(random_seed=2020, remove=False, demo=False, batch_size=50):
 
     if demo:
         load_batch_from_file("data/demo_ids.json", "demo")
+    elif interview:
+        load_batch_from_file("data/interview_ids.json", "interview")
     else:
-        interview_ids = load_batch_from_file("data/interview_ids.json", "interview")
+        training_ids = load_batch_from_file("data/training_ids.json", "training")
         print("Creating other batches")
         print(f"Batch size {batch_size}")
-        remaining_ids = [art_id for art_id in article_ids if art_id not in interview_ids]
+        remaining_ids = [art_id for art_id in article_ids if art_id not in training_ids]
 
         random.shuffle(remaining_ids)
         """

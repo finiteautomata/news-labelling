@@ -1,4 +1,4 @@
-from django.db import models, transaction
+from django.db import models, transaction, IntegrityError
 from api.models import Article, Assignment, assignment_done
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
@@ -33,8 +33,16 @@ class Batch(models.Model):
         """
         with transaction.atomic():
             batch_assignment = BatchAssignment.objects.create(batch=self, user=user)
-            for art in self.articles.all():
-                Assignment.objects.create(user=user, article=art)
+
+            for article in self.articles.all():
+                """
+                Some articles might have been previously assigned -- in that case, skip
+                """
+
+                if user.assignment_set.filter(article=article).exists():
+                    print(f"Assignment of '{article.title[:50]}' to {user.username} already exists -- skipping")
+                else:
+                    Assignment.objects.create(user=user, article=article)
 
         return batch_assignment
 

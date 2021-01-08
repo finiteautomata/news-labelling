@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block  head %}
+{% endblock %}
+
+{% block title %}
+Dashboard usuarios
+{% endblock %}
+
+{% block content %}
+
+<h1>Dashboard usuarios</h1>
+
+
+<div class="row">
+
+
+    <table id="user-report">
+        <thead>
+
+            <tr>
+                <th scope="col">Anotador</th>
+                <th scope="col">Art. asignados</th>
+                <th scope="col">Art. restantes</th>
+                <th scope="col">Anotados</th>
+                <th scope="col">Salteados</th>
+                <th scope="col">Comentarios anotados</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for user_report in report.user_reports %}
+                <tr>
+                    <th scope="row"> {{ user_report.username }}</th>
+                    <th> {{user_report.assignments}}</th>
+                    <th> {{user_report.assignments_left }}</th>
+                    <th> {{user_report.labeled_articles}}</th>
+                    <th> {{user_report.skipped_articles}}</th>
+                    <th> {{user_report.labeled_comments}}</th>
+                </tr>
+
+            {% endfor %}
+        </tbody>
+
+    </table>
+</div>
+
+{%endblock %}

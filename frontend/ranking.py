@@ -43,7 +43,7 @@ class RankingCalculator:
         """
         ranking = self.ranking()
         # Si no tiene assignments, no le miento :-)
-        if Assignment.next_assignment_of(user):
+        if not user.is_staff and Assignment.next_assignment_of(user):
 
             num_assigned = Assignment.objects.filter(user=user).count()
             num_done = Assignment.objects.filter(user=user, done=True).count()

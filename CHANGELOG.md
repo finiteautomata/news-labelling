@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 0.3.1
+
+- Agrego comandos varios para manejo de DB
+- Training ids finales
+- No mentir al staff en el ranking
+- Vista para staff para ver anotaciones
+- Agrego feedback
+
 ## 0.2.2
 
 - Cambio ranking para que no muestre los que no tienen asignaciones

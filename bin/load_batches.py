@@ -37,7 +37,7 @@ def load_batch_from_file(path, batch_name):
     return tweet_ids
 
 
-def load_batches(random_seed=2020, remove=False, demo=False, interview=False, batch_size=50):
+def load_batches(random_seed=2020, remove=False, demo=False, interview=False, batch_size=20):
     random.seed(random_seed)
 
     article_ids = [art.tweet_id for art in Article.objects.all().only('tweet_id')]

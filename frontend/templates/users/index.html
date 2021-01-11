@@ -48,6 +48,7 @@ Dashboard usuarios
                 <th scope="col">Anotados</th>
                 <th scope="col">Salteados</th>
                 <th scope="col">Comentarios anotados</th>
+                <th scope="col">Tiempo</th>
             </tr>
         </thead>
 
@@ -60,6 +61,7 @@ Dashboard usuarios
                     <td> {{user_report.labeled_articles}}</td>
                     <td> {{user_report.skipped_articles}}</td>
                     <td> {{user_report.labeled_comments}}</td>
+                    <td> {{user_report.time|floatformat:-2}}</td>
                 </tr>
 
             {% endfor %}

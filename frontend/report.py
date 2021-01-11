@@ -1,3 +1,5 @@
+import json
+from datetime import datetime
 import pandas as pd
 from api.models import Assignment, ArticleLabel, BatchAssignment
 
@@ -25,6 +27,7 @@ class AnnotationReport:
                 "labeled_articles": 0,
                 "skipped_articles": 0,
                 "labeled_comments": 0,
+                "time": 0,
                 "username": u.username,
             }
             for u in self.users
@@ -51,9 +54,14 @@ class AnnotationReport:
 
                 report[username]["labeled_comments"] += article_label.comment_labels.count()
 
+            metadata = json.loads(article_label.metadata)
+            end = datetime.strptime(metadata["end_time"], '%Y-%m-%dT%H:%M:%S.%fZ')
+            start = datetime.strptime(metadata["start_time"], '%Y-%m-%dT%H:%M:%S.%fZ')
 
+            report[username]["time"] += (end - start).seconds
 
         for username, user_report in report.items():
+            user_report["time"] = user_report["time"] / 3600
             yield user_report
 
     def batch_report(self):

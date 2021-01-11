@@ -1,4 +1,5 @@
-from api.models import Assignment, ArticleLabel
+import pandas as pd
+from api.models import Assignment, ArticleLabel, BatchAssignment
 
 class AnnotationReport:
     """
@@ -54,3 +55,24 @@ class AnnotationReport:
 
         for username, user_report in report.items():
             yield user_report
+
+    def batch_report(self):
+        """
+        Calculate batch report
+        """
+
+        usernames = [u.username for u in self.users]
+        df = pd.DataFrame(columns=usernames)
+
+        for batch_assignment in BatchAssignment.objects.all():
+            user_name = batch_assignment.user.username
+            if user_name in usernames:
+                batch_name = batch_assignment.batch.name
+                value = "completed" if batch_assignment.done else "progressing"
+                df.loc[batch_name, user_name] = value
+
+        df.fillna("na", inplace=True)
+
+        for batch_name, rec in df.iterrows():
+            yield [batch_name, [rec[u] for u in usernames]]
+

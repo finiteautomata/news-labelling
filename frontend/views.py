@@ -89,7 +89,7 @@ class UserView(LoginRequiredMixin, View):
             "article_labels": article_labels,
         })
 
-class UserIndex(LoginRequiredMixin, View):
+class DashboardView(LoginRequiredMixin, View):
     """
     User index
     """

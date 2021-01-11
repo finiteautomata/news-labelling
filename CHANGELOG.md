@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.3.2
+
+- Agrego dashboard
+
 ## 0.3.1
 
 - Agrego comandos varios para manejo de DB

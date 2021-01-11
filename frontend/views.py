@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404, redirect
 from api.models import Article, Assignment, CommentLabel, ArticleLabel
 from .ranking import RankingCalculator
+from .report import AnnotationReport
 
 class Index(LoginRequiredMixin, RankingCalculator, View):
     """
@@ -86,6 +87,26 @@ class UserView(LoginRequiredMixin, View):
         return render(request, 'users/show.html', {
             "user": user,
             "article_labels": article_labels,
+        })
+
+class DashboardView(LoginRequiredMixin, View):
+    """
+    User index
+    """
+
+    @method_decorator(staff_member_required)
+    def get(self, request):
+        """
+        Show index
+        """
+        users = User.objects.all()
+
+        # Get only annotators
+        users = [u for u in users if u.assignment_set.count() > 0]
+
+        report = AnnotationReport(users)
+        return render(request, 'users/index.html', {
+            "report": report,
         })
 
 

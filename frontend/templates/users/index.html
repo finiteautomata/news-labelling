@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block  head %}
+{% endblock %}
+
+{% block title %}
+Dashboard usuarios
+{% endblock %}
+
+{% block content %}
+
+<h1>Dashboard usuarios</h1>
+
+<style>
+
+    .batch-completed {
+        background-color: greenyellow;
+    }
+
+    .batch-progressing {
+        background-color: yellow;
+    }
+
+    .batch-na {
+        background-color: lightgray;
+    }
+
+    #user-report {
+        table-layout: fixed;
+    }
+
+    #batch-report {
+        table-layout: fixed;
+    }
+</style>
+
+
+<div class="row">
+
+
+    <table id="user-report">
+        <thead>
+
+            <tr>
+                <th scope="col">Anotador</th>
+                <th scope="col">Art. asignados</th>
+                <th scope="col">Art. restantes</th>
+                <th scope="col">Anotados</th>
+                <th scope="col">Salteados</th>
+                <th scope="col">Comentarios anotados</th>
+                <th scope="col">Tiempo</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for user_report in report.user_reports %}
+                <tr>
+                    <th scope="row"> {{ user_report.username }}</th>
+                    <td> {{user_report.assignments}}</td>
+                    <td> {{user_report.assignments_left }}</td>
+                    <td> {{user_report.labeled_articles}}</td>
+                    <td> {{user_report.skipped_articles}}</td>
+                    <td> {{user_report.labeled_comments}}</td>
+                    <td> {{user_report.time|floatformat:-2}}</td>
+                </tr>
+
+            {% endfor %}
+        </tbody>
+
+    </table>
+</div>
+
+
+<div class="row">
+
+    <h2> Asignación de batches </h2>
+
+    <table id="user-report">
+        <thead>
+
+            <tr>
+                <th scope="col">Batch</th>
+
+                {% for user in report.users %}
+                    <th scope="col"> {{ user }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for batch_report in report.batch_report %}
+                <tr>
+                    <th scope="row"> {{batch_report.0}}</th>
+                    {% for status in batch_report.1 %}
+                        <td class="batch batch-{{status}}"> {{ status }} </td>
+                    {% endfor %}
+                </tr>
+
+            {% endfor %}
+        </tbody>
+
+    </table>
+
+</div>
+
+{%endblock %}

@@ -21,7 +21,9 @@ def load_batch_from_file(path, batch_name):
 
     if Batch.objects.filter(name=batch_name).exists():
         print(f"Batch {batch_name} already exists -- skipping")
-        return
+        batch = Batch.objects.get(name=batch_name)
+
+        return [art.tweet_id for art in batch.articles.all()]
 
     with open(path) as f:
         tweet_ids = json.load(f)
@@ -67,7 +69,7 @@ def load_batches(random_seed=2020, remove=False, demo=False, interview=False, ba
         """
         Create batch ids
         """
-        batch_ids = [remaining_ids[i:i+batch_size] for i in remaining_ids[::batch_size]]
+        batch_ids = [remaining_ids[i:i+batch_size] for i in range(len(remaining_ids))[::batch_size]]
 
         batches = []
 
@@ -75,6 +77,7 @@ def load_batches(random_seed=2020, remove=False, demo=False, interview=False, ba
             for i, ids in enumerate(batch_ids):
                 articles = Article.objects.filter(tweet_id__in=ids)
                 assert articles.count() == len(ids)
+                assert len(ids) > 0
                 batch = Batch.create_from_articles(str(i+1), articles)
 
                 print(f"Batch {batch.name} created")

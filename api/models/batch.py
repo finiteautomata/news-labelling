@@ -17,6 +17,7 @@ class Batch(models.Model):
         """
         Convenience method for creating batch
         """
+        assert articles is not []
         with transaction.atomic():
             batch = cls(name=name)
             batch.save()

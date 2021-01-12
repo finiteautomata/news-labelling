@@ -55,7 +55,11 @@ Dashboard usuarios
         <tbody>
             {% for user_report in report.user_reports %}
                 <tr>
-                    <th scope="row"> {{ user_report.username }}</th>
+                    <th scope="row">
+                        <a href="{% url 'user_view' user_report.username%}">
+                            {{ user_report.username }}
+                        </a>
+                    </th>
                     <td> {{user_report.assignments}}</td>
                     <td> {{user_report.assignments_left }}</td>
                     <td> {{user_report.labeled_articles}}</td>

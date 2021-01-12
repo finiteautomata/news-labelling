@@ -4,26 +4,49 @@
 
 ## Cecilia Roth: “La marcha anticuarentena me pareció una irresponsabilidad sanitaria”*
 
-## Luis Novaresio contó cómo será su boda con Braulio Bauab: "Nos va a casar una rabina"
+
+> -  @usuario Irresponsable es q te sigas falopeando a los 60 años, vieja trola.
+
+Acá se te pasó marcarlo como MUJER (pusiste LGBTI, quizás fue sin querer)
+
+## Los piratas del siglo XXI se roban US$1000 millones por año del mar argentino
+
+Tu feedback
+
+```
+El término "pirata" me generó dudas en varios comentarios. Decidí no considerarlo en este caso, ya que aparece en el mismo titular de la nota. La única excepción que puse a esto fue el comentario de "Mucho pirata chino. Quizás cambiaron mariscos por barbijos", en la que etiqueté discriminación racial debido a la alusión de diseminar el virus
+```
+
+Me parece perfecto. No hay ninguna alusión racial o xenofóbica salvo la que marcaste.
+
+## Así fue el minuto a minuto del debate entre los candidatos a vicepresidente de Estados Unidos
 
 
->  @usuario Luis te haces el vanguardista y sos más cavernícola que Mirtha!!
+> -  @usuario Ella solo usa made in China
 
-Acá marcaste ASPECTO. Creo que no hay discriminación siquiera.
+Este comentario no es discriminatorio, y tampoco hacia la mujer
 
->  @usuario Que suerte que el kirchnerismo legalizó que dos personas del mismo sexo se puedan casar. Felicidades gorilon!!!
->  @usuario DALE GRACIAS A NÉSTOR KIRCHNER GORILA VIEJO
+## Protestas y cortes en la Ciudad: piqueteros marcharon en la 9 de Julio a favor de la toma de tierras
 
-Acá hay más una discriminación política (por "gorila") que otra cosa. Marcar eso.
+> -  @usuario @usuario Secesión inmediata de orcolandia
 
-## Thelma Fardin contó cómo sigue la causa contra Juan Darthés: “Brasil le permite la impunidad”
+Este quizás va marcado. Lo marcaría como POBREZA...potencialmente hasta algo racial hay, pero creo que con marcarlo está bien
 
-> @usuario Argentina a vos también
+## Video: Jair Bolsonaro le hace upa a un hombre de talla baja pensando que era un niño
 
-Marcado como MUJER. No queda claro que lo sea
+Tu feedback
 
-## Escándalo en España: fallan los tests de coronavirus fabricados en China
+```
+En este caso creo que desde el mismo titular de la noticia aparece un lenguaje discriminatorio por llamar "enano", dado que resulta ofensivo.
+```
 
->  @usuario Me parece que a los que hay que aislar  del mundo es a los chinos . Cagada tras cagada hacen
+Está perfecto.
 
-> Algunos otros comentarios donde dicen que "lo chino" es malo, o "diseminaron" el virus, marcarlos
+## Intentó violar a su novia y ella lo asesinó a escobazos
+
+
+```
+En el comentario de "👏🏽👏🏽👏🏽👏🏽👏🏽👏🏽" y "Pues...uno menos." el discurso discriminatorio se da hacia el sexo masculino también. No sabía si esto entraría dentro de otros, pero por las dudas te lo quería aclarar.
+```
+
+Está bien. No lo marques así. Vos lo pusiste como "CRIMINAL". Me parece perfecto

@@ -62,8 +62,13 @@ class RankingCalculator:
                 u:v for u, v in ranking.items()
                 if v["comments"] < ranking[username]["comments"]
             }
+            """
+            users_up = len([
+                u for u, v in ranking.items()
+                if v["comments"] >= ranking[username]["comments"]
+            ])
 
-            if users_below:
+            if users_up < users_below:
                 # Agarro otros y los pongo arriba
                 users_will_put_up_in_ranking = random.sample(
                     users_below.keys(),
@@ -77,6 +82,7 @@ class RankingCalculator:
 
                     values["articles"] = new_articles
                     values["comments"] = ranking[username]["comments"] + new_comments
+            """
 
         return sorted(
             list(ranking.items()),

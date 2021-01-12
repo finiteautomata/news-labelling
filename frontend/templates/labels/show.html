@@ -12,11 +12,23 @@
 
 {% block content %}
 
+<div class="row">
+  <h2>Etiquetas de {{username}}</h2>
+
+  {% if article_label.feedback %}
+
+    <h3> Feedback</h3>
+
+    <p>
+      {{ article_label.feedback|linebreaks}}
+    </p>
+  {% endif %}
+</div>
 
 <div class="row centering">
   <blockquote class="twitter-tweet"><p lang="es" dir="ltr"> {{article.text}} <a href="https://twitter.com/user/status/{{article.tweet_id}}?ref_src=twsrc%5Etfw">August 3, 2020</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
 </div>
+
 
 
 <div class="row">

@@ -71,6 +71,7 @@ class LabelView(LoginRequiredMixin, View):
 
         return render(request, 'labels/show.html', {
             "article": article,
+            "username": username,
             "article_label": label,
             "hate_speech_types": hate_speech_types,
         })

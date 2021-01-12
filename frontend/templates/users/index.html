@@ -32,6 +32,23 @@ Dashboard usuarios
     #batch-report {
         table-layout: fixed;
     }
+
+    #feedback-report {
+        table-layout: fixed;
+    }
+
+    #feedback-report .user {
+        width: 10%;
+    }
+
+    #feedback-report .article {
+        width: 30%;
+    }
+
+    #feedback-report .feedback {
+        width: 30%;
+    }
+
 </style>
 
 
@@ -72,6 +89,8 @@ Dashboard usuarios
         </tbody>
 
     </table>
+
+
 </div>
 
 
@@ -96,7 +115,9 @@ Dashboard usuarios
                 <tr>
                     <th scope="row"> {{batch_report.0}}</th>
                     {% for status in batch_report.1 %}
-                        <td class="batch batch-{{status}}"> {{ status }} </td>
+                        <td class="batch batch-{{status}}">
+                            {{ status }}
+                        </td>
                     {% endfor %}
                 </tr>
 
@@ -104,6 +125,38 @@ Dashboard usuarios
         </tbody>
 
     </table>
+
+</div>
+
+<div class="row">
+    <h2>Feedback de anotadores</h2>
+
+    <table id="feedback-report">
+        <thead>
+
+            <tr>
+                <th scope="col" class="user">Usuario</th>
+                <th scope="col" class="article">Artículo</th>
+                <th scope="col" class="feedback">Feedback</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for feedback in report.feedbacks %}
+                <tr>
+                    <td> {{feedback.user.username}}</td>
+                    <td> {{feedback.article.title}}</td>
+                    <td>
+                        <a href="{% url 'label_view' feedback.user.username feedback.article.id%}">
+                            {{feedback.text}}
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+
 
 </div>
 

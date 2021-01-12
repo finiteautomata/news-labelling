@@ -3,6 +3,7 @@ from datetime import datetime
 import pandas as pd
 from api.models import Assignment, ArticleLabel, BatchAssignment
 
+
 class AnnotationReport:
     """
     Calculates report
@@ -83,4 +84,19 @@ class AnnotationReport:
 
         for batch_name, rec in df.iterrows():
             yield [batch_name, [rec[u] for u in usernames]]
+
+
+    def feedbacks(self):
+        """
+        Return feedbacks
+        """
+
+        feedback_labels = ArticleLabel.objects.exclude(feedback="")
+
+        for feedback in feedback_labels:
+            yield {
+                "user": feedback.user,
+                "text": feedback.feedback,
+                "article": feedback.article,
+            }
 

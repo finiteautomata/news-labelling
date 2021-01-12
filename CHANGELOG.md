@@ -1,8 +1,15 @@
 # CHANGELOG
 
+## 0.3.3
+
+- Arreglo problemas con batches
+- Arreglo problemas con dependencias
+- Cambios menores en dashboard
+
 ## 0.3.2
 
 - Agrego dashboard
+
 
 ## 0.3.1
 

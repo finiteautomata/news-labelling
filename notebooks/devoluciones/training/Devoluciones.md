@@ -1,17 +1,50 @@
-# glerici
+# Categorías
+
+
+- LGBTI y Criminal tienen bastante acuerdo general
+- Racismo bastante bien, mejorar un poquito y estamos
+- Mujer no tan bien pero era una nota difícil
+- ASPECTO bien pero mejorar
+- Politica podría ser peor
+- Discapacidad tiene muy mal
+- Pobreza muy mal
+
+
+# Devoluciones generales
+
+- Los casos en los cuales se hagan apreciaciones discriminatorias por el aspecto de alguien que no hagan referencia explícita a alguna otra cualidad de la mujer los vamos a marcar como ASPECTO (recordemos, gordofobia, gerontofobia, y también por otras cuestiones del aspecto) y no como MUJER.
+
+Por ejemplo "Cecilia, sos un asco de la cantidad de cirugías" => marcar como ASPECTO y no como MUJER
+
+- Si habla de alguna cuestión del cuerpo femenino de manera ofensiva (tanto si hace alusión a una cirugía estética o no) lo marcamos sólo como MUJER.
+
+Por ejemplo "Che mirate los dos globos de plástico que tiene XXXXX" => MUJER
+
+- Decirle "momia"/"fósil" a una mujer lo marcamos como ASPECTO (gerontofobia) y no como MUJER (a menos que haya algo más para marcar esto también)
+
+- Acusaciones del estilo "China hizo el virus y lo diseminó" o de asociar rasgos a una población/nacionalidad ("lo chino es todo una mierda") las marcamos como racistas. Eso no aplica a acusaciones al Gobierno chino, por ejemplo
+
+- Cuando vemos comentarios del estilo "negro hdp/de mierda/etc", marquemos como RACISTA y también si hay otra clase que corresponda. Por ejemplo, si es una nota sobre senegaleses, sólo esa; si habla de movimientos sociales, podemos poner POBREZA; si es sobre un motín en la carcel, CRIMINAL.
 
 
 
-## Cecilia Roth: “La marcha anticuarentena me pareció una irresponsabilidad sanitaria”*
+## Aclaraciones particulares
+
+
+## glerici
+
+Marcaste en la nota
+
+*Cecilia Roth: “La marcha anticuarentena me pareció una irresponsabilidad sanitaria”*
 
 -  @usuario Kuka
 Este comentario lo marcaste como "MUJER". No es discriminatorio a la mujer (en todo caso, es sólo POLITICA)
 
-> - @usuario que se calle es cómplice del saqueo hijos de puta
-> - @usuario Jajaja cuánto le habrán pagado por declarar esta boludez?
-> - @usuario Realmente a quien mierda le importa lo que diga esta???
-> - @usuario Y vos me parecés una pelotuda a rosca
-> - @usuario Me importa un choto lo que diga esta estúpida
+>  @usuario que se calle es cómplice del saqueo hijos de puta
+>  @usuario Jajaja cuánto le habrán pagado por declarar esta boludez?
+>  @usuario Realmente a quien mierda le importa lo que diga esta???
+>  @usuario Y vos me parecés una pelotuda a rosca
+>  @usuario Me importa un choto lo que diga esta estúpida
 
 Estos comentarios se los podrían hacer tranquilamente a un hombre. Bajo nuestros criterios de anotación, no son discriminatorio
 
@@ -52,16 +85,12 @@ Este a lo sumo es gerontofobia, que lo marcaste bien. No marcar como MUJER
 
 > @usuario Lleno d Nano Cerebros minusválidos infectados con el peor d todos los Virus e Peroncho KK. Ese cuando se les mete en el cuerpo hace estragos dejándolos inservibles y llenos d fanatismo, lo peor es q cada vez son + y así está el país!! Y no estsoy a favor d MM. Sociedad enferma!!!
 
-A priori sí POLITICA, no veo la parte LGBTI. De hecho parece bastante disconexo del resto
+A priori sí POLITICA, no veo la parte LGBTI. De hecho parece bastante disconexo del
 
 
 >  @usuario La rabina ,si es que eso existe,deberá estudiar en el Toráh la opinión que tiene yaveh acerca de la sodomía.....hagan lo que se les cante pero no sé metan con creencias milenarias.....dios no ama a los promiscuos
 
-Marcado como RACISMO, no veo que lo haya acá (habla de que no hay rabinas mujeres, entiendo)
-
->  @usuario Que par de putos.
-> @usuario Entre el covid y esta nota..es igual . Ambos  causan desagrado🙄
-Te faltó marcar LGBTI en estos dos
+Marcado como RACISMO, no veo que lo haya acá
 
 
 ## Thelma Fardin contó cómo sigue la causa contra Juan Darthés: “Brasil le permite la impunidad”
@@ -88,20 +117,33 @@ No tiene nada que ver y es polémico, pero habla de que Fardin tiene acusaciones
 
 Acá te faltó marcar DISCAPACIDAD porque la acusa de drogadicta
 
->  @usuario De los Presos que sacan de las carceles ni una Palabra mucho feminismo y no e visto a ninguna de estas aborteras de izquierda defender los derechos de las mujeres ni criticar a Zaffaroni que defiende y apoya criminales y violadores con su teoria abolicionista.
 
-Acá creo que habla de violadores y criminales...pero no está discriminándolos. No poner CRIMINAL
-
-
-## LLAMADO a la acción
+# lprats
 
 
-> @usuario Parece que este virus nos va a depurar un poco de algunos males...
-
- Este no es un llamado a la acción
+> @usuario Pasarte de merca durante años, es una verdadera irresponsabilidad sanitaria
 
 
-> - @usuario Pero miren a esta criatura de belcebú, con la cría de asesino en brazos para dar lástima. Ay! ay! Cobras y leones hambrientos" Problema solucionado.
-> - @usuario Napal y tema solucionado
 
-Estos, más o menos reales, hablan de "matarlos"
+## Thelma Fardin contó cómo sigue la causa contra Juan Darthés: “Brasil le permite la impunidad”
+
+
+>  @usuario Fardin deja la merca,te hace mal.
+> le cagaste la vida a un tipo para tener cámara y te cagaste en las víctimas reales.
+
+Acá te faltó marcar DISCAPACIDAD porque la acusa de drogadicta
+
+
+
+
+
+
+
+ ### dvalado
+
+*Cecilia Roth: “La marcha anticuarentena me pareció una irresponsabilidad sanitaria”*
+
+
+-  @usuario 🤮🤮🤮🤮
+
+ Ofensivo, pero en este caso no lo vamos a considerar discriminatorio porque no queda claro (distinto es si es una chica trans, una pareja gay, o un ícono de aplausos )

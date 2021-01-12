@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.3.4
+
+- Mejoro un poquito look and feel de dashboard
+- Ranking menos mentiroso
+
 ## 0.3.3
 
 - Arreglo problemas con batches

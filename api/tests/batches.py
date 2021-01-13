@@ -120,6 +120,19 @@ class BatchTest(TestCase):
         )
         self.assertIs(self.user.assignment_set.count(), len(articles2))
 
+    def test_raises_when_already_set(self):
+        """
+        Check it can be revoked when not started
+        """
+        articles = ArticleFactory.create_batch(5)
+
+        batch = Batch.create_from_articles(name="1", articles=articles)
+        batch.assign_to(self.user)
+
+        self.user.article_labels.create(article=articles[0], is_interesting=False)
+        with self.assertRaises(ValueError):
+            batch.revoke_from(self.user)
+
 
 class BatchAssignmentTest(TestCase):
 
@@ -165,6 +178,30 @@ class BatchAssignmentTest(TestCase):
         batch_assignment.refresh_from_db()
 
         self.assertIs(batch_assignment.done, True)
+
+    def test_completed_articles_when_just_started(self):
+        """
+        Check assignment not done after creation
+        """
+        batch_assignment = self.batch.assign_to(self.user)
+
+        batch_assignment.refresh_from_db()
+
+        self.assertIs(batch_assignment.completed_articles, 0)
+
+    def test_completed_articles_after_few_labels(self):
+        """
+        Check assignment not done after creation
+        """
+        batch_assignment = self.batch.assign_to(self.user)
+
+        for art in self.articles[:3]:
+            ArticleLabelFactory(article=art, user=self.user)
+
+        batch_assignment.refresh_from_db()
+
+        self.assertIs(batch_assignment.completed_articles, 3)
+
 
 
     def test_update_after_removing(self):

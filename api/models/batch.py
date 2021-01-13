@@ -58,8 +58,9 @@ class Batch(models.Model):
 
             if batch_assignment.completed_articles == 0:
                 user.assignment_set.filter(article__in=self.articles.all()).delete()
-
-            batch_assignment.delete()
+                batch_assignment.delete()
+            else:
+                raise ValueError("Already started batch!")
 
     def is_assigned_to(self, user):
         """
@@ -100,6 +101,11 @@ class BatchAssignment(models.Model, Completable):
             self.complete()
         elif self.done:
             self.undo()
+        else:
+            """
+            Just update total articles
+            """
+            self.save()
 
 
 def check_batch_status(sender, assignment, **kwargs):

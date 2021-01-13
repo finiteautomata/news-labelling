@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.3.6
+
+- Agrego cantidad de artículos por batch
+- Revocar batches
+
 ## 0.3.5
 
 - Ordeno feedbacks

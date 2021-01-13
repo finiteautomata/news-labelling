@@ -3,6 +3,17 @@ import datetime
 from django.contrib.auth.models import User
 from api.models import Assignment, CommentLabel, ArticleLabel
 
+fake_names = [
+    "koalacansado",
+    "cocodrilodundee",
+    "montypython",
+    "patonegro",
+    "pangolinpreciso",
+    "unicornioazul",
+    "elsalmon",
+    "winniepooh",
+]
+
 class RankingCalculator:
     """
     Calculates rankings
@@ -42,6 +53,7 @@ class RankingCalculator:
         Creates a fake ranking for that user
         """
         ranking = self.ranking()
+
         # Si no tiene assignments, no le miento :-)
         if not user.is_staff and Assignment.next_assignment_of(user):
 
@@ -84,7 +96,20 @@ class RankingCalculator:
                     values["comments"] = ranking[username]["comments"] + new_comments
             """
 
-        return sorted(
+        ret = sorted(
             list(ranking.items()),
             key=lambda x: x[1]["comments"], reverse=True
         )
+
+        if not user.is_staff:
+            """
+            Replace names!
+            Change tuples to list to support assignment
+            """
+
+            ret = [list(p) for p in ret]
+            for pair, fake_name in zip(ret, fake_names):
+                if pair[0] != user.username:
+                    pair[0] = fake_name
+
+        return ret

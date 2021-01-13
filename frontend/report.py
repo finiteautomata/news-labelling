@@ -77,7 +77,12 @@ class AnnotationReport:
             user_name = batch_assignment.user.username
             if user_name in usernames:
                 batch_name = batch_assignment.batch.name
-                value = "completed" if batch_assignment.done else "progressing"
+                if batch_assignment.done:
+                    value = "completed"
+                else:
+                    completed = batch_assignment.completed_articles
+                    to_be_done = batch_assignment.batch.articles.count()
+                    value = f"progressing ({completed}/{to_be_done})"
                 df.loc[batch_name, user_name] = value
 
         df.fillna("na", inplace=True)

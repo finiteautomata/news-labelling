@@ -8,6 +8,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from .mixins import Completable
 
 assignment_done = django.dispatch.Signal()
+assignment_undone = django.dispatch.Signal()
 
 # Create your models here.
 class Assignment(models.Model, Completable):
@@ -39,6 +40,12 @@ class Assignment(models.Model, Completable):
         Send signal after completion
         """
         assignment_done.send(sender=self.__class__, assignment=self)
+
+    def after_undo(self):
+        """
+        Send signal after undo
+        """
+        assignment_undone.send(sender=self.__class__, assignment=self)
 
 
 def undo_assignment_on_label_delete(sender, instance, **kwargs):

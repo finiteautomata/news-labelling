@@ -1,7 +1,8 @@
 from django.db import models, transaction, IntegrityError
-from api.models import Article, Assignment, assignment_done
+from api.models import Article, Assignment, assignment_done, assignment_undone
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models.signals import post_delete
 from .mixins import Completable
 
 # Create your models here.
@@ -47,6 +48,7 @@ class Batch(models.Model):
 
         return batch_assignment
 
+
     def is_assigned_to(self, user):
         """
         Checks is assigned
@@ -62,13 +64,33 @@ class BatchAssignment(models.Model, Completable):
 
     batch = models.ForeignKey(Batch, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    completed_articles = models.IntegerField(default=0)
     done = models.BooleanField(default=False)
 
 
     class Meta:
         unique_together = ('user', 'batch')
 
-def check_batch_completed(sender, assignment, **kwargs):
+    def update(self):
+        """
+        Check status
+        """
+        completed_articles = Assignment.objects.filter(
+            done=True,
+            article__in=self.batch.articles.all(),
+            user=self.user
+        ).count()
+
+        total_articles = self.batch.articles.count()
+
+        self.completed_articles = completed_articles
+        if completed_articles == total_articles:
+            self.complete()
+        elif self.done:
+            self.undo()
+
+
+def check_batch_status(sender, assignment, **kwargs):
     """
     Check batch is complete after
     """
@@ -80,18 +102,12 @@ def check_batch_completed(sender, assignment, **kwargs):
     try:
         batch_assignment = BatchAssignment.objects.get(user=user, batch=batch)
 
-        done_assignments = Assignment.objects.filter(
-            done=True,
-            article__in=batch.articles.all(),
-            user=user
-        ).count()
-
-        if done_assignments == batch.articles.count():
-            batch_assignment.complete()
-
+        batch_assignment.update()
     except ObjectDoesNotExist:
 
         print(f"No batch assignment of {user.username} and {batch}")
 
 
-assignment_done.connect(check_batch_completed, sender=Assignment)
+assignment_done.connect(check_batch_status, sender=Assignment)
+assignment_undone.connect(check_batch_status, sender=Assignment)
+post_delete.connect(check_batch_status, sender=Assignment)

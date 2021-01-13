@@ -15,12 +15,6 @@ class Completable:
 
         self.after_complete()
 
-    def after_complete(self):
-        """
-        Abstract method. Override!
-        """
-        pass
-
     def undo(self):
         """
         Undo!
@@ -30,3 +24,18 @@ class Completable:
             raise ValueError("Assignment not done")
         self.done = False
         self.save()
+
+        self.after_undo()
+
+    def after_complete(self):
+        """
+        Abstract method. Override!
+        """
+        pass
+
+
+    def after_undo(self):
+        """
+        Abstract method, override!
+        """
+        pass

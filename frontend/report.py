@@ -91,10 +91,11 @@ class AnnotationReport:
         Return feedbacks
         """
 
-        feedback_labels = ArticleLabel.objects.exclude(feedback="")
+        feedback_labels = ArticleLabel.objects.exclude(feedback="").order_by("-created_at")
 
         for feedback in feedback_labels:
             yield {
+                "date": feedback.created_at,
                 "user": feedback.user,
                 "text": feedback.feedback,
                 "article": feedback.article,

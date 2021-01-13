@@ -37,6 +37,9 @@ Dashboard usuarios
         table-layout: fixed;
     }
 
+    #feedback-report .date {
+        width: 20%;
+    }
     #feedback-report .user {
         width: 10%;
     }
@@ -46,7 +49,7 @@ Dashboard usuarios
     }
 
     #feedback-report .feedback {
-        width: 30%;
+        width: 40%;
     }
 
 </style>
@@ -135,6 +138,7 @@ Dashboard usuarios
         <thead>
 
             <tr>
+                <th scope="col" class="date">Fecha</th>
                 <th scope="col" class="user">Usuario</th>
                 <th scope="col" class="article">Artículo</th>
                 <th scope="col" class="feedback">Feedback</th>
@@ -144,12 +148,15 @@ Dashboard usuarios
         <tbody>
             {% for feedback in report.feedbacks %}
                 <tr>
+                    <td> {{feedback.date}} </td>
                     <td> {{feedback.user.username}}</td>
-                    <td> {{feedback.article.title}}</td>
                     <td>
                         <a href="{% url 'label_view' feedback.user.username feedback.article.id%}">
-                            {{feedback.text}}
+                            {{feedback.article.title}}
                         </a>
+                    </td>
+                    <td>
+                            {{feedback.text}}
                     </td>
                 </tr>
             {% endfor %}

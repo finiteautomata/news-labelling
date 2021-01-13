@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.3.5
+
+- Ordeno feedbacks
+- Nombres fake en ranking
+
 ## 0.3.4
 
 - Mejoro un poquito look and feel de dashboard

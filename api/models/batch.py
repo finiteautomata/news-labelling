@@ -98,7 +98,8 @@ class BatchAssignment(models.Model, Completable):
 
         self.completed_articles = completed_articles
         if completed_articles == total_articles:
-            self.complete()
+            if not self.done:
+                self.complete()
         elif self.done:
             self.undo()
         else:

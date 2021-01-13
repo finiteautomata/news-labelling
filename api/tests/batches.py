@@ -84,6 +84,41 @@ class BatchTest(TestCase):
         with self.assertRaises(IntegrityError):
             batch.assign_to(self.user)
 
+    def test_revokes_from_user_when_not_started(self):
+        """
+        Check it can be revoked when not started
+        """
+        articles = ArticleFactory.create_batch(5)
+        batch = Batch.create_from_articles(name="batch name", articles=articles)
+
+        batch.assign_to(self.user)
+
+        batch.revoke_from(self.user)
+
+        self.assertIs(batch.is_assigned_to(self.user), False)
+
+    def test_revokes_only_deletes_current_assignments(self):
+        """
+        Check it can be revoked when not started
+        """
+        articles1 = ArticleFactory.create_batch(5)
+        articles2 = ArticleFactory.create_batch(5)
+
+        batch1 = Batch.create_from_articles(name="1", articles=articles1)
+        batch1.assign_to(self.user)
+
+        batch2 = Batch.create_from_articles(name="2", articles=articles2)
+        batch2.assign_to(self.user)
+
+
+        batch1.revoke_from(self.user)
+
+        self.assertIs(batch2.is_assigned_to(self.user), True)
+        self.assertIs(
+            self.user.assignment_set.filter(article__in=articles2).count(),
+            len(articles2),
+        )
+        self.assertIs(self.user.assignment_set.count(), len(articles2))
 
 
 class BatchAssignmentTest(TestCase):

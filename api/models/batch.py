@@ -48,6 +48,18 @@ class Batch(models.Model):
 
         return batch_assignment
 
+    def revoke_from(self, user):
+        """
+        Revokes from user. If started, raises exception
+        """
+
+        with transaction.atomic():
+            batch_assignment = BatchAssignment.objects.get(batch=self, user=user)
+
+            if batch_assignment.completed_articles == 0:
+                user.assignment_set.filter(article__in=self.articles.all()).delete()
+
+            batch_assignment.delete()
 
     def is_assigned_to(self, user):
         """
@@ -107,7 +119,13 @@ def check_batch_status(sender, assignment, **kwargs):
 
         print(f"No batch assignment of {user.username} and {batch}")
 
+def check_after_delete(sender, instance, **kwargs):
+    """
+    Check after removal of assignment
+    """
+    return check_batch_status(sender, assignment=instance, **kwargs)
+
 
 assignment_done.connect(check_batch_status, sender=Assignment)
 assignment_undone.connect(check_batch_status, sender=Assignment)
-post_delete.connect(check_batch_status, sender=Assignment)
+post_delete.connect(check_after_delete, sender=Assignment)

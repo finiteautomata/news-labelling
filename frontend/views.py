@@ -59,13 +59,16 @@ class LabelView(LoginRequiredMixin, View):
     """
     Show user labels
     """
-    @method_decorator(staff_member_required)
     def get(self, request, username, article_pk):
+
         article = get_object_or_404(Article, pk=article_pk)
         label = get_object_or_404(ArticleLabel,
             user__username=username,
             article=article,
         )
+
+        if not request.user.is_staff and request.user != label.user:
+            return redirect("index")
 
         hate_speech_types = [t[0] for t in CommentLabel.HATE_SPEECH_TYPES]
 

@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.3.7
+
+- Dejo que usuarios puedan ver sus labels (sólo con link)
+- Ordeno batches
+
 ## 0.3.6
 
 - Agrego cantidad de artículos por batch

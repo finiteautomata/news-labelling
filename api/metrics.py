@@ -3,6 +3,13 @@ import numpy as np
 import krippendorff
 from api.models import ArticleLabel, CommentLabel
 
+
+def no_null_columns(df):
+    """
+    Return dataframe only having those columns for which no nan appears
+    """
+    return df[df.columns[df.notna().all()]]
+
 class AgreementCalculator:
     """
     Class that calculates agreement metrics
@@ -28,9 +35,6 @@ class AgreementCalculator:
 
         if not self.users:
             self.users = list({label.user for label in self.article_labels})
-
-
-
 
     def __init__(self, batch=None, articles=None, users=None):
         """
@@ -165,3 +169,39 @@ class AgreementCalculator:
         support = df.notna().sum(axis=1)
 
         return df.fillna(0).sum(axis=1) / support
+
+    def get_agrees_and_disagrees(self, on):
+        """
+        Return comments in which there were disagree for a given category
+        """
+        category_df = self.get_labelled_comments(on)
+        category_df = no_null_columns(category_df)
+
+        agree_comments = category_df[category_df.columns[category_df.all()]]
+        non_hateful_comments = category_df[category_df.columns[(~category_df.astype(bool)).all()]]
+        no_agree = ~((category_df.sum() == 0) | (category_df.sum() == len(self.users)))
+
+        disagree_comments = category_df[category_df.columns[no_agree]]
+
+        """
+        #Estos son muchos! Filtrar sólo los de aquellos artículos
+        # donde haya habido algún acuerdo
+
+        allowed_articles = set(
+            c.article_id for c in Comment.objects.filter(id__in=agree_comments.columns)
+        )
+
+        allowed_comments = Comment.objects.filter(
+            id__in=non_hateful_comments.columns,
+            article_id__in=allowed_articles,
+        )
+
+        #print(len(allowed_comments))
+        comment_ids = set(c.id for c in allowed_comments)
+
+        non_hateful_comments = non_hateful_comments[[
+            c for c in non_hateful_comments.columns if c in comment_ids
+        ]]
+        """
+        return agree_comments, disagree_comments, non_hateful_comments
+

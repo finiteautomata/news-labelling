@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block  head %}
+<link rel="stylesheet" href="{% static 'base/guidelines.css' %}"/>
+{% endblock %}
+
+{% block title %}
+Batch {{batch.name}}
+{% endblock %}
+
+{% block content %}
+
+<h1>Batch {{batch.name}}</h1>
+
+<div class="row">
+
+    <div class="four columns">
+        <p>
+            Asignado a
+            <ul>
+                {% for user in users %}
+                    <li>{{user.username}}</li>
+                {% endfor %}
+            </ul>
+        </p>
+    </div>
+
+    <div class="eight columns">
+
+
+        <table>
+
+            <thead>
+                <th scope="col">Categoría</th>
+                <th scope="col">Alpha</th>
+                <th scope="col">Soporte</th>
+            </thead>
+
+            <tbody>
+                {% for category, category_report in report.items %}
+                    <tr>
+                        <th scope="row">{{category}}</th>
+                        <td>{{category_report.agreement|floatformat:-2}}</td>
+                        <td>{{category_report.support}}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+
+    </div>
+
+</div>
+
+<div class="row">
+    <h2>Resumen por categoría</h2>
+    {% for category in report %}
+        <details>
+            <summary>
+                {{category}}
+            </summary>
+        </details>
+
+        <hr>
+    {% endfor %}
+</div>
+
+
+{%endblock %}

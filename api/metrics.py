@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import krippendorff
 from api.models import ArticleLabel, CommentLabel
 
@@ -125,7 +126,17 @@ class AgreementCalculator:
 
         df = self.get_labelled_comments(on)
 
-        return krippendorff.alpha(df.values.astype('float'))
+        """
+        Get support
+        """
+
+        labelled_by_all = df.columns[df.notna().all()]
+        any_marked_positive = df[labelled_by_all].sum() > 0
+        support = any_marked_positive.sum()
+        if support == 0:
+            return np.nan, support
+
+        return krippendorff.alpha(df.values.astype('float')), support
 
     def get_bias_towards(self, on="hate"):
         """

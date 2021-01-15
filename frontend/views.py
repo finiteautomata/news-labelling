@@ -25,19 +25,6 @@ class Index(LoginRequiredMixin, RankingCalculator, View):
             "ranking": self.fake_ranking_for(request.user),
         })
 
-class StatisticsView(LoginRequiredMixin, RankingCalculator, View):
-    """
-    Statistics
-    """
-
-    def get(self, request):
-        """
-        GET stats
-        """
-        return render(request, 'stats.html', {
-            "ranking": self.ranking(),
-        })
-
 
 class ArticleView(LoginRequiredMixin, View):
     """

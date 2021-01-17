@@ -108,8 +108,10 @@ class RankingCalculator:
             """
 
             ret = [list(p) for p in ret]
-            for pair, fake_name in zip(ret, fake_names):
+            i = 0
+            for pair in ret:
                 if pair[0] != user.username:
-                    pair[0] = fake_name
+                    pair[0] = fake_names[i]
+                    i += 1
 
         return ret

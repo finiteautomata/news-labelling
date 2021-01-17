@@ -1,78 +1,37 @@
 # lprats
 
-## Cecilia Roth: “La marcha anticuarentena me pareció una irresponsabilidad sanitaria”*
+Tu feedback
+
+>El término "Aborteras" que utilizan 2 usuarios distintos me resuena como un término utilizado para ofender y lo encuentro relacionado con idiologías u opiniones (pero no políticas) es por eso que los incluí en la categoría "otros".
+
+Sí. En el manual de etiquetado tomamos una decisión arbitraria y pedimos que estos los marquen como discriminatorios hacia la mujer. Podrían haber estado tranquilamente puestos en cuestiones políticas pero consideramos mejor ponerlo en esa categoría.
+
+Ahí abajo te marco algunos comentarios sobre esto
+
+> Este artículo, según mi punto de vista, se encuentra en un límite muy delgado entre: violencia de género y defensa de la víctima; un acto criminal (violación). Entiendo que aplaudir o festejar la muerte de un delincuente es un acto discriminatorio (como ha sido categorizado en notas referidas a delincuentes presos), por lo que lo categorizaré como tal, aun entendiendo que la mujer es la victima en este escenario.
+
+Me parece una buena decisión. Claramente es un artículo difícil, y nos vamos a encontrar de tanto en cuando con algunos de este estilo
 
 
-> @usuario Y a quien le importa la opinión de esta mujer...! a mi me pareció fantástica y cuál es la diferencia?
 
-Estos comentarios se los podrían hacer tranquilamente a un hombre. Bajo nuestros criterios de anotación, no son discriminatorios
-
-
->  @usuario 🤮🤮🤮🤮
-
- Ofensivo, pero en este caso no lo vamos a considerar discriminatorio porque no queda claro (distinto es si es una chica trans, una pareja gay, o un ícono de aplausos en una nota de un asesinato, por ejemplo)
-
-
-> @usuario Irresponsable es q te sigas falopeando a los 60 años, vieja trola.
-
-Este no lo marcaste como MUJER
-
-> @usuario Estamos grandes???no la conocí....
-
-Ligeramente ofensivo por su aspecto, pero me parece que no cruza la raya
-
-
-## Luis Novaresio contó cómo será su boda con Braulio Bauab: "Nos va a casar una rabina"
-
-
-> @usuario La rabina ,si es que eso existe,deberá estudiar en el Toráh la opinión que tiene yaveh acerca de la sodomía.....hagan lo que se les cante pero no sé metan con creencias milenarias.....dios no ama a los promiscuos
-
-Este lo marcaste como MUJER, va sólo LGBTI (creo que no está ofendiendo a la rabina, sólo duda de que exista como tal)
-
-> @usuario En ningun parrafo de los 70 libros que fueron escritos por inspiracion divina y en estos libros sagrados solamente figuran UNGIDOS los varones para el sacerdocio...!?
-
-Acá más allá de todo, no está atacando a la comunidad gay, sino que habla de que hay una "rabina". No es discriminatorio
 
 ## Thelma Fardin contó cómo sigue la causa contra Juan Darthés: “Brasil le permite la impunidad”
 
-> @usuario Otra que me da vergüenza ajena
+Podés ver las etiquetas en [https://labelling.jmperez.com.ar/users/lprats/labels/9122/](https://labelling.jmperez.com.ar/users/lprats/labels/9122/)
 
-Ofensivo, pero no veo lo discriminatorio
+> @usuario De los Preso}s que sacan de las carceles ni una Palabra mucho feminismo y no e visto a ninguna de estas aborteras de izquierda defender los derechos de las mujeres ni criticar a Zaffaroni que defiende y apoya criminales y violadores con su teoria abolicionista.
+> @usuario Terminala flaca, no existís. Te mandaste ese chamuyo para que te conociéramos y las aborteras te llevaran de bandera, pero tus 15 minutos de fama se acabaron. Proba con buscar un empleo honesto ahora, mamu. Aburriste! 😤
 
-> @usuario Y Argentina te permite seguir siendo actriz. Bodriooooooo
+Acá les dice "aborteras", marcar en estos casos como MUJER
 
-Idem, no queda claro si lo relaciona a la denuncia
+> - @usuario No entiendo cómo le pueden creer si a cualquiera se le mete la pija para adentro con esta
+> - @usuario Esta pendeja usó a Juan una noche de tensión sexual y después es tan más agradecida en morderle la mano a quien le dio de comer. Tal vez Juan no la comió bien. Pasa!
+> -  @usuario Thelmita si sos petera deciloooo @usuario
 
-> @usuario Y en Argentina también. Si no ya estarías imputada por violación a los derechos de autor.
+Estos son también para marcar como MUJER
 
-No tiene nada que ver y es polémico, pero me parece habla de que Fardin tiene acusaciones de copiar contenido. No lo marcamos como discriminatorio
+ ## Así fue el minuto a minuto del debate entre los candidatos a vicepresidente de Estados Unidos
 
+https://labelling.jmperez.com.ar/users/lprats/labels/8979/
 
->  @usuario Fardin deja la merca,te hace mal.
-> le cagaste la vida a un tipo para tener cámara y te cagaste en las víctimas reales.
-
-Acá te faltó marcar DISCAPACIDAD porque la acusa de drogadicta
-
-## Escándalo en España: fallan los tests de coronavirus fabricados en China
-
-> @usuario Y la culp es de españa ?  O los putos chinos ?
-
-Acá marcaste LGBTI. Más allá del uso de "putos", no está discriminando a nadie LGBTI, sino que la usa como mera palabra ofensiva.
-
->  @usuario @usuario Los cagaron otra vez
-
-Marcaste RACISMO, No queda claro que lo haya me parece
-
-> @usuario No podía fallar!  Jajajajaja Perdón que me ria pero jamás les hubiera comprado a ellos!
-
-Border, pero no
-
-
-
-## Llamado a la acción
-
-
->  @usuario Gracias Dios, te quedan vários todavía para llevarte.
->  @usuario Si se morían 1000 se solucionaba el problema de raíz
-
-Súper violentos ambos y medio al borde, pero no hay un llamado a la acción
+Acá también hay algunos comentarios que dicen "ABORTERA". Recordar marcarlos como MUJER (cuando dicen esto, feminazis, etc)

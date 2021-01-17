@@ -116,7 +116,11 @@ Dashboard usuarios
         <tbody>
             {% for batch_report in report.batch_report %}
                 <tr>
-                    <th scope="row"> {{batch_report.0}}</th>
+                    <th scope="row">
+                        <a href="{% url 'batch_view' batch_report.0 %}">
+                            {{batch_report.0}}
+                        </a>
+                    </th>
                     {% for status in batch_report.1 %}
                         <td class="batch batch-{{status}}">
                             {{ status }}

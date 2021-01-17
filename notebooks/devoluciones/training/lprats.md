@@ -19,7 +19,7 @@ Me parece una buena decisión. Claramente es un artículo difícil, y nos vamos 
 
 Podés ver las etiquetas en [https://labelling.jmperez.com.ar/users/lprats/labels/9122/](https://labelling.jmperez.com.ar/users/lprats/labels/9122/)
 
-> @usuario De los Presos que sacan de las carceles ni una Palabra mucho feminismo y no e visto a ninguna de estas aborteras de izquierda defender los derechos de las mujeres ni criticar a Zaffaroni que defiende y apoya criminales y violadores con su teoria abolicionista.
+> @usuario De los Preso}s que sacan de las carceles ni una Palabra mucho feminismo y no e visto a ninguna de estas aborteras de izquierda defender los derechos de las mujeres ni criticar a Zaffaroni que defiende y apoya criminales y violadores con su teoria abolicionista.
 > @usuario Terminala flaca, no existís. Te mandaste ese chamuyo para que te conociéramos y las aborteras te llevaran de bandera, pero tus 15 minutos de fama se acabaron. Proba con buscar un empleo honesto ahora, mamu. Aburriste! 😤
 
 Acá les dice "aborteras", marcar en estos casos como MUJER
@@ -34,4 +34,4 @@ Estos son también para marcar como MUJER
 
 https://labelling.jmperez.com.ar/users/lprats/labels/8979/
 
-Acá también hay algunos comentarios que dice "ABORTERA. Recordar marcarlos como MUJER (cuando dicen esto, feminazis, etc)
+Acá también hay algunos comentarios que dicen "ABORTERA". Recordar marcarlos como MUJER (cuando dicen esto, feminazis, etc)

@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-
+{% load debug_tags %}
 {% block  head %}
 <link rel="stylesheet" href="{% static 'base/guidelines.css' %}"/>
 {% endblock %}
@@ -41,7 +41,7 @@ Batch {{batch.name}}
                 {% for category, category_report in report.items %}
                     <tr>
                         <th scope="row">{{category}}</th>
-                        <td>{{category_report.agreement|floatformat:-2}}</td>
+                        <td>{{category_report.alpha|floatformat:-2}}</td>
                         <td>{{category_report.support}}</td>
                     </tr>
                 {% endfor %}
@@ -55,11 +55,64 @@ Batch {{batch.name}}
 
 <div class="row">
     <h2>Resumen por categoría</h2>
-    {% for category in report %}
+    {% for category, category_report in report.items %}
         <details>
             <summary>
                 {{category}}
             </summary>
+
+
+            <div class="row">
+
+                <h3>COINCIDENCIAS {{category.upper}}</h3>
+
+                {% for article, comments in category_report.agrees %}
+
+                    <div>
+                        <blockquote>{{article.title}}</blockquote>
+
+                        <ul>
+                            {% for comment in comments %}
+                                <li>{{comment.text}}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+
+                {% endfor %}
+            </div>
+
+            <div class="row">
+
+                <h3>SIN ACUERDO {{category.upper}}</h3>
+
+                {% for article, comments in category_report.disagrees %}
+
+                    <div>
+                        <blockquote>{{article.title}}</blockquote>
+
+                        <ul>
+                            {% for tup in comments %}
+                                <li>
+                                    <b> {{tup.0.text}}</b>
+                                    <p> <b>SI: </b>
+                                        {% for pos in tup.1 %}
+                                        {{pos}}
+                                        {% endfor %}
+                                        <b>NO: </b>
+                                        {% for neg in tup.2 %}
+                                        {{neg}}
+                                        {% endfor %}
+
+                                    </p>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+
+                {% endfor %}
+            </div>
         </details>
 
         <hr>

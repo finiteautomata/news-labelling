@@ -1,3 +1,4 @@
+from collections import defaultdict
 import pandas as pd
 import numpy as np
 import krippendorff
@@ -31,7 +32,17 @@ class AgreementCalculator:
             self.users = users
             query["user__in"] = users
 
-        self.article_labels = ArticleLabel.objects.filter(**query)
+        self.article_labels = list(ArticleLabel.objects.filter(**query).prefetch_related(
+            'comment_labels', 'comment_labels__comment', 'article', 'user'
+        ))
+        self.article_to_comments = defaultdict(list)
+        self.comment_text = {}
+
+        for article_label in self.article_labels:
+            for comment_label in article_label.comment_labels.all():
+                comment = comment_label.comment
+                self.comment_text[comment.id] = comment.text
+                self.article_to_comments[comment.article_id].append(comment)
 
         if not self.users:
             self.users = list({label.user for label in self.article_labels})
@@ -170,38 +181,101 @@ class AgreementCalculator:
 
         return df.fillna(0).sum(axis=1) / support
 
-    def get_agrees_and_disagrees(self, on):
+
+    def get_category_report(self, category):
         """
-        Return comments in which there were disagree for a given category
+        Returns category report
         """
-        category_df = self.get_labelled_comments(on)
+        category_df = self.get_labelled_comments(category)
         category_df = no_null_columns(category_df)
 
-        agree_comments = category_df[category_df.columns[category_df.all()]]
-        non_hateful_comments = category_df[category_df.columns[(~category_df.astype(bool)).all()]]
-        no_agree = ~((category_df.sum() == 0) | (category_df.sum() == len(self.users)))
+        alpha, support = self.get_agreement(category)
 
+        report = CategoryReport(category, list(category_df.index), alpha, support)
+
+        agree_comments = category_df[category_df.columns[category_df.all()]]
+        #non_hateful_comments = category_df[category_df.columns[(~category_df.astype(bool)).all()]]
+        no_agree = ~((category_df.sum() == 0) | (category_df.sum() == len(self.users)))
         disagree_comments = category_df[category_df.columns[no_agree]]
 
+        checked_articles = set()
+        for article_label in self.article_labels:
+            article = article_label.article
+            if article.id in checked_articles:
+                """
+                Don't check things twice
+                """
+                continue
+            else:
+                checked_articles.add(article.id)
+
+            for comment_label in article_label.comment_labels.all():
+                comment = comment_label.comment
+                if comment.id in agree_comments.columns:
+                    report.agree_on(article, comment)
+                elif comment.id in disagree_comments.columns:
+                    # Annotators who said yes, this is hateful
+                    positive_annotators = disagree_comments.index[disagree_comments[comment.id]]
+                    negative_annotators = disagree_comments.index.difference(positive_annotators)
+
+                    report.disagree_on(
+                        article,
+                        comment,
+                        positive=positive_annotators,
+                        negative=negative_annotators,
+                    )
+        return report
+
+class CategoryReport:
+    """
+    Full report for a category and a group of articles
+    """
+
+    def __init__(self, category, annotators, alpha, support):
+        self.category = category
+        self.alpha = alpha
+        self.support = support
+        self.annotators = annotators
+        # Dicts from articles to agree comments
+        self.article_to_agree = defaultdict(list)
+        self.article_to_disagree = defaultdict(dict)
+
+        self.num_agrees = 0
+        self.num_disagrees = 0
+
+    def agree_on(self, article, comment):
         """
-        #Estos son muchos! Filtrar sólo los de aquellos artículos
-        # donde haya habido algún acuerdo
-
-        allowed_articles = set(
-            c.article_id for c in Comment.objects.filter(id__in=agree_comments.columns)
-        )
-
-        allowed_comments = Comment.objects.filter(
-            id__in=non_hateful_comments.columns,
-            article_id__in=allowed_articles,
-        )
-
-        #print(len(allowed_comments))
-        comment_ids = set(c.id for c in allowed_comments)
-
-        non_hateful_comments = non_hateful_comments[[
-            c for c in non_hateful_comments.columns if c in comment_ids
-        ]]
+        Mark agree on comment
         """
-        return agree_comments, disagree_comments, non_hateful_comments
+        self.num_agrees += 1
+        self.article_to_agree[article].append(comment)
 
+    def disagree_on(self, article, comment, positive, negative):
+        """
+        Mark disagree on comment
+        """
+        self.num_disagrees += 1
+        self.article_to_disagree[article][comment] = {
+            "positive": positive,
+            "negative": negative
+        }
+
+    def agrees(self):
+        """
+        Generator for agree comments
+        """
+        for article, comments in self.article_to_agree.items():
+            yield (article, comments)
+
+    def disagrees(self):
+        """
+        Generator for disagree comments
+        """
+        for article, comment_votes in self.article_to_disagree.items():
+
+            triplet_comments = [
+                (comment, list(votes["positive"]), list(votes["negative"]))
+                for comment, votes in comment_votes.items()
+            ]
+            # Sort comments by positive votes
+            yield (article, triplet_comments)

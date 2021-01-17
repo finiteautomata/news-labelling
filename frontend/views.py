@@ -96,11 +96,7 @@ class BatchView(LoginRequiredMixin, View):
         categories = ["HATE"] + list(CommentLabel.type_mapping)
 
         for category in categories:
-            alpha, support = calculator.get_agreement(category)
-            report[category] = {
-                "agreement": alpha,
-                "support": support,
-            }
+            report[category] = calculator.get_category_report(category)
 
         return report
 

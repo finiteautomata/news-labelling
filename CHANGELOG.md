@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.3.8
+
+- Agrego agreements sobre cada batch
+
 ## 0.3.7
 
 - Dejo que usuarios puedan ver sus labels (sólo con link)

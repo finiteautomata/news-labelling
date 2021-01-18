@@ -88,7 +88,7 @@ class AnnotationReport:
         df.fillna("na", inplace=True)
 
         idx = df.index
-        order = ["training"] + sorted(idx.difference(["training"]))
+        order = ["training"] + sorted(idx.difference(["training"]), key=lambda x: int(x))
 
         for batch_name, rec in df.loc[order].iterrows():
             yield [batch_name, [rec[u] for u in usernames]]

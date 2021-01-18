@@ -93,7 +93,7 @@ class BatchView(LoginRequiredMixin, View):
         calculator = AgreementCalculator(batch=batch, users=users)
 
         report = {}
-        categories = ["HATE"] + list(CommentLabel.type_mapping)
+        categories = ["HATE", "CALLS"] + list(CommentLabel.type_mapping)
 
         for category in categories:
             report[category] = calculator.get_category_report(category)

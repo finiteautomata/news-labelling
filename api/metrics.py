@@ -92,7 +92,7 @@ class AgreementCalculator:
         """
 
         if self.df_comments is None:
-            keys = ["HATE"] + list(CommentLabel.type_mapping)
+            keys = ["HATE", "CALLS"]+ list(CommentLabel.type_mapping)
             idx = pd.MultiIndex.from_product(
                 [keys, self.usernames],
                 names=["categoria", "etiquetador"]
@@ -107,6 +107,7 @@ class AgreementCalculator:
                     Seteo odio primero
                     """
                     self.df_comments.loc[("HATE", username), comment_label.comment_id] = comment_label.is_hateful
+                    self.df_comments.loc[("CALLS", username), comment_label.comment_id] = comment_label.calls_for_action
 
                     for name, field in CommentLabel.type_mapping.items():
                         val = getattr(comment_label, field)

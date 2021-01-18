@@ -97,11 +97,15 @@ Batch {{batch.name}}
                                     <b> {{tup.0.text}}</b>
                                     <p> <b>SI: </b>
                                         {% for pos in tup.1 %}
-                                        {{pos}}
+                                        <a href="{% url 'label_view' pos article.id %}#{{tup.0.id}}">
+                                            {{pos}}
+                                        </a>
                                         {% endfor %}
                                         <b>NO: </b>
                                         {% for neg in tup.2 %}
-                                        {{neg}}
+                                        <a href="{% url 'label_view' neg article.id %}#{{tup.0.id}}">
+                                            {{neg}}
+                                        </a>
                                         {% endfor %}
 
                                     </p>

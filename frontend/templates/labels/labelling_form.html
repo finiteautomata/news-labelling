@@ -41,6 +41,10 @@ form {
     color: green;
 }
 
+:target {
+  background-color: lightpink;
+}
+
 <!--
 hr {
   margin-top: 1.5rem;
@@ -67,7 +71,7 @@ hr {
 
   <div class="comment-labels">
   {% for comment_label in article_label.comment_labels.all %}
-    <form>
+    <form id="{{comment_label.comment.id}}">
       <hr>
       <div class="row">
         <p class="error-messages">

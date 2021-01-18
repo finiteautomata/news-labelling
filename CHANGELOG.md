@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.3.9
+
+- Agrego links a comentarios en las comparativas
+- Ordeno bien los nombres de Batches
+- Agrego llamado a la acción a los dashboards
+
 ## 0.3.8
 
 - Agrego agreements sobre cada batch

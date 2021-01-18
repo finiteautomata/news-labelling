@@ -69,17 +69,16 @@ class CommentLabel(models.Model):
         """
         user = self.article_label.user
         article = self.article_label.article
-        ret = f"Label of {user.username} to '{self.comment.text}'\n"
-        ret += f"Article: {article.text}\n\n"
+        ret = f"{user.username} sobre '{self.comment.text}'\n"
         if self.is_hateful:
             if self.calls_for_action:
-                calls = "and violent"
+                calls = " y violento "
             else:
-                calls = "but not violent"
+                calls = " "
 
-            ret += f"Hateful {calls} towards {self.hateful_against()}"
+            ret += f"Odioso{calls} -> {self.hateful_against()}"
         else:
-            ret += "Not hateful"
+            ret += "No odioso"
         return ret
 
     def __str__(self):

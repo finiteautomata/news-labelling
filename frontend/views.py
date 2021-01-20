@@ -36,9 +36,11 @@ class ArticleView(LoginRequiredMixin, View):
         GET article
         """
         article = get_object_or_404(Article, pk=pk)
+        assignment = get_object_or_404(Assignment, article=article, user=request.user)
 
         return render(request, 'articles/show.html', {
             "article": article,
+            "assignment": assignment,
             "hate_speech_types": CommentLabel.HATE_SPEECH_TYPES,
 
         })

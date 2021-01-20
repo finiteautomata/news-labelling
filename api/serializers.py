@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.db import transaction
+from django.core.exceptions import ObjectDoesNotExist
 from .models import Article, Comment, CommentLabel, Assignment
 
 
@@ -78,7 +79,9 @@ class ArticleLabelSerializer(serializers.Serializer):
         article = self.context['article']
         user = self.context['user']
 
-        if not Assignment.objects.filter(article=article, user=user).exists():
+        try:
+            assignment = Assignment.objects.get(article=article, user=user)
+        except ObjectDoesNotExist:
             raise serializers.ValidationError("Assignment should exist")
         """
         Check no label for article and user
@@ -87,9 +90,11 @@ class ArticleLabelSerializer(serializers.Serializer):
         if article.labels.filter(user=user).count() > 0:
             raise serializers.ValidationError("Article already labeled by user")
         """
-        If not is_interesting => no labels
+        If not is_interesting => no labels and was skippable
         """
         if not data["is_interesting"]:
+            if not assignment.skippable:
+                raise serializers.ValidationError("Assignment is not skippable")
             if len(data.get("comment_labels", {})) > 0:
                 raise serializers.ValidationError("There must be no label if not interesting")
             return data

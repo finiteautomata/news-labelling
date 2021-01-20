@@ -174,12 +174,15 @@ hr {
 
 <hr/>
 
+{% if assignment.skippable %}
 
 <div class="row">
     <a href="#" id="not_interesting" class="button u-full-width submit-button" style="background-color:red; color:white">
       No es interesante
     </a>
 </div>
+
+{% endif %}
 
 
 <script type="text/javascript">

@@ -19,7 +19,7 @@ class ArticleLabelSerializerTest(TestCase):
         )
 
 
-    def create_serializer(self, data, assignment=False, article=None):
+    def create_serializer(self, data, assignment=False, assignment_args={}, article=None):
         """
         Create serializer with data and context
         """
@@ -27,7 +27,7 @@ class ArticleLabelSerializerTest(TestCase):
             article = self.article
 
         if assignment:
-            self.create_assignment(article)
+            self.create_assignment(article, **assignment_args)
 
         now = datetime.datetime.now()
         before = now - datetime.timedelta(minutes=5)
@@ -41,11 +41,11 @@ class ArticleLabelSerializerTest(TestCase):
             data=data, context={'article': article, 'user': self.user}
         )
 
-    def create_assignment(self, article):
+    def create_assignment(self, article, **kwargs):
         """
         Creates assignment for user and article
         """
-        return self.user.assignment_set.create(article=article)
+        return self.user.assignment_set.create(article=article, **kwargs)
 
     def test_is_not_valid_if_no_assignment(self):
         """
@@ -68,6 +68,16 @@ class ArticleLabelSerializerTest(TestCase):
         }, assignment=True)
 
         assert serializer.is_valid()
+
+    def test_is_not_valid_if_not_interesting_but_not_skippable(self):
+        """
+        If is not interesting, it should be valid
+        """
+        serializer = self.create_serializer({
+            "is_interesting": False,
+        }, assignment=True, assignment_args={"skippable": False})
+
+        assert not serializer.is_valid()
 
     def test_not_valid_if_already_labeled(self):
         """

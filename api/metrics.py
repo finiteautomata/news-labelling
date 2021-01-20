@@ -230,6 +230,8 @@ class AgreementCalculator:
 class CategoryReport:
     """
     Full report for a category and a group of articles
+
+    This is terribly designed. Refactor if possible
     """
 
     def __init__(self, category, annotators, alpha, support):

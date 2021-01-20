@@ -4,7 +4,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404, redirect
-from api.models import Article, Assignment, CommentLabel, ArticleLabel, Batch
+from api.models import Article, Assignment, CommentLabel, ArticleLabel, Batch, Comment
 from api.metrics import AgreementCalculator
 from .ranking import RankingCalculator
 from .report import AnnotationReport
@@ -105,9 +105,11 @@ class BatchView(LoginRequiredMixin, View):
         batch = get_object_or_404(Batch, name=batch_name)
         users = [u for u in User.objects.exclude(username="jmperez") if batch.is_assigned_to(u)]
 
+        num_comments = Comment.objects.filter(article__batch=batch).count()
 
         return render(request, 'batches/show.html', {
             "batch": batch,
+            "num_comments": num_comments,
             "report": self.get_agreements_report(batch, users),
             "users": users,
         })

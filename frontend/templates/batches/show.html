@@ -15,18 +15,28 @@ Batch {{batch.name}}
 
 <div class="row">
 
-    <div class="four columns">
-        <p>
-            Asignado a
-            <ul>
-                {% for user in users %}
-                    <li>{{user.username}}</li>
-                {% endfor %}
-            </ul>
-        </p>
+    <div class="six columns">
+
+        <table>
+            <tbody>
+
+                <tr>
+                    <th scope="row">Asignado a</th>
+                    <td>{% for user in users %}
+                        <li>{{user.username}}</li>
+                    {% endfor %}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Total Comentarios</th>
+                    <td> {{num_comments}}</td>
+                </tr>
+
+            </tbody>
+        </table>
+
     </div>
 
-    <div class="eight columns">
+    <div class="six columns">
 
 
         <table>
@@ -35,6 +45,8 @@ Batch {{batch.name}}
                 <th scope="col">Categoría</th>
                 <th scope="col">Alpha</th>
                 <th scope="col">Soporte</th>
+                <th scope="col">#Agrees</th>
+                <th scope="col">#Disagrees</th>
             </thead>
 
             <tbody>
@@ -43,15 +55,17 @@ Batch {{batch.name}}
                         <th scope="row">{{category}}</th>
                         <td>{{category_report.alpha|floatformat:-2}}</td>
                         <td>{{category_report.support}}</td>
+                        <td>{{category_report.num_agrees}}</td>
+                        <td>{{category_report.num_disagrees}}</td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
-
-
     </div>
 
 </div>
+
+
 
 <div class="row">
     <h2>Resumen por categoría</h2>

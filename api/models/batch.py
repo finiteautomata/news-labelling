@@ -84,17 +84,22 @@ class BatchAssignment(models.Model, Completable):
     class Meta:
         unique_together = ('user', 'batch')
 
+    @property
+    def assignments(self):
+        return self.user.assignment_set.filter(
+            article__batch=self.batch,
+        )
+
     def update(self):
         """
         Check status
         """
-        completed_articles = Assignment.objects.filter(
+        completed_articles = self.user.assignment_set.filter(
             done=True,
             article__in=self.batch.articles.all(),
-            user=self.user
         ).count()
 
-        total_articles = self.batch.articles.count()
+        total_articles = self.assignments.count()
 
         self.completed_articles = completed_articles
         if completed_articles == total_articles:

@@ -1,3 +1,4 @@
+from django.db import transaction
 
 class Completable:
     """
@@ -7,25 +8,27 @@ class Completable:
         """
         Set as done
         """
-        if self.done:
-            # Raise if already completed
-            raise ValueError("Assignment already completed")
-        self.done = True
-        self.save()
+        with transaction.atomic():
+            if self.done:
+                # Raise if already completed
+                raise ValueError("Assignment already completed")
+            self.done = True
+            self.save()
 
-        self.after_complete()
+            self.after_complete()
 
     def undo(self):
         """
         Undo!
         """
-        if not self.done:
-            # Raise if already completed
-            raise ValueError("Assignment not done")
-        self.done = False
-        self.save()
+        with transaction.atomic():
+            if not self.done:
+                # Raise if already completed
+                raise ValueError("Assignment not done")
+            self.done = False
+            self.save()
 
-        self.after_undo()
+            self.after_undo()
 
     def after_complete(self):
         """

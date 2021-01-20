@@ -46,8 +46,18 @@ class Assignment(models.Model, Completable):
         """
         Send signal after undo
         """
+        # Must delete ArticleLabel if one
+
         assignment_undone.send(sender=self.__class__, assignment=self)
 
+
+    def remove_label(self):
+        """
+        Delete label for this assignment
+        """
+        if self.done:
+            article_label = self.user.article_labels.get(article=self.article)
+            return article_label.delete()
 
 def undo_assignment_on_label_delete(sender, instance, **kwargs):
     """

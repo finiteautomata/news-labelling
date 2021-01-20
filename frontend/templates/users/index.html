@@ -66,6 +66,7 @@ Dashboard usuarios
                 <th scope="col">Art. asignados</th>
                 <th scope="col">Art. restantes</th>
                 <th scope="col">Anotados</th>
+                <th scope="col">Anotados últ. 3 horas</th>
                 <th scope="col">Salteados</th>
                 <th scope="col">Comentarios anotados</th>
                 <th scope="col">Tiempo</th>
@@ -83,6 +84,7 @@ Dashboard usuarios
                     <td> {{user_report.assignments}}</td>
                     <td> {{user_report.assignments_left }}</td>
                     <td> {{user_report.labeled_articles}}</td>
+                    <td> {{user_report.labeled_articles_last_hours}}</td>
                     <td> {{user_report.skipped_articles}}</td>
                     <td> {{user_report.labeled_comments}}</td>
                     <td> {{user_report.time|floatformat:-2}}</td>

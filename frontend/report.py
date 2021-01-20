@@ -1,5 +1,6 @@
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
+from django.utils import timezone
 import pandas as pd
 from api.models import Assignment, ArticleLabel, BatchAssignment
 
@@ -26,6 +27,7 @@ class AnnotationReport:
                 "assignments": 0,
                 "assignments_left": 0,
                 "labeled_articles": 0,
+                "labeled_articles_last_hours": 0,
                 "skipped_articles": 0,
                 "labeled_comments": 0,
                 "time": 0,
@@ -43,6 +45,7 @@ class AnnotationReport:
                 if not assignment.done:
                     report[username]["assignments_left"] += 1
 
+        three_hours_ago = timezone.now() - timedelta(hours=3)
 
         for article_label in ArticleLabel.objects.select_related('user'):
             username = article_label.user.username
@@ -50,6 +53,9 @@ class AnnotationReport:
             if username in report:
                 if article_label.is_interesting:
                     report[username]["labeled_articles"] += 1
+
+                    if article_label.created_at > three_hours_ago:
+                        report[username]["labeled_articles_last_hours"] += 1
                 else:
                     report[username]["skipped_articles"] += 1
 
@@ -73,7 +79,10 @@ class AnnotationReport:
         usernames = [u.username for u in self.users]
         df = pd.DataFrame(columns=usernames)
 
-        for batch_assignment in BatchAssignment.objects.all():
+        batch_assignments = BatchAssignment.objects.prefetch_related(
+            'batch', 'user'
+        ).all()
+        for batch_assignment in batch_assignments:
             user_name = batch_assignment.user.username
             if user_name in usernames:
                 batch_name = batch_assignment.batch.name
@@ -81,7 +90,8 @@ class AnnotationReport:
                     value = "completed"
                 else:
                     completed = batch_assignment.completed_articles
-                    to_be_done = batch_assignment.batch.articles.count()
+                    to_be_done = batch_assignment.assignments.count()
+
                     value = f"progressing ({completed}/{to_be_done})"
                 df.loc[batch_name, user_name] = value
 

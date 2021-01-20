@@ -103,7 +103,7 @@ class ArticleLabelSerializer(serializers.Serializer):
 
         Check labels are assigned to each comment
         """
-        comment_ids = {comm.id for comm in article.comment_set.all()}
+        comment_ids = {comm.id for comm in assignment.comments_to_label()}
         label_ids = {comment_label["comment"] for comment_label in data['comment_labels']}
 
         if comment_ids != label_ids:

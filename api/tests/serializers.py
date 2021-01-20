@@ -41,11 +41,17 @@ class ArticleLabelSerializerTest(TestCase):
             data=data, context={'article': article, 'user': self.user}
         )
 
-    def create_assignment(self, article, **kwargs):
+    def create_assignment(self, article, num_comments=None,**kwargs):
         """
         Creates assignment for user and article
         """
-        return self.user.assignment_set.create(article=article, **kwargs)
+        assignment = self.user.assignment_set.create(article=article, **kwargs)
+
+        if num_comments:
+            comments_to_label = self.article.comment_set.all()[:num_comments]
+            assignment.set_comments(comments_to_label)
+
+        return assignment
 
     def test_is_not_valid_if_no_assignment(self):
         """
@@ -217,6 +223,52 @@ class ArticleLabelSerializerTest(TestCase):
         }, assignment=True)
 
         assert not serializer.is_valid()
+
+    def test_valid_if_labels_only_selected_comments(self):
+        """
+        Valid if labels only specified comments in assignment
+        """
+        num_comments = 3
+        serializer = self.create_serializer({
+            "is_interesting": True,
+            "comment_labels": [
+                comment_label(comm.id)
+                for comm in self.article.comment_set.all()[:num_comments]
+            ],
+        }, assignment=True, assignment_args={"num_comments": num_comments})
+
+        assert serializer.is_valid()
+
+    def test_not_valid_if_specified_comments_but_labels_less(self):
+        """
+        Valid if labels only specified comments in assignment
+        """
+        num_comments = 3
+        serializer = self.create_serializer({
+            "is_interesting": True,
+            "comment_labels": [
+                comment_label(comm.id)
+                for comm in self.article.comment_set.all()[:num_comments-1]
+            ],
+        }, assignment=True, assignment_args={"num_comments": num_comments})
+
+        assert not serializer.is_valid()
+
+    def test_not_valid_if_specified_comments_but_labels_more(self):
+        """
+        Valid if labels only specified comments in assignment
+        """
+        num_comments = 3
+        serializer = self.create_serializer({
+            "is_interesting": True,
+            "comment_labels": [
+                comment_label(comm.id)
+                for comm in self.article.comment_set.all()[:num_comments+1]
+            ],
+        }, assignment=True, assignment_args={"num_comments": num_comments})
+
+        assert not serializer.is_valid()
+
 
     def test_create_for_not_interesting(self):
         """

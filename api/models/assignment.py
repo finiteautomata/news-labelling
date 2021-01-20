@@ -64,7 +64,7 @@ class Assignment(models.Model, Completable):
 
     def set_comments(self, comments):
         """
-
+        Set whitelist of comments
         """
         with transaction.atomic():
             for comment in comments:
@@ -72,6 +72,19 @@ class Assignment(models.Model, Completable):
                     comment=comment,
                     assignment=self,
                 )
+
+    def comments_to_label(self):
+        """
+        Get comments to be labeled
+
+        If a whitelist => use that whitelist
+        If no whitelist => use all comments from article
+        """
+
+        if self.comments.count() > 0:
+            return self.comments.all()
+        return self.article.comment_set.all()
+
 
 class AssignmentComment(models.Model, Completable):
     """

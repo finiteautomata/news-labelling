@@ -42,7 +42,7 @@ class ArticleView(LoginRequiredMixin, View):
             "article": article,
             "assignment": assignment,
             "hate_speech_types": CommentLabel.HATE_SPEECH_TYPES,
-
+            "comments": assignment.comments_to_label(),
         })
 
 class LabelView(LoginRequiredMixin, View):

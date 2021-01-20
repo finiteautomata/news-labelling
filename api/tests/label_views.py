@@ -133,3 +133,51 @@ class LabelViewTest(APITestCase, AuthenticationMixin):
             self.assertEqual(
                 response.data["labels"], [exp_label]
             )
+
+
+    def test_label_an_article_with_just_some_comments(self):
+        """
+        Check that after labelling it works ok
+        """
+
+        art = ArticleFactory(create_comments__num_comments=5)
+        assignment = self.user.assignment_set.create(article=art)
+        comments_to_label = list(art.comment_set.all()[:3])
+
+        assignment.set_comments(comments_to_label)
+        url = reverse("api:article-label", args=[art.id])
+
+        labels = [
+            comment_label(
+                comm.id,
+                is_hateful=bool(i % 2 == 0),
+                types=["RACISMO", "POBREZA"],
+                calls_for_action=bool(i % 4 == 0),
+            )
+            for i, comm in enumerate(comments_to_label)
+        ]
+
+        now = datetime.datetime.utcnow()
+        before = now - datetime.timedelta(hours=1)
+        req = {
+            "is_interesting": True,
+            "comment_labels": labels,
+            "metadata": {
+                "start_time": str(before),
+                "end_time": str(now)
+            },
+            "feedback": "A bit difficult"
+        }
+
+        resp = self.client.post(url, req, format='json')
+
+        assert resp.status_code == status.HTTP_201_CREATED
+
+        for exp_label, comment in zip(labels, comments_to_label):
+            comment_url = reverse("api:comment-detail", args=[comment.id])
+            response = self.client.get(comment_url, format="json")
+            exp_label.pop('comment')
+
+            self.assertEqual(
+                response.data["labels"], [exp_label]
+            )

@@ -116,7 +116,7 @@ class AssignmentTest(TestCase):
 
     def test_create_assignment_with_two_comments(self):
         """
-        Assignment must be completed on creation of ArticleLabel
+        Can create assignment with two comments
         """
 
         article = ArticleFactory()
@@ -127,7 +127,7 @@ class AssignmentTest(TestCase):
 
     def test_cannot_assign_comments_from_other_article(self):
         """
-        Assignment must be completed on creation of ArticleLabel
+        Cannot set comments from other article
         """
 
         article1 = ArticleFactory()
@@ -142,4 +142,38 @@ class AssignmentTest(TestCase):
 
         self.assertIs(assignment.comments.count(), 0)
 
+
+    def test_comments_to_label_without_setting_are_all_comments(self):
+        """
+        Cannot set comments from other article
+        """
+
+        article = ArticleFactory()
+
+        assignment = Assignment.objects.create(user=self.user, article=article)
+
+        self.assertSetEqual(
+            article.comment_set.all(),
+            assignment.comments_to_label(),
+        )
+
+    def test_comments_to_label_returns_set_comments(self):
+        """
+        Cannot set comments from other article
+        """
+
+        article = ArticleFactory()
+
+        assignment = Assignment.objects.create(user=self.user, article=article)
+
+        articles_to_label = list(article.comment_set.all()[:2])
+        assignment.set_comments(articles_to_label)
+
+        assert 2 == assignment.comments.count()
+        assert assignment.comments.count() < article.comment_set.all().count()
+
+        self.assertSequenceEqual(
+            assignment.comments_to_label(),
+            articles_to_label,
+        )
 

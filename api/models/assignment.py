@@ -1,8 +1,10 @@
 from django.contrib.auth.models import User
-from django.db import models
+from django.db import models, transaction
 import django.dispatch
 from .article import Article
+from .comment import Comment
 from .article_label import ArticleLabel
+from django.core.exceptions import ValidationError
 from django.db.models.signals import post_delete, post_save
 from django.core.exceptions import ObjectDoesNotExist
 from .mixins import Completable
@@ -20,6 +22,7 @@ class Assignment(models.Model, Completable):
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     done = models.BooleanField(default=False)
+    comments = models.ManyToManyField(Comment, through="AssignmentComment")
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -58,6 +61,44 @@ class Assignment(models.Model, Completable):
         if self.done:
             article_label = self.user.article_labels.get(article=self.article)
             return article_label.delete()
+
+    def set_comments(self, comments):
+        """
+
+        """
+        with transaction.atomic():
+            for comment in comments:
+                AssignmentComment.objects.create(
+                    comment=comment,
+                    assignment=self,
+                )
+
+class AssignmentComment(models.Model, Completable):
+    """
+    Assignment to comments relationship model
+    """
+
+    assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE)
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('assignment', 'comment')
+
+    def clean(self):
+        """
+        Model validation
+        """
+        if self.comment.article_id != self.assignment.article_id:
+            raise ValidationError("Comment should match Assignment's article")
+
+
+    def save(self, *args, **kwargs):
+        """
+        Override save to call Clean
+        """
+        self.clean()
+        return super().save(*args, **kwargs)
+
 
 def undo_assignment_on_label_delete(sender, instance, **kwargs):
     """

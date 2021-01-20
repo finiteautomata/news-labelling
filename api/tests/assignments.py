@@ -1,8 +1,9 @@
 from django.test import TestCase
 from django.db import IntegrityError
+from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from .factories import ArticleFactory, ArticleLabelFactory, UserFactory, ArticleLabel
-from ..models import Assignment
+from ..models import Assignment, AssignmentComment
 
 
 class AssignmentTest(TestCase):
@@ -112,5 +113,33 @@ class AssignmentTest(TestCase):
         assignment.refresh_from_db()
 
         self.assertIs(assignment.done, False)
+
+    def test_create_assignment_with_two_comments(self):
+        """
+        Assignment must be completed on creation of ArticleLabel
+        """
+
+        article = ArticleFactory()
+
+        assignment = Assignment.objects.create(user=self.user, article=article)
+
+        assignment.set_comments(article.comment_set.all()[:2])
+
+    def test_cannot_assign_comments_from_other_article(self):
+        """
+        Assignment must be completed on creation of ArticleLabel
+        """
+
+        article1 = ArticleFactory()
+        article2 = ArticleFactory()
+
+        assignment = Assignment.objects.create(user=self.user, article=article1)
+
+        with self.assertRaises(ValidationError):
+            assignment.set_comments(article2.comment_set.all()[:2])
+
+        assignment.refresh_from_db()
+
+        self.assertIs(assignment.comments.count(), 0)
 
 

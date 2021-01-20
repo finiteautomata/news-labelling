@@ -28,14 +28,13 @@ class RankingCalculator:
             for u in User.objects.filter(assignment__isnull=False)
         }
 
-        for article_label in ArticleLabel.objects.select_related('user'):
+        article_labels = ArticleLabel.objects.prefetch_related(
+            'user', 'comment_labels'
+        )
+        for article_label in article_labels:
             username = article_label.user.username
             ranking[username]["articles"] += 1
-
-        for comment_label in CommentLabel.objects.select_related('article_label'):
-            # N+1, replace!
-            username = comment_label.article_label.user.username
-            ranking[username]["comments"] += 1
+            ranking[username]["comments"] += article_label.comment_labels.count()
 
         return ranking
 
@@ -53,12 +52,7 @@ class RankingCalculator:
         Creates a fake ranking for that user
         """
         ranking = self.ranking()
-
-        # Si no tiene assignments, no le miento :-)
-        if not user.is_staff and Assignment.next_assignment_of(user):
-
-            num_assigned = Assignment.objects.filter(user=user).count()
-            num_done = Assignment.objects.filter(user=user, done=True).count()
+        if not user.is_staff:
             username = user.username
             random.seed(datetime.datetime.today().day)
 
@@ -70,31 +64,6 @@ class RankingCalculator:
                     values["articles"] += new_articles
                     values["comments"] += new_comments
 
-            users_below = {
-                u:v for u, v in ranking.items()
-                if v["comments"] < ranking[username]["comments"]
-            }
-            """
-            users_up = len([
-                u for u, v in ranking.items()
-                if v["comments"] >= ranking[username]["comments"]
-            ])
-
-            if users_up < users_below:
-                # Agarro otros y los pongo arriba
-                users_will_put_up_in_ranking = random.sample(
-                    users_below.keys(),
-                    min(3, len(users_below)
-                ))
-
-                for other_user in users_will_put_up_in_ranking:
-                    values = ranking[other_user]
-                    new_articles = random.randint(num_done+1, num_assigned)
-                    new_comments = (new_articles - num_done) * 50
-
-                    values["articles"] = new_articles
-                    values["comments"] = ranking[username]["comments"] + new_comments
-            """
 
         ret = sorted(
             list(ranking.items()),

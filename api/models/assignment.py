@@ -109,8 +109,10 @@ class Assignment(models.Model, Completable):
 
                 if len(comments_to_reassign) > 0:
                     self.remove_label()
+                    self.skippable = False
+                    self.save(update_fields=["skippable"])
                     self.comments.set(comments_to_reassign)
-
+        return self.refresh_from_db()
 
 class AssignmentComment(models.Model, Completable):
     """

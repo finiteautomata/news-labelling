@@ -183,7 +183,7 @@ class AssignmentTest(TestCase):
             articles_to_label,
         )
 
-class AssignmentReassign(TestCase):
+class AssignmentReassignTest(TestCase):
 
     """
     Tests for Assignment reassing_for
@@ -228,6 +228,22 @@ class AssignmentReassign(TestCase):
         self.skipped_assignment.refresh_from_db()
 
         self.assertIs(self.skipped_assignment.done, False)
+
+    def test_reassign_undo_assignment_with_hateful_set_it_as_not_skippable(self):
+        """
+        Test article is reassigned for those articles which one of them skipped and not the other
+        """
+        annotated_assignment = label_article(
+            self.user, self.article, is_interesting=True, comments=[
+            {"is_hateful": True},
+            {"is_hateful": False},
+            {"is_hateful": False},
+        ])
+
+        self.skipped_assignment.reassign_for(annotated_assignment)
+        self.skipped_assignment.refresh_from_db()
+
+        self.assertIs(self.skipped_assignment.skippable, False)
 
     def test_reassign_sets_only_comments_that_were_marked_as_hateful(self):
         """

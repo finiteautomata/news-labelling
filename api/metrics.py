@@ -139,15 +139,15 @@ class AgreementCalculator:
             - OTROS
 
         """
-
         df = self.get_labelled_comments(on)
 
         """
         Get support
         """
 
-        labelled_by_all = df.columns[df.notna().all()]
-        any_marked_positive = df[labelled_by_all].sum() > 0
+        #labelled_by_all = df.columns[df.notna().all()]
+        #any_marked_positive = df[labelled_by_all].sum() > 0
+        any_marked_positive = df.fillna(0).sum() > 0
         support = any_marked_positive.sum()
         if support == 0:
             return np.nan, support

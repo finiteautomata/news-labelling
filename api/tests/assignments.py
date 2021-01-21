@@ -2,8 +2,9 @@ from django.test import TestCase
 from django.db import IntegrityError
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
-from .factories import ArticleFactory, ArticleLabelFactory, UserFactory, ArticleLabel
+from .factories import ArticleFactory, ArticleLabelFactory, UserFactory, ArticleLabel, BatchFactory
 from ..models import Assignment, AssignmentComment
+from .helpers import label_article
 
 
 class AssignmentTest(TestCase):
@@ -14,6 +15,11 @@ class AssignmentTest(TestCase):
         self.user = User.objects.create_user(
             username="test",
             password="test",
+        )
+
+        self.another_user = User.objects.create_user(
+            username="another_test",
+            password="another_test",
         )
 
 
@@ -177,3 +183,120 @@ class AssignmentTest(TestCase):
             articles_to_label,
         )
 
+class AssignmentReassign(TestCase):
+
+    """
+    Tests for Assignment reassing_for
+    """
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="test",
+            password="test",
+        )
+
+        self.another_user = User.objects.create_user(
+            username="another_test",
+            password="another_test",
+        )
+
+        batch = BatchFactory(create_articles__num=2, create_articles__num_comments=3)
+
+        articles = batch.articles.all()
+
+        batch.assign_to(self.user)
+        batch.assign_to(self.another_user)
+
+        self.article = articles[0]
+
+        ## Label
+
+        label_article(self.another_user, self.article, is_interesting=False)
+        self.skipped_assignment = self.article.assignment_set.get(user=self.another_user)
+
+    def test_reassign_undo_assignment(self):
+        """
+        Test article is reassigned for those articles which one of them skipped and not the other
+        """
+        annotated_assignment = label_article(
+            self.user, self.article, is_interesting=True, comments=[
+            {"is_hateful": True},
+            {"is_hateful": False},
+            {"is_hateful": False},
+        ])
+
+        self.skipped_assignment.reassign_for(annotated_assignment)
+        self.skipped_assignment.refresh_from_db()
+
+        self.assertIs(self.skipped_assignment.done, False)
+
+    def test_reassign_sets_only_comments_that_were_marked_as_hateful(self):
+        """
+        Test article is reassigned for those articles which one of them skipped and not the other
+        """
+
+        annotated_assignment = label_article(
+            self.user, self.article, is_interesting=True, comments=[
+            {"is_hateful": True},
+            {"is_hateful": False},
+            {"is_hateful": False},
+        ])
+
+        self.skipped_assignment.reassign_for(annotated_assignment, only_comments=True)
+        self.skipped_assignment.refresh_from_db()
+
+        annotated_label = annotated_assignment.article_label
+        possibly_hateful_comments = [
+            comment_label.comment
+            for comment_label in annotated_label.comment_labels.all() if comment_label.is_hateful
+        ]
+
+        self.assertSequenceEqual(
+            self.skipped_assignment.comments.all(),
+            possibly_hateful_comments
+        )
+
+    def test_reassign_for_second_annotation_on_no_hateful_does_not_reset(self):
+        """
+        Test article is reassigned for those articles which one of them skipped and not the other
+        """
+
+        annotated_assignment = label_article(
+            self.user, self.article, is_interesting=True, comments=[
+            {"is_hateful": False},
+            {"is_hateful": False},
+            {"is_hateful": False},
+        ])
+
+        self.skipped_assignment.reassign_for(annotated_assignment, only_comments=True)
+        self.skipped_assignment.refresh_from_db()
+
+        self.assertIs(
+            self.skipped_assignment.done,
+            True
+        )
+
+    def test_reassign_wrt_skipped_assignment_raises(self):
+        """
+        Test article is reassigned for those articles which one of them skipped and not the other
+        """
+
+        another_skipped_assignment = label_article(
+            self.user, self.article, is_interesting=False
+        )
+
+        with self.assertRaises(ValueError):
+            self.skipped_assignment.reassign_for(another_skipped_assignment, only_comments=True)
+
+    def test_reassign_wrt_not_done_assignment_raises(self):
+        """
+        Test article is reassigned for those articles which one of them skipped and not the other
+        """
+
+        not_done_assignment = Assignment.objects.get(
+            user=self.user, article=self.article
+        )
+
+        assert not_done_assignment.done is False
+
+        with self.assertRaises(ValueError):
+            self.skipped_assignment.reassign_for(not_done_assignment, only_comments=True)

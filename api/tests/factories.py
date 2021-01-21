@@ -1,7 +1,7 @@
 import factory
 from django.utils import timezone
 from django.contrib.auth.models import User
-from ..models import Article, Comment, ArticleLabel, CommentLabel
+from ..models import Article, Batch, Comment, ArticleLabel, CommentLabel
 
 class UserFactory(factory.django.DjangoModelFactory):
     class Meta:
@@ -61,6 +61,36 @@ class ArticleFactory(factory.django.DjangoModelFactory):
         """
         num_comments = kwargs.get("num_comments", 3)
         CommentFactory.create_batch(num_comments, article=self)
+
+
+
+class BatchFactory(factory.django.DjangoModelFactory):
+    """
+    Article Factory
+    """
+    class Meta:
+        """
+        Meta class
+        """
+        model = Batch
+
+    name = factory.Sequence(lambda n: f"{n}")
+
+    @factory.post_generation
+    def create_articles(self, *args, **kwargs):
+        """
+        Create comments after initialization
+
+        If you want to change number of comments created, use something like this:
+
+        >> BatchFactory(create_articles__num_articles=10)
+        """
+        num_articles = kwargs.get("num", 3)
+        num_comments = kwargs.get("num_comments", 3)
+        ArticleFactory.create_batch(
+            num_articles, batch=self,
+            create_comments__num_comments=num_comments
+        )
 
 class CommentFactory(factory.django.DjangoModelFactory):
     """

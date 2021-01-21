@@ -1,8 +1,11 @@
 from django.test import TestCase
 from django.db import IntegrityError
 from django.contrib.auth.models import User
-from .factories import ArticleFactory, ArticleLabelFactory, UserFactory, ArticleLabel
-from ..models import Batch
+from .factories import (
+    ArticleFactory, ArticleLabelFactory, UserFactory, ArticleLabel,
+    BatchFactory, CommentLabelFactory
+)
+from ..models import Batch, Assignment
 
 
 class BatchTest(TestCase):
@@ -15,15 +18,20 @@ class BatchTest(TestCase):
             password="test",
         )
 
+        self.another_user = User.objects.create_user(
+            username="another_test",
+            password="another_test",
+        )
+
 
     def test_cannot_create_with_same_name(self):
         """
         Test cannot create with same name
         """
-        Batch.objects.create(name="name")
+        BatchFactory(name="name")
 
         with self.assertRaises(IntegrityError):
-            Batch.objects.create(name="name")
+            BatchFactory(name="name")
 
     def test_create_with_articles(self):
         """
@@ -33,29 +41,27 @@ class BatchTest(TestCase):
         batch = Batch.create_from_articles(name="name", articles=articles)
 
         assert batch.pk is not None
-        self.assertIs(batch.articles.count(), len(articles))
+        self.assertSequenceEqual(batch.articles.all(), articles)
 
     def test_assign_to_user_creates_assignments(self):
         """
         Test assign_to creates assignments
         """
-        articles = ArticleFactory.create_batch(5)
-        batch = Batch.create_from_articles(name="batch name", articles=articles)
 
+        batch = BatchFactory(create_articles__num=5)
+        assert batch.articles.count() == 5
         batch.assign_to(self.user)
 
-        self.assertListEqual(
-            [assign.article.id for assign in self.user.assignment_set.all()],
-            [art.id for art in articles]
+        self.assertSequenceEqual(
+            [assign.article for assign in self.user.assignment_set.all()],
+            batch.articles.all()
         )
 
     def test_is_assigned_after_assign_to(self):
         """
         Test is_assigned returns True after assign_to
         """
-        articles = ArticleFactory.create_batch(5)
-        batch = Batch.create_from_articles(name="batch name", articles=articles)
-
+        batch = BatchFactory(create_articles__num=5)
         batch.assign_to(self.user)
 
         self.assertIs(batch.is_assigned_to(self.user), True)
@@ -64,35 +70,21 @@ class BatchTest(TestCase):
         """
         Check cannot assign twice
         """
-        articles = ArticleFactory.create_batch(5)
-        batch = Batch.create_from_articles(name="batch name", articles=articles)
+        batch = BatchFactory(create_articles__num=5)
 
         batch.assign_to(self.user)
 
         with self.assertRaises(IntegrityError):
             batch.assign_to(self.user)
 
-    def test_remove_from_when_not_started(self):
-        """
-        Check cannot assign twice
-        """
-        articles = ArticleFactory.create_batch(5)
-        batch = Batch.create_from_articles(name="batch name", articles=articles)
-
-        batch.assign_to(self.user)
-
-        with self.assertRaises(IntegrityError):
-            batch.assign_to(self.user)
 
     def test_revokes_from_user_when_not_started(self):
         """
         Check it can be revoked when not started
         """
-        articles = ArticleFactory.create_batch(5)
-        batch = Batch.create_from_articles(name="batch name", articles=articles)
+        batch = BatchFactory(create_articles__num=5)
 
         batch.assign_to(self.user)
-
         batch.revoke_from(self.user)
 
         self.assertIs(batch.is_assigned_to(self.user), False)
@@ -101,37 +93,42 @@ class BatchTest(TestCase):
         """
         Check it can be revoked when not started
         """
-        articles1 = ArticleFactory.create_batch(5)
-        articles2 = ArticleFactory.create_batch(5)
 
-        batch1 = Batch.create_from_articles(name="1", articles=articles1)
+        batch1 = BatchFactory(create_articles__num=5)
+        batch2 = BatchFactory(create_articles__num=5)
+
         batch1.assign_to(self.user)
-
-        batch2 = Batch.create_from_articles(name="2", articles=articles2)
         batch2.assign_to(self.user)
-
 
         batch1.revoke_from(self.user)
 
         self.assertIs(batch2.is_assigned_to(self.user), True)
-        self.assertIs(
-            self.user.assignment_set.filter(article__in=articles2).count(),
-            len(articles2),
+
+        assignments = Assignment.objects.filter(
+            user=self.user,
+            article__batch=batch2,
+        ).prefetch_related('article')
+        ## Son iguales
+        self.assertSequenceEqual(
+            [assignment.article for assignment in assignments],
+            batch2.articles.all(),
         )
-        self.assertIs(self.user.assignment_set.count(), len(articles2))
+        ## No le quedan otros
+        self.assertIs(self.user.assignment_set.count(), batch2.articles.count())
 
     def test_raises_when_already_set(self):
         """
         Check it can be revoked when not started
         """
-        articles = ArticleFactory.create_batch(5)
-
-        batch = Batch.create_from_articles(name="1", articles=articles)
+        batch = BatchFactory(create_articles__num=5)
         batch.assign_to(self.user)
 
-        self.user.article_labels.create(article=articles[0], is_interesting=False)
+        an_article = batch.articles.all()[0]
+
+        self.user.article_labels.create(article=an_article, is_interesting=False)
         with self.assertRaises(ValueError):
             batch.revoke_from(self.user)
+
 
 
 class BatchAssignmentTest(TestCase):

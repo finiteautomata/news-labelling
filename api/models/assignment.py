@@ -53,14 +53,16 @@ class Assignment(models.Model, Completable):
 
         assignment_undone.send(sender=self.__class__, assignment=self)
 
+    @property
+    def article_label(self):
+        return self.user.article_labels.get(article=self.article)
 
     def remove_label(self):
         """
         Delete label for this assignment
         """
         if self.done:
-            article_label = self.user.article_labels.get(article=self.article)
-            return article_label.delete()
+            return self.article_label.delete()
 
     def set_comments(self, comments):
         """
@@ -84,6 +86,30 @@ class Assignment(models.Model, Completable):
         if self.comments.count() > 0:
             return self.comments.all()
         return self.article.comment_set.all()
+
+    def reassign_for(self, another_assignment, only_comments=True):
+        """
+        Reassign when skipped
+        """
+
+        if not self.done or self.article_label.is_interesting:
+            raise ValueError("Should be a skipped assignment")
+
+        if not another_assignment.done or not another_assignment.article_label.is_interesting:
+            raise ValueError("Should reassign wrt an annotated assignment")
+
+        with transaction.atomic():
+            if only_comments:
+                annotated_label = another_assignment.article_label
+                comments_to_reassign = [
+                    comment_label.comment
+                    for comment_label in annotated_label.comment_labels.all()
+                    if comment_label.is_hateful
+                ]
+
+                if len(comments_to_reassign) > 0:
+                    self.remove_label()
+                    self.comments.set(comments_to_reassign)
 
 
 class AssignmentComment(models.Model, Completable):

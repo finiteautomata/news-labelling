@@ -1,8 +1,9 @@
 import json
 from datetime import datetime, timedelta
 from django.utils import timezone
+from django.contrib.auth.models import User
 import pandas as pd
-from api.models import Assignment, ArticleLabel, BatchAssignment
+from api.models import Assignment, ArticleLabel, BatchAssignment, Batch
 
 
 class AnnotationReport:
@@ -79,21 +80,21 @@ class AnnotationReport:
         usernames = [u.username for u in self.users]
         df = pd.DataFrame(columns=usernames)
 
-        batch_assignments = BatchAssignment.objects.prefetch_related(
-            'batch', 'user'
-        ).all()
-        for batch_assignment in batch_assignments:
-            user_name = batch_assignment.user.username
-            if user_name in usernames:
-                batch_name = batch_assignment.batch.name
-                if batch_assignment.done:
-                    value = "completed"
-                else:
-                    completed = batch_assignment.completed_articles
-                    to_be_done = batch_assignment.assignments.count()
+        users = User.objects.filter(username__in=usernames)
 
-                    value = f"progressing ({completed}/{to_be_done})"
-                df.loc[batch_name, user_name] = value
+        for batch in Batch.objects.all():
+            for user in users:
+                if batch.is_assigned_to(user):
+                    batch_assignment = BatchAssignment(batch, user)
+
+                    if batch_assignment.done:
+                        value = "completed"
+                    else:
+                        completed = batch_assignment.completed_articles
+                        to_be_done = batch_assignment.assignments.count()
+
+                        value = f"progressing ({completed}/{to_be_done})"
+                    df.loc[batch.name, user.username] = value
 
         df.fillna("na", inplace=True)
 

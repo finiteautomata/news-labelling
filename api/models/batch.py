@@ -1,9 +1,6 @@
-from django.db import models, transaction, IntegrityError
-from api.models import Article, Assignment, assignment_done, assignment_undone
+from django.db import models, transaction
 from django.contrib.auth.models import User
-from django.core.exceptions import ObjectDoesNotExist
-from django.db.models.signals import post_delete
-from .mixins import Completable
+from api.models import Article, Assignment, assignment_done, assignment_undone
 
 # Create your models here.
 class Batch(models.Model):
@@ -11,7 +8,13 @@ class Batch(models.Model):
     Batch model
     """
     name = models.CharField(max_length=300, blank=False, unique=True)
-    users = models.ManyToManyField(User, through="BatchAssignment")
+
+    @property
+    def users(self):
+        """
+        Return users who have any assignment to this batch
+        """
+        return User.objects.filter(assignment__article__batch=self).distinct()
 
     @classmethod
     def create_from_articles(cls, name, articles):
@@ -34,7 +37,6 @@ class Batch(models.Model):
         Assign batch to user
         """
         with transaction.atomic():
-            batch_assignment = BatchAssignment.objects.create(batch=self, user=user)
 
             for article in self.articles.all():
                 """
@@ -44,9 +46,9 @@ class Batch(models.Model):
                 if user.assignment_set.filter(article=article).exists():
                     print(f"Assignment of '{article.title[:50]}' to {user.username} already exists -- skipping")
                 else:
-                    Assignment.objects.create(user=user, article=article)
+                    user.assignment_set.create(article=article)
 
-        return batch_assignment
+        return BatchAssignment(self, user)
 
     def revoke_from(self, user):
         """
@@ -54,11 +56,11 @@ class Batch(models.Model):
         """
 
         with transaction.atomic():
-            batch_assignment = BatchAssignment.objects.get(batch=self, user=user)
+
+            batch_assignment = BatchAssignment(self, user)
 
             if batch_assignment.completed_articles == 0:
-                user.assignment_set.filter(article__in=self.articles.all()).delete()
-                batch_assignment.delete()
+                batch_assignment.assignments.delete()
             else:
                 raise ValueError("Already started batch!")
 
@@ -66,23 +68,24 @@ class Batch(models.Model):
         """
         Checks is assigned
         """
-        return BatchAssignment.objects.filter(batch=self, user=user).exists()
+
+        return user.assignment_set.filter(
+            article__batch=self,
+        ).exists()
 
 
 
-class BatchAssignment(models.Model, Completable):
+class BatchAssignment:
     """
     Batch to user relationship model
     """
+    def __init__(self, batch, user):
+        """
+        Constructor
+        """
+        self.user = user
+        self.batch = batch
 
-    batch = models.ForeignKey(Batch, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    completed_articles = models.IntegerField(default=0)
-    done = models.BooleanField(default=False)
-
-
-    class Meta:
-        unique_together = ('user', 'batch')
 
     @property
     def assignments(self):
@@ -90,54 +93,16 @@ class BatchAssignment(models.Model, Completable):
             article__batch=self.batch,
         )
 
-    def update(self):
+    @property
+    def done(self):
         """
-        Check status
+        Is assigned
         """
-        completed_articles = self.user.assignment_set.filter(
-            done=True,
-            article__in=self.batch.articles.all(),
-        ).count()
+        return self.assignments.exists() and not self.assignments.filter(done=False).exists()
 
-        total_articles = self.assignments.count()
-
-        self.completed_articles = completed_articles
-        if completed_articles == total_articles:
-            if not self.done:
-                self.complete()
-        elif self.done:
-            self.undo()
-        else:
-            """
-            Just update total articles
-            """
-            self.save()
-
-
-def check_batch_status(sender, assignment, **kwargs):
-    """
-    Check batch is complete after
-    """
-    user = assignment.user
-    article = assignment.article
-    # TODO: Fix this
-    batch = article.batch
-
-    try:
-        batch_assignment = BatchAssignment.objects.get(user=user, batch=batch)
-
-        batch_assignment.update()
-    except ObjectDoesNotExist:
-
-        print(f"No batch assignment of {user.username} and {batch}")
-
-def check_after_delete(sender, instance, **kwargs):
-    """
-    Check after removal of assignment
-    """
-    return check_batch_status(sender, assignment=instance, **kwargs)
-
-
-assignment_done.connect(check_batch_status, sender=Assignment)
-assignment_undone.connect(check_batch_status, sender=Assignment)
-post_delete.connect(check_after_delete, sender=Assignment)
+    @property
+    def completed_articles(self):
+        """
+        Number of completed articles
+        """
+        return self.assignments.filter(done=True).count()

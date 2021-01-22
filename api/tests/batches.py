@@ -60,7 +60,7 @@ class BatchTest(TestCase):
 
         self.assertIs(batch.is_assigned_to(self.user), True)
 
-    def test_assigning_twice_raises(self):
+    def test_assigning_twice_creates_no_new_assignments(self):
         """
         Check cannot assign twice
         """
@@ -69,20 +69,11 @@ class BatchTest(TestCase):
 
         batch.assign_to(self.user)
 
-        with self.assertRaises(IntegrityError):
-            batch.assign_to(self.user)
-
-    def test_remove_from_when_not_started(self):
-        """
-        Check cannot assign twice
-        """
-        articles = ArticleFactory.create_batch(5)
-        batch = Batch.create_from_articles(name="batch name", articles=articles)
+        assignments_count = self.user.assignment_set.count()
 
         batch.assign_to(self.user)
 
-        with self.assertRaises(IntegrityError):
-            batch.assign_to(self.user)
+        self.assertIs(assignments_count, self.user.assignment_set.count())
 
     def test_revokes_from_user_when_not_started(self):
         """
@@ -92,7 +83,6 @@ class BatchTest(TestCase):
         batch = Batch.create_from_articles(name="batch name", articles=articles)
 
         batch.assign_to(self.user)
-
         batch.revoke_from(self.user)
 
         self.assertIs(batch.is_assigned_to(self.user), False)
@@ -162,8 +152,6 @@ class BatchAssignmentTest(TestCase):
         batch_assignment = self.batch.assign_to(self.user)
         ArticleLabelFactory(article=self.articles[0], user=self.user)
 
-        batch_assignment.refresh_from_db()
-
         self.assertIs(batch_assignment.done, False)
 
     def test_batch_assignment_done_after_just_all_labels(self):
@@ -175,7 +163,6 @@ class BatchAssignmentTest(TestCase):
         for art in self.articles:
             ArticleLabelFactory(article=art, user=self.user)
 
-        batch_assignment.refresh_from_db()
 
         self.assertIs(batch_assignment.done, True)
 
@@ -184,8 +171,6 @@ class BatchAssignmentTest(TestCase):
         Check assignment not done after creation
         """
         batch_assignment = self.batch.assign_to(self.user)
-
-        batch_assignment.refresh_from_db()
 
         self.assertIs(batch_assignment.completed_articles, 0)
 
@@ -197,8 +182,6 @@ class BatchAssignmentTest(TestCase):
 
         for art in self.articles[:3]:
             ArticleLabelFactory(article=art, user=self.user)
-
-        batch_assignment.refresh_from_db()
 
         self.assertIs(batch_assignment.completed_articles, 3)
 
@@ -213,11 +196,9 @@ class BatchAssignmentTest(TestCase):
         for art in self.articles:
             ArticleLabelFactory(article=art, user=self.user)
 
-        batch_assignment.refresh_from_db()
         self.assertIs(batch_assignment.done, True)
         # Let's remove the article label from last article
 
         ArticleLabel.objects.filter(article=self.articles[-1]).delete()
-        batch_assignment.refresh_from_db()
 
         self.assertIs(batch_assignment.done, False)

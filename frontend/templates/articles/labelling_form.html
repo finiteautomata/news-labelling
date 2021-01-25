@@ -221,24 +221,27 @@ hr {
     (radio) => radio.addEventListener('change', () => onHatefulRadioChange(radio))
   );
 
-  document.getElementById("not_interesting").addEventListener("click", (event) => {
-    event.preventDefault();
-    metadata.end_time = new Date();
+  var skipButton = document.getElementById("not_interesting");
 
-    axios.post(
-      endpoint,
-      { is_interesting: false, metadata: metadata }
-    )
-    .then( () => {
-      alert("Artículo marcado como no interesante");
-      location.href = next_url;
-    })
-    .catch( (errors) => {
-      alert("Hubo un error con esto: "+ errors);
+  if (skipButton) {
+    skipButton.addEventListener("click", (event) => {
+      event.preventDefault();
+      metadata.end_time = new Date();
+
+      axios.post(
+        endpoint,
+        { is_interesting: false, metadata: metadata }
+      )
+      .then( () => {
+        alert("Artículo marcado como no interesante");
+        location.href = next_url;
+      })
+      .catch( (errors) => {
+        alert("Hubo un error con esto: "+ errors);
+      });
+
     });
-
-  });
-
+  }
   var hateSpeechTypes = [
     {% for type in hate_speech_types %}
     "{{type.0}}",

@@ -1,12 +1,12 @@
 from django.contrib.auth.models import User
 from django.db import models, transaction
 import django.dispatch
-from .article import Article
-from .comment import Comment
-from .article_label import ArticleLabel
 from django.core.exceptions import ValidationError
 from django.db.models.signals import post_delete, post_save
 from django.core.exceptions import ObjectDoesNotExist
+from .article import Article
+from .comment import Comment
+from .article_label import ArticleLabel
 from .mixins import Completable
 
 assignment_done = django.dispatch.Signal()
@@ -87,32 +87,6 @@ class Assignment(models.Model, Completable):
             return self.comments.all()
         return self.article.comment_set.all()
 
-    def reassign_for(self, another_assignment, only_comments=True):
-        """
-        Reassign when skipped
-        """
-
-        if not self.done or self.article_label.is_interesting:
-            raise ValueError("Should be a skipped assignment")
-
-        if not another_assignment.done or not another_assignment.article_label.is_interesting:
-            raise ValueError("Should reassign wrt an annotated assignment")
-
-        with transaction.atomic():
-            if only_comments:
-                annotated_label = another_assignment.article_label
-                comments_to_reassign = [
-                    comment_label.comment
-                    for comment_label in annotated_label.comment_labels.all()
-                    if comment_label.is_hateful
-                ]
-
-                if len(comments_to_reassign) > 0:
-                    self.remove_label()
-                    self.skippable = False
-                    self.save(update_fields=["skippable"])
-                    self.comments.set(comments_to_reassign)
-        return self.refresh_from_db()
 
 class AssignmentComment(models.Model, Completable):
     """

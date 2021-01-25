@@ -35,18 +35,17 @@ class Assigner:
             If one or zero assignments, just assign if it is not already assigned
             """
             return self.assign_if_not_assigned(article, user)
-        elif num_assignments == 2:
+        else:
             if user in users and reassign:
                 # Should reassign
                 assignment = article.assignment_set.get(user=user)
-                another_assignment = article.assignment_set.exclude(user=user)[0]
 
-                return self._reassign(assignment, another_assignment)
-
+                return self._reassign(article, user, assignment)
 
 
 
-    def _reassign(self, assignment, another_assignment):
+
+    def _reassign(self, article, user, assignment):
         """
         Reassign when skipped
         """
@@ -54,20 +53,24 @@ class Assigner:
         if not assignment.done or assignment.article_label.is_interesting:
             raise ValueError("Should be a skipped assignment")
 
-        if not another_assignment.done or not another_assignment.article_label.is_interesting:
+        other_labels = article.labels.exclude(user=user).filter(is_interesting=True).prefetch_related(
+            'comment_labels', 'comment_labels__comment')
+        if not other_labels.exists():
             raise ValueError("Should reassign wrt an annotated assignment")
 
         with transaction.atomic():
-            annotated_label = another_assignment.article_label
-            comments_to_reassign = [
+            comments_to_reassign = {
                 comment_label.comment
-                for comment_label in annotated_label.comment_labels.all()
+                for article_label in other_labels
+                for comment_label in article_label.comment_labels.all()
                 if comment_label.is_hateful
-            ]
+            }
 
             if len(comments_to_reassign) > 0:
                 assignment.remove_label()
                 assignment.skippable = False
                 assignment.save(update_fields=["skippable"])
                 assignment.comments.set(comments_to_reassign)
-        return assignment.refresh_from_db()
+
+            assignment.refresh_from_db()
+            return assignment

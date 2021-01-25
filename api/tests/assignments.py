@@ -276,9 +276,9 @@ class AssignerTest(TestCase):
 
         annotated_assignment = label_article(
             self.user, an_article, is_interesting=True, comments=[
-            {"is_hateful": True},
-            {"is_hateful": False},
-            {"is_hateful": False},
+            {"is_hateful": hateful_labels[0]},
+            {"is_hateful": hateful_labels[1]},
+            {"is_hateful": hateful_labels[2]},
         ])
 
         return label_article(
@@ -286,7 +286,7 @@ class AssignerTest(TestCase):
         )
 
 
-    def test_reassing_for_two_users_if_one_skipped_reassigns_only_hateful_comments(self):
+    def test_reassign_for_two_users_if_one_skipped_reassigns_only_hateful_comments(self):
         """
         Test article is reassigned for those articles which one of them skipped and not the other
         """
@@ -298,6 +298,85 @@ class AssignerTest(TestCase):
 
         skipped_assignment.refresh_from_db()
         self.assertIs(skipped_assignment.done, False)
+
+    def test_reassign_for_three_users_if_one_skipped_reassigns_only_hateful_comments(self):
+        """
+        Test article is reassigned for those articles which one of them skipped and not the other
+        """
+        yet_another_user = User.objects.create_user(
+            username="yet_another_user",
+            password="test",
+        )
+        an_article = self.articles[0]
+
+        comments = list(an_article.comment_set.all())
+        assigner = Assigner()
+        assigner.assign(an_article, self.user)
+        assigner.assign(an_article, self.another_user)
+
+        # Note. I create this by hand because my rule for three annotators was different
+        an_article.assignment_set.create(user=yet_another_user)
+
+        label_article(
+            self.user, an_article, is_interesting=True, comments=[
+            {"is_hateful": True},
+            {"is_hateful": False},
+            {"is_hateful": False},
+        ])
+
+        label_article(
+            self.another_user, an_article, is_interesting=True, comments=[
+            {"is_hateful": False},
+            {"is_hateful": True},
+            {"is_hateful": False},
+        ])
+
+        label_article(
+            yet_another_user, an_article, is_interesting=False
+        )
+
+        assignment = assigner.assign(an_article, yet_another_user, reassign=True)
+
+        self.assertIs(assignment.done, False)
+        self.assertEqual(assignment.user, yet_another_user)
+        self.assertSequenceEqual(
+            assignment.comments_to_label(),
+            comments[:2],
+        )
+
+    def test_reassign_if_everyone_skipped_raises(self):
+        """
+        Test article is reassigned for those articles which one of them skipped and not the other
+        """
+        yet_another_user = User.objects.create_user(
+            username="yet_another_user",
+            password="test",
+        )
+        an_article = self.articles[0]
+
+        comments = list(an_article.comment_set.all())
+        assigner = Assigner()
+        assigner.assign(an_article, self.user)
+        assigner.assign(an_article, self.another_user)
+
+        # Note. I create this by hand because my rule for three annotators was different
+        an_article.assignment_set.create(user=yet_another_user)
+
+        label_article(
+            self.user, an_article, is_interesting=False
+        )
+
+        label_article(
+            self.another_user, an_article, is_interesting=False
+        )
+
+        label_article(
+            yet_another_user, an_article, is_interesting=False
+        )
+
+        with self.assertRaises(ValueError):
+            assigner.assign(an_article, yet_another_user, reassign=True)
+
 
     def test_reassign_undo_assignment_with_hateful_set_it_as_not_skippable(self):
         """

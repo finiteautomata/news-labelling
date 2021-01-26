@@ -1,6 +1,6 @@
-from .article_views import ArticleViewTest
-from .comment_views import CommentViewTest
-from .label_views import LabelViewTest
-from .serializers import ArticleLabelSerializerTest
-from .assignments import AssignmentTest
-from .batches import BatchTest, BatchAssignmentTest
+from .article_views import *
+from .comment_views import *
+from .label_views import *
+from .serializers import *
+from .assignments import *
+from .batches import *

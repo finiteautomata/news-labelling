@@ -28,6 +28,8 @@ class Assigner:
         """
         num_assignments = article.assignment_set.count()
 
+        times_annotated = article.labels.filter(is_interesting=True).count()
+
         users = [assignment.user for assignment in article.assignment_set.all()]
 
         if num_assignments <= 1:
@@ -41,7 +43,38 @@ class Assigner:
                 assignment = article.assignment_set.get(user=user)
 
                 return self._reassign(article, user, assignment)
+            elif times_annotated == 2:
+                # Article was annotated twice, but not by user
+                return self._assign_only_hateful(article, user)
 
+    def comments_labeled_as_hateful(self, article, user):
+        """
+        Return comments labeled as hateful by at least one annotator
+        """
+        article_labels = article.labels.exclude(
+            user=user
+        ).filter(is_interesting=True).prefetch_related('comment_labels', 'comment_labels__comment')
+
+        return {comment_label.comment
+            for article_label in article_labels
+            for comment_label in article_label.comment_labels.all()
+            if comment_label.is_hateful
+        }
+    def _assign_only_hateful(self, article, user):
+        """
+        Assign only comments labeled as hateful by any annotator
+        """
+        comments_to_assign = self.comments_labeled_as_hateful(article, user)
+
+        if len(comments_to_assign) > 0:
+            with transaction.atomic():
+                assignment = user.assignment_set.create(
+                    article=article,
+                    skippable=False,
+                )
+
+                assignment.comments.set(comments_to_assign)
+                return assignment
 
 
 
@@ -53,18 +86,12 @@ class Assigner:
         if not assignment.done or assignment.article_label.is_interesting:
             raise ValueError("Should be a skipped assignment")
 
-        other_labels = article.labels.exclude(user=user).filter(is_interesting=True).prefetch_related(
-            'comment_labels', 'comment_labels__comment')
+        other_labels = article.labels.exclude(user=user).filter(is_interesting=True)
         if not other_labels.exists():
             raise ValueError("Should reassign wrt an annotated assignment")
 
         with transaction.atomic():
-            comments_to_reassign = {
-                comment_label.comment
-                for article_label in other_labels
-                for comment_label in article_label.comment_labels.all()
-                if comment_label.is_hateful
-            }
+            comments_to_reassign = self.comments_labeled_as_hateful(article, user)
 
             if len(comments_to_reassign) > 0:
                 assignment.remove_label()

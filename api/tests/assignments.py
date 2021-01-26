@@ -207,7 +207,6 @@ class AssignerTest(TestCase):
         """
         Assign article to user
         """
-
         an_article = self.articles[0]
 
         assigner = Assigner()
@@ -339,6 +338,7 @@ class AssignerTest(TestCase):
 
         self.assertIs(assignment.done, False)
         self.assertEqual(assignment.user, yet_another_user)
+        self.assertEqual(assignment.skippable, False)
         self.assertSequenceEqual(
             assignment.comments_to_label(),
             comments[:2],
@@ -354,7 +354,6 @@ class AssignerTest(TestCase):
         )
         an_article = self.articles[0]
 
-        comments = list(an_article.comment_set.all())
         assigner = Assigner()
         assigner.assign(an_article, self.user)
         assigner.assign(an_article, self.another_user)
@@ -453,7 +452,7 @@ class AssignerTest(TestCase):
         )
 
         with self.assertRaises(ValueError):
-            assigner.assign(self.another_user, an_article, reassign=True)
+            assigner.assign(an_article, self.another_user, reassign=True)
 
     def test_reassign_wrt_not_done_assignment_raises(self):
         """
@@ -471,4 +470,146 @@ class AssignerTest(TestCase):
         )
 
         with self.assertRaises(ValueError):
-            assigner.assign(self.another_user, an_article, reassign=True)
+            assigner.assign(an_article, self.another_user, reassign=True)
+
+    def test_assign_for_third_only_hateful_comments(self):
+        """
+        Test article is assigned for third only assigns hateful comments
+        """
+        yet_another_user = User.objects.create_user(
+            username="yet_another_user",
+            password="test",
+        )
+        an_article = self.articles[0]
+
+        comments = list(an_article.comment_set.all())
+        assigner = Assigner()
+        assigner.assign(an_article, self.user)
+        assigner.assign(an_article, self.another_user)
+
+        label_article(
+            self.user, an_article, is_interesting=True, comments=[
+            {"is_hateful": True},
+            {"is_hateful": False},
+            {"is_hateful": False},
+        ])
+
+        label_article(
+            self.another_user, an_article, is_interesting=True, comments=[
+            {"is_hateful": False},
+            {"is_hateful": True},
+            {"is_hateful": False},
+        ])
+
+        assignment = assigner.assign(an_article, yet_another_user, reassign=True)
+
+        self.assertIs(assignment.done, False)
+        self.assertEqual(assignment.user, yet_another_user)
+        self.assertEqual(assignment.skippable, False)
+        self.assertSequenceEqual(
+            assignment.comments_to_label(),
+            comments[:2],
+        )
+
+    def test_assign_for_third_assigns_comments_with_one_or_two_votes(self):
+        """
+        Test article is assigned for third only assigns hateful comments
+        """
+        yet_another_user = User.objects.create_user(
+            username="yet_another_user",
+            password="test",
+        )
+        an_article = self.articles[0]
+
+        comments = list(an_article.comment_set.all())
+        assigner = Assigner()
+        assigner.assign(an_article, self.user)
+        assigner.assign(an_article, self.another_user)
+
+        label_article(
+            self.user, an_article, is_interesting=True, comments=[
+            {"is_hateful": True},
+            {"is_hateful": False},
+            {"is_hateful": False},
+        ])
+
+        label_article(
+            self.another_user, an_article, is_interesting=True, comments=[
+            {"is_hateful": True},
+            {"is_hateful": False},
+            {"is_hateful": True},
+        ])
+
+        assignment = assigner.assign(an_article, yet_another_user, reassign=True)
+
+        self.assertIs(assignment.done, False)
+        self.assertEqual(assignment.user, yet_another_user)
+        self.assertEqual(assignment.skippable, False)
+        self.assertSequenceEqual(
+            assignment.comments_to_label(),
+            [comments[0], comments[2]],
+        )
+
+
+    def test_assign_for_third_if_no_hateful_does_not_assign(self):
+        """
+        Test article is assigned for third without hateful
+        """
+        yet_another_user = User.objects.create_user(
+            username="yet_another_user",
+            password="test",
+        )
+        an_article = self.articles[0]
+
+        assigner = Assigner()
+        assigner.assign(an_article, self.user)
+        assigner.assign(an_article, self.another_user)
+
+        label_article(
+            self.user, an_article, is_interesting=True, comments=[
+            {"is_hateful": False},
+            {"is_hateful": False},
+            {"is_hateful": False},
+        ])
+
+        label_article(
+            self.another_user, an_article, is_interesting=True, comments=[
+            {"is_hateful": False},
+            {"is_hateful": False},
+            {"is_hateful": False},
+        ])
+
+        assignment = assigner.assign(an_article, yet_another_user, reassign=True)
+
+        self.assertIs(assignment, None)
+        self.assertEqual(yet_another_user.assignment_set.count(), 0)
+
+    def test_assign_for_third_if_no_hateful_and_skipped_does_not_assign(self):
+        """
+        Test article is assigned for third without hateful
+        """
+        yet_another_user = User.objects.create_user(
+            username="yet_another_user",
+            password="test",
+        )
+        an_article = self.articles[0]
+
+        assigner = Assigner()
+        assigner.assign(an_article, self.user)
+        assigner.assign(an_article, self.another_user)
+
+        label_article(
+            self.user, an_article, is_interesting=False
+        )
+
+        label_article(
+            self.another_user, an_article, is_interesting=True, comments=[
+            {"is_hateful": False},
+            {"is_hateful": False},
+            {"is_hateful": False},
+        ])
+
+        assignment = assigner.assign(an_article, yet_another_user, reassign=True)
+
+        self.assertIs(assignment, None)
+        self.assertEqual(yet_another_user.assignment_set.count(), 0)

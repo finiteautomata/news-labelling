@@ -1,6 +1,7 @@
 from django.db import models, transaction
 from django.contrib.auth.models import User
-from api.models import Article, Assignment, assignment_done, assignment_undone
+from .assigner import Assigner
+from . import Article, Assignment
 
 # Create your models here.
 class Batch(models.Model):
@@ -37,16 +38,13 @@ class Batch(models.Model):
         Assign batch to user
         """
         with transaction.atomic():
+            assigner = Assigner()
 
             for article in self.articles.all():
                 """
                 Some articles might have been previously assigned -- in that case, skip
                 """
-
-                if user.assignment_set.filter(article=article).exists():
-                    print(f"Assignment of '{article.title[:50]}' to {user.username} already exists -- skipping")
-                else:
-                    user.assignment_set.create(article=article)
+                assigner.assign(article, user)
 
         return BatchAssignment(self, user)
 
@@ -77,7 +75,7 @@ class Batch(models.Model):
 
 class BatchAssignment:
     """
-    Batch to user relationship model
+    Batch to user helper
     """
     def __init__(self, batch, user):
         """

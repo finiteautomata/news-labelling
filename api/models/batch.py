@@ -86,6 +86,18 @@ class BatchAssignment:
 
 
     @property
+    def summary(self):
+        ret = {
+            "articles": 0,
+            "comments": 0,
+        }
+
+        for assignment in self.assignments:
+            ret["articles"] += 1
+            ret["comments"] += assignment.comments_to_label().count()
+        return ret
+
+    @property
     def assignments(self):
         return self.user.assignment_set.filter(
             article__batch=self.batch,

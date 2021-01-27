@@ -37,9 +37,11 @@ def assign_batch(
         print("Skipping")
         return
 
-    batch.assign_to(user)
+    batch_assignment = batch.assign_to(user)
 
-    print(f"Batch '{batch_name}' ({batch.articles.count()} articles) assigned to {username}")
+    print(f"Batch '{batch_name}' assigned to {username}")
+    summary = batch_assignment.summary
+    print(f"Articles {summary['articles']} -- Comments {summary['comments']}")
 
 if __name__ == '__main__':
     fire.Fire(assign_batch)

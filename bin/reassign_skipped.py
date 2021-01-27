@@ -12,12 +12,17 @@ from django.db import transaction
 from api.models import Article, ArticleLabel, Assigner
 
 
-def reassign_skipped():
+def reassign_skipped(batch_name):
     """
     Assign batch to user
     """
 
-    skipped_labels = ArticleLabel.objects.filter(is_interesting=False).prefetch_related(
+    query = {
+        "is_interesting": False,
+        "article__batch__name": batch_name
+    }
+
+    skipped_labels = ArticleLabel.objects.filter(**query).prefetch_related(
         'article', 'user'
     )
 
@@ -36,15 +41,13 @@ def reassign_skipped():
 
                 if not assignment.done:
                     reassigned_articles += 1
-                    print("-")
-                    print(f"Reassigning {article.title} to {user.username}")
                     new_comments = assignment.comments_to_label().count()
-                    print(f"{new_comments} comments to label")
                     total_count[user] += new_comments
 
     print("Reassigned articles")
     print(reassigned_articles)
     print("Comments to be labelled per user")
     print(total_count)
+
 if __name__ == '__main__':
     fire.Fire(reassign_skipped)

@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.4.0
+
+- Reassign skipped articles
+- Create assignments of just a few comments
+- BatchAssignment is no longer saved on database
+
 ## 0.3.9
 
 - Agrego links a comentarios en las comparativas

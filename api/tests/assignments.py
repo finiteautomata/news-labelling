@@ -77,6 +77,16 @@ class AssignmentTest(TestCase):
         with self.assertRaises(ValueError):
             assignment.complete()
 
+    def test_reassigned_false_by_default(self):
+        """
+        Test we get the first not-done assignment
+        """
+        articles = ArticleFactory()
+
+        assignment = Assignment.objects.create(user=self.user, article=article)
+
+        self.assertEqual(assignment.reassigned, False)
+
 
     def test_two_assignments_to_same_article_and_user_are_invalid(self):
         """
@@ -199,7 +209,7 @@ class AssignerTest(TestCase):
             password="another_test",
         )
 
-        batch = BatchFactory(create_articles__num=2, create_articles__num_comments=3)
+        batch = BatchFactory(create_articles__num=2, create_articles__num_comments=5)
 
         self.articles = batch.articles.all()
 
@@ -263,7 +273,7 @@ class AssignerTest(TestCase):
         #label_article(self.another_user, self.article, is_interesting=False)
         #self.skipped_assignment = self.article.assignment_set.get(user=self.another_user)
 
-    def set_skipped_and_labeled_article(self, hateful_labels=[True, False, False]):
+    def set_skipped_and_labeled_article(self, hateful_labels):
         """
         Custom setup
         """
@@ -275,9 +285,7 @@ class AssignerTest(TestCase):
 
         annotated_assignment = label_article(
             self.user, an_article, is_interesting=True, comments=[
-            {"is_hateful": hateful_labels[0]},
-            {"is_hateful": hateful_labels[1]},
-            {"is_hateful": hateful_labels[2]},
+            {"is_hateful": l} for l in hateful_labels
         ])
 
         return label_article(
@@ -285,20 +293,91 @@ class AssignerTest(TestCase):
         )
 
 
-    def test_reassign_for_two_users_if_one_skipped_reassigns_only_hateful_comments(self):
+    def test_reassign_for_two_users_only_reassigns_if_is_over_threshold(self):
         """
         Test article is reassigned for those articles which one of them skipped and not the other
         """
 
-        skipped_assignment = self.set_skipped_and_labeled_article()
+        skipped_assignment = self.set_skipped_and_labeled_article(
+            hateful_labels=[True, True, True, False, False]
+        )
 
         assigner = Assigner()
-        assigner.assign(skipped_assignment.article, skipped_assignment.user, reassign=True)
+        assigner.assign(
+            skipped_assignment.article,
+            skipped_assignment.user,
+            reassign=True, reassign_threshold=2
+        )
 
         skipped_assignment.refresh_from_db()
         self.assertIs(skipped_assignment.done, False)
 
-    def test_reassign_for_three_users_if_one_skipped_reassigns_only_hateful_comments(self):
+    def test_reassign_for_two_users_sets_reassigned_to_true(self):
+        """
+        Test article is reassigned for those articles which one of them skipped and not the other
+        """
+
+        skipped_assignment = self.set_skipped_and_labeled_article(
+            hateful_labels=[True, True, True, False, False]
+        )
+
+        assigner = Assigner()
+        assigner.assign(
+            skipped_assignment.article,
+            skipped_assignment.user,
+            reassign=True, reassign_threshold=2
+        )
+
+        skipped_assignment.refresh_from_db()
+        self.assertIs(skipped_assignment.reassigned, True)
+
+    def test_reassign_if_doesnt_passes_threshold_it_is_not_reassigned(self):
+        """
+        Test article is reassigned for those articles which one of them skipped and not the other
+        """
+
+        skipped_assignment = self.set_skipped_and_labeled_article(
+            hateful_labels=[True, True, False, False, False]
+        )
+
+        assigner = Assigner()
+        assigner.assign(
+            skipped_assignment.article,
+            skipped_assignment.user,
+            reassign=True, reassign_threshold=3
+        )
+
+        skipped_assignment.refresh_from_db()
+        self.assertIs(skipped_assignment.reassigned, False)
+        self.assertIs(skipped_assignment.done, True)
+
+
+    def test_reassign_for_two_users_sets_all_comments(self):
+        """
+        Test article is reassigned for those articles which one of them skipped and not the other
+        """
+
+        skipped_assignment = self.set_skipped_and_labeled_article(
+            hateful_labels=[True, True, True, False, False]
+        )
+
+        article = skipped_assignment.article
+        user = skipped_assignment.user
+
+        assigner = Assigner()
+        assigner.assign(
+            article,
+            user,
+            reassign=True, reassign_threshold=2
+        )
+
+        skipped_assignment.refresh_from_db()
+        self.assertCountEqual(
+            skipped_assignment.comments_to_label(),
+            article.comment_set.all()
+        )
+
+    def test_reassign_for_three_users(self):
         """
         Test article is reassigned for those articles which one of them skipped and not the other
         """
@@ -320,13 +399,18 @@ class AssignerTest(TestCase):
             self.user, an_article, is_interesting=True, comments=[
             {"is_hateful": True},
             {"is_hateful": False},
+            {"is_hateful": True},
             {"is_hateful": False},
+            {"is_hateful": False},
+
         ])
 
         label_article(
             self.another_user, an_article, is_interesting=True, comments=[
-            {"is_hateful": False},
             {"is_hateful": True},
+            {"is_hateful": True},
+            {"is_hateful": False},
+            {"is_hateful": False},
             {"is_hateful": False},
         ])
 
@@ -334,14 +418,15 @@ class AssignerTest(TestCase):
             yet_another_user, an_article, is_interesting=False
         )
 
-        assignment = assigner.assign(an_article, yet_another_user, reassign=True)
+        assignment = assigner.assign(an_article, yet_another_user, reassign=True, reassign_threshold=3)
 
         self.assertIs(assignment.done, False)
+        self.assertIs(assignment.reassigned, True)
         self.assertEqual(assignment.user, yet_another_user)
         self.assertEqual(assignment.skippable, False)
         self.assertSequenceEqual(
             assignment.comments_to_label(),
-            comments[:2],
+            comments,
         )
 
     def test_reassign_if_everyone_skipped_raises(self):
@@ -374,45 +459,23 @@ class AssignerTest(TestCase):
         )
 
         with self.assertRaises(ValueError):
-            assigner.assign(an_article, yet_another_user, reassign=True)
+            assigner.assign(an_article, yet_another_user, reassign=True, reassign_threshold=3)
 
 
     def test_reassign_undo_assignment_with_hateful_set_it_as_not_skippable(self):
         """
         Test article is reassigned for those articles which one of them skipped and not the other
         """
-        skipped_assignment = self.set_skipped_and_labeled_article()
+        skipped_assignment = self.set_skipped_and_labeled_article(
+            hateful_labels=[True, True, True, True, False]
+        )
 
         assigner = Assigner()
-        assigner.assign(skipped_assignment.article, skipped_assignment.user, reassign=True)
+        assigner.assign(skipped_assignment.article, skipped_assignment.user, reassign=True, reassign_threshold=3)
 
         skipped_assignment.refresh_from_db()
         self.assertIs(skipped_assignment.skippable, False)
 
-    def test_reassign_sets_only_comments_that_were_marked_as_hateful(self):
-        """
-        Test article is reassigned for those articles which one of them skipped and not the other
-        """
-
-        skipped_assignment = self.set_skipped_and_labeled_article()
-
-        assigner = Assigner()
-        assigner.assign(skipped_assignment.article, skipped_assignment.user, reassign=True)
-        skipped_assignment.refresh_from_db()
-
-        annotated_label = skipped_assignment.article.labels.get(
-            is_interesting=True,
-            user=self.user
-        )
-        possibly_hateful_comments = [
-            comment_label.comment
-            for comment_label in annotated_label.comment_labels.all() if comment_label.is_hateful
-        ]
-
-        self.assertSequenceEqual(
-            skipped_assignment.comments.all(),
-            possibly_hateful_comments
-        )
 
     def test_reassign_for_second_annotation_on_no_hateful_does_not_reset(self):
         """
@@ -420,17 +483,15 @@ class AssignerTest(TestCase):
         """
 
         skipped_assignment = self.set_skipped_and_labeled_article(
-            hateful_labels=[False, False, False]
+            hateful_labels=[False, False, False, False, False]
         )
 
         assigner = Assigner()
         assigner.assign(skipped_assignment.article, skipped_assignment.user, reassign=True)
 
 
-        self.assertIs(
-            skipped_assignment.done,
-            True
-        )
+        self.assertIs(skipped_assignment.done, True)
+        self.assertIs(skipped_assignment.reassigned, False)
 
     def test_reassign_wrt_skipped_assignment_raises(self):
         """
@@ -492,12 +553,16 @@ class AssignerTest(TestCase):
             {"is_hateful": True},
             {"is_hateful": False},
             {"is_hateful": False},
+            {"is_hateful": False},
+            {"is_hateful": False},
         ])
 
         label_article(
             self.another_user, an_article, is_interesting=True, comments=[
             {"is_hateful": False},
             {"is_hateful": True},
+            {"is_hateful": False},
+            {"is_hateful": False},
             {"is_hateful": False},
         ])
 
@@ -531,6 +596,8 @@ class AssignerTest(TestCase):
             {"is_hateful": True},
             {"is_hateful": False},
             {"is_hateful": False},
+            {"is_hateful": False},
+            {"is_hateful": False},
         ])
 
         label_article(
@@ -538,6 +605,8 @@ class AssignerTest(TestCase):
             {"is_hateful": True},
             {"is_hateful": False},
             {"is_hateful": True},
+            {"is_hateful": False},
+            {"is_hateful": False},
         ])
 
         assignment = assigner.assign(an_article, yet_another_user, reassign=True)
@@ -570,10 +639,14 @@ class AssignerTest(TestCase):
             {"is_hateful": False},
             {"is_hateful": False},
             {"is_hateful": False},
+            {"is_hateful": False},
+            {"is_hateful": False},
         ])
 
         label_article(
             self.another_user, an_article, is_interesting=True, comments=[
+            {"is_hateful": False},
+            {"is_hateful": False},
             {"is_hateful": False},
             {"is_hateful": False},
             {"is_hateful": False},
@@ -604,6 +677,8 @@ class AssignerTest(TestCase):
 
         label_article(
             self.another_user, an_article, is_interesting=True, comments=[
+            {"is_hateful": False},
+            {"is_hateful": False},
             {"is_hateful": False},
             {"is_hateful": False},
             {"is_hateful": False},

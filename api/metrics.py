@@ -117,7 +117,7 @@ class AgreementCalculator:
         else:
             return self.df_comments
 
-    def get_agreement(self, on="HATE"):
+    def get_agreement(self, on="HATE", users=None):
         """
         Get agreement
 
@@ -141,6 +141,8 @@ class AgreementCalculator:
         """
         df = self.get_labelled_comments(on)
 
+        if users:
+            df = df.loc[users]
         """
         Get support
         """

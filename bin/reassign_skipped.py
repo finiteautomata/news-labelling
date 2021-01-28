@@ -12,15 +12,17 @@ from django.db import transaction
 from api.models import Article, ArticleLabel, Assigner
 
 
-def reassign_skipped(batch_name):
+def reassign_skipped(batch_name, reassign_threshold=5):
     """
-    Assign batch to user
+    Reassign skipped articles
     """
 
     query = {
         "is_interesting": False,
-        "article__batch__name": batch_name
+
     }
+    if batch_name != "all":
+        query["article__batch__name"] = batch_name
 
     skipped_labels = ArticleLabel.objects.filter(**query).prefetch_related(
         'article', 'user'
@@ -29,6 +31,7 @@ def reassign_skipped(batch_name):
     assigner = Assigner()
     reassigned_articles = 0
     total_count = defaultdict(int)
+
     with transaction.atomic():
         for skipped_label in skipped_labels:
             article = skipped_label.article
@@ -37,7 +40,10 @@ def reassign_skipped(batch_name):
                 """
                 So, anyone annotated this => reassign
                 """
-                assignment = assigner.assign(article, user, reassign=True)
+                assignment = assigner.assign(
+                    article, user,
+                    reassign=True, reassign_threshold=reassign_threshold
+                )
 
                 if not assignment.done:
                     reassigned_articles += 1

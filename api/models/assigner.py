@@ -15,7 +15,7 @@ class Assigner:
         else:
             return user.assignment_set.create(article=article)
 
-    def assign(self, article, user, reassign=False):
+    def assign(self, article, user, reassign=False, reassign_threshold=3):
         """
         Assign article to user
 
@@ -42,7 +42,7 @@ class Assigner:
                 # Should reassign
                 assignment = article.assignment_set.get(user=user)
 
-                return self._reassign(article, user, assignment)
+                return self._reassign(article, user, assignment, reassign_threshold)
             elif times_annotated == 2:
                 # Article was annotated twice, but not by user
                 return self._assign_only_hateful(article, user)
@@ -78,7 +78,7 @@ class Assigner:
 
 
 
-    def _reassign(self, article, user, assignment):
+    def _reassign(self, article, user, assignment, reassign_threshold):
         """
         Reassign when skipped
         """
@@ -93,11 +93,11 @@ class Assigner:
         with transaction.atomic():
             comments_to_reassign = self.comments_labeled_as_hateful(article, user)
 
-            if len(comments_to_reassign) > 0:
+            if len(comments_to_reassign) >= reassign_threshold:
                 assignment.remove_label()
                 assignment.skippable = False
-                assignment.save(update_fields=["skippable"])
-                assignment.comments.set(comments_to_reassign)
+                assignment.reassigned = True
+                assignment.save(update_fields=["skippable", "reassigned"])
 
             assignment.refresh_from_db()
             return assignment

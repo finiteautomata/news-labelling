@@ -27,6 +27,7 @@ class Assignment(models.Model, Completable):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     skippable = models.BooleanField(default=True)
+    reassigned = models.BooleanField(default=False)
 
     @classmethod
     def next_assignment_of(cls, user):

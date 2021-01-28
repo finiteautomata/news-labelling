@@ -81,7 +81,7 @@ class AssignmentTest(TestCase):
         """
         Test we get the first not-done assignment
         """
-        articles = ArticleFactory()
+        article = ArticleFactory()
 
         assignment = Assignment.objects.create(user=self.user, article=article)
 

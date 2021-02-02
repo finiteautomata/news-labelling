@@ -216,11 +216,13 @@ class FullAnalysisView(LoginRequiredMixin, View):
         #num_comments = Comment.objects.filter(article__batch=batch).count()
         heatmap, avg_agreement = self.get_pairwise_agreements()
         report = self.get_agreements_report()
+        biases = self.calculator.get_bias_towards("hate")
         return render(request, 'dashboard/full_analysis.html', {
             "report": report,
             "users": self.users,
             "heatmap": heatmap,
             "avg_agreement": avg_agreement,
+            "biases": biases,
         })
 
 

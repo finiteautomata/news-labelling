@@ -28,7 +28,7 @@ Análisis Completo
             </tbody>
         </table>
 
-        <img src="data:image/png;base64,{{heatmap}}" width="auto">
+        <img src="data:image/png;base64,{{heatmap}}" width="430px">
 
         <h4>Agreement promedio</h4>
         <table>
@@ -42,7 +42,7 @@ Análisis Completo
                 {% for annotator, agreement in avg_agreement.items %}
                     <tr>
                         <th scope="row">{{annotator}}</th>
-                        <td>{{agreement|floatformat:-2}}</td>
+                        <td>{{agreement|floatformat:-3}}</td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -66,6 +66,23 @@ Análisis Completo
                         <th scope="row">{{category}}</th>
                         <td>{{category_report.0|floatformat:-2}}</td>
                         <td>{{category_report.1}}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <table>
+            <h4>% de comentarios marcados como odiosos</h4>
+            <thead>
+                <th scope="col">Anotador</th>
+                <th scope="col">Bias. Agreement</th>
+            </thead>
+
+            <tbody>
+                {% for annotator, bias in biases.items %}
+                    <tr>
+                        <th scope="row">{{annotator}}</th>
+                        <td>{{bias|floatformat:-2}}</td>
                     </tr>
                 {% endfor %}
             </tbody>

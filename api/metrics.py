@@ -1,8 +1,12 @@
+import os
 from collections import defaultdict
+from django.contrib.auth.models import User
+import pickle
+from tqdm.auto import tqdm
 import pandas as pd
 import numpy as np
 import krippendorff
-from api.models import ArticleLabel, CommentLabel
+from api.models import ArticleLabel, CommentLabel, Comment
 
 
 def no_null_columns(df):
@@ -11,41 +15,95 @@ def no_null_columns(df):
     """
     return df[df.columns[df.notna().all()]]
 
+
+path = "data/dataframe_comments.pkl"
+
+class DataFrameCalculator:
+    """
+    Object that calculates dataframe for comments and users annotation
+    """
+    def __init__(self):
+        """
+        Constructor
+        """
+        annotators = User.objects.exclude(assignment=None)
+
+        self.usernames = [u.username for u in annotators]
+        self.df_comments = None
+        self.last_label_date = None
+
+        if os.path.exists(path):
+            try:
+                with open(path, "rb") as f:
+                    self.df_comments, self.last_label_date = pickle.load(f)
+            except Exception as e:
+                # Some error, forget about it!
+                pass
+
+    def save(self):
+        """
+        Save dataframe
+        """
+        if self.df_comments is None or not self.last_label_date:
+            raise ValueError("Date and DF must be not null")
+        with open(path, "wb") as f:
+            pickle.dump((self.df_comments, self.last_label_date), f)
+
+    def __update_with_labels(self, article_labels):
+        max_date = None
+        for article_label in tqdm(article_labels, total=article_labels.count()):
+            username = article_label.user.username
+            if not max_date:
+                max_date = article_label.updated_at
+            else:
+                max_date = max(max_date, article_label.updated_at)
+
+            for comment_label in article_label.comment_labels.all():
+                """
+                Seteo odio primero
+                """
+                self.df_comments.loc[("HATE", username), comment_label.comment_id] = comment_label.is_hateful
+                self.df_comments.loc[("CALLS", username), comment_label.comment_id] = comment_label.calls_for_action
+
+                for name, field in CommentLabel.type_mapping.items():
+                    val = getattr(comment_label, field)
+                    self.df_comments.loc[(name, username), comment_label.comment_id] = val
+
+        self.last_label_date = max_date
+
+    def get_df(self):
+        """
+        Get full dataframe
+        """
+        if self.df_comments is None:
+            keys = ["HATE", "CALLS"]+ list(CommentLabel.type_mapping)
+            comments = Comment.objects.exclude(labels=None).only()
+
+            idx = pd.MultiIndex.from_product(
+                [keys, self.usernames],
+                names=["categoria", "etiquetador"]
+            )
+
+            self.df_comments = pd.DataFrame(index=idx, columns=[c.id for c in comments])
+            article_labels = ArticleLabel.objects.prefetch_related(
+                'comment_labels', 'comment_labels__comment', 'user'
+            )
+            self.__update_with_labels(article_labels)
+            self.save()
+        else:
+            article_labels = ArticleLabel.objects.prefetch_related(
+                'comment_labels', 'comment_labels__comment', 'user'
+            ).filter(updated_at__gt=self.last_label_date)
+            if article_labels.count() > 0:
+                self.__update_with_labels(article_labels)
+                self.save()
+        return self.df_comments
+
 class AgreementCalculator:
     """
     Class that calculates agreement metrics
     """
 
-    def __get_labels(self, batch, articles, users):
-        """
-        Get articles from options
-        """
-        query = {}
-        if batch:
-            # We take all labels for articles in batch
-            query["article__in"] =  batch.articles.all()
-
-        elif articles:
-            query["article__in"] =  articles
-
-        if users:
-            self.users = users
-            query["user__in"] = users
-
-        self.article_labels = list(ArticleLabel.objects.filter(**query).prefetch_related(
-            'comment_labels', 'comment_labels__comment', 'article', 'user'
-        ))
-        self.article_to_comments = defaultdict(list)
-        self.comment_text = {}
-
-        for article_label in self.article_labels:
-            for comment_label in article_label.comment_labels.all():
-                comment = comment_label.comment
-                self.comment_text[comment.id] = comment.text
-                self.article_to_comments[comment.article_id].append(comment)
-
-        if not self.users:
-            self.users = list({label.user for label in self.article_labels})
 
     def __init__(self, batch=None, articles=None, users=None):
         """
@@ -55,17 +113,29 @@ class AgreementCalculator:
         if all(opt is None for opt in [batch, articles, users]):
             raise ValueError("Must bring batch, articles or users")
 
-        self.__get_labels(
-            batch=batch, articles=articles, users=users
+        self.article_labels = ArticleLabel.objects.prefetch_related(
+                'comment_labels', 'comment_labels__comment', 'user'
         )
 
-        self.df_comments = None
+        self.comment_ids = None
+
+        if batch:
+            # We take all labels for articles in batch
+            self.comment_ids = [c.id for c in Comment.objects.filter(article__batch=batch)]
+            self.article_labels = self.article_labels.filter(article__batch=batch)
+
+        elif articles:
+            self.comment_ids = [c.id for c in Comment.objects.filter(article__in=articles)]
+            self.article_labels = self.article_labels.filter(article__in=articles)
+
+        if users:
+            self.users = [u.username for u in users]
+            self.article_labels = self.article_labels.filter(user__in=users)
+        self.dataframe_calculator = DataFrameCalculator()
 
     @property
     def usernames(self):
         return sorted(user.username for user in self.users)
-
-
 
     def get_labelled_articles(self):
         """
@@ -90,32 +160,18 @@ class AgreementCalculator:
         1 means labelled as hateful, 0 as not. NaN not labelled
 
         """
-
-        if self.df_comments is None:
-            keys = ["HATE", "CALLS"]+ list(CommentLabel.type_mapping)
-            idx = pd.MultiIndex.from_product(
-                [keys, self.usernames],
-                names=["categoria", "etiquetador"]
-            )
-
-            self.df_comments = pd.DataFrame(index=idx)
-
-            for article_label in self.article_labels:
-                username = article_label.user.username
-                for comment_label in article_label.comment_labels.all():
-                    """
-                    Seteo odio primero
-                    """
-                    self.df_comments.loc[("HATE", username), comment_label.comment_id] = comment_label.is_hateful
-                    self.df_comments.loc[("CALLS", username), comment_label.comment_id] = comment_label.calls_for_action
-
-                    for name, field in CommentLabel.type_mapping.items():
-                        val = getattr(comment_label, field)
-                        self.df_comments.loc[(name, username), comment_label.comment_id] = val
+        ret = self.dataframe_calculator.get_df()
         if on:
-            return self.df_comments.loc[on.upper()]
-        else:
-            return self.df_comments
+            ret = ret.loc[on.upper()]
+
+            if self.users:
+                ret = ret.loc[self.users]
+
+        if self.comment_ids:
+            ret = ret[ret.columns.intersection(self.comment_ids)]
+        return ret
+
+
 
     def get_agreement(self, on="HATE", users=None):
         """
@@ -193,6 +249,7 @@ class AgreementCalculator:
         category_df = no_null_columns(category_df)
 
         alpha, support = self.get_agreement(category)
+        # Got agreement
 
         report = CategoryReport(category, list(category_df.index), alpha, support)
 

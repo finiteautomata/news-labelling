@@ -20,16 +20,17 @@ def assign_batch(
     """
     Assign batch to user
     """
-    try:
-        user = User.objects.get(username=username)
-    except ObjectDoesNotExist:
-        print(f"{username} is not a valid username")
-        sys.exit(1)
 
     try:
         batch = Batch.objects.get(name=batch_name)
     except ObjectDoesNotExist:
         print(f"{batch_name} not a valid batch name")
+        sys.exit(1)
+
+    try:
+        user = User.objects.get(username=username)
+    except ObjectDoesNotExist:
+        print(f"{username} is not a valid username")
         sys.exit(1)
 
     if batch.is_assigned_to(user):

@@ -17,6 +17,7 @@ class ArticleLabel(models.Model):
         Article, on_delete=models.CASCADE, related_name="labels"
     )
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
     metadata = models.TextField()
     feedback = models.TextField(default="")
 

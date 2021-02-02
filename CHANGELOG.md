@@ -1,4 +1,7 @@
 # CHANGELOG
+## 0.4.2
+- Even faster metrics
+- Add full analysis dashboard
 
 ## 0.4.1
 - Faster metrics calculation

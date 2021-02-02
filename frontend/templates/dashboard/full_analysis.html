@@ -14,46 +14,9 @@ Análisis Completo
 <h1>Análisis Completo</h1>
 
 <div class="row">
-
     <div class="six columns">
 
         <table>
-            <tbody>
-
-                <tr>
-                    <th scope="row">Total Comentarios</th>
-                    <td> {{num_comments}}</td>
-                </tr>
-
-            </tbody>
-        </table>
-
-        <img src="data:image/png;base64,{{heatmap}}" width="450px">
-
-        <h4>Agreement promedio</h4>
-        <table>
-
-            <thead>
-                <th scope="col">Anotador</th>
-                <th scope="col">Avg. Agreement</th>
-            </thead>
-
-            <tbody>
-                {% for annotator, agreement in avg_agreement.items %}
-                    <tr>
-                        <th scope="row">{{annotator}}</th>
-                        <td>{{agreement|floatformat:-3}}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <div class="six columns">
-
-
-        <table>
-
             <thead>
                 <th scope="col">Categoría</th>
                 <th scope="col">Alpha</th>
@@ -70,7 +33,8 @@ Análisis Completo
                 {% endfor %}
             </tbody>
         </table>
-
+    </div>
+    <div class="six columns">
         <table>
             <h4>% de comentarios marcados como odiosos</h4>
             <thead>
@@ -89,6 +53,37 @@ Análisis Completo
         </table>
     </div>
 
+</div>
+
+<div class="row">
+    <div class="six columns">
+
+        <h3>Heatmap agreements</h3>
+
+        <img src="data:image/png;base64,{{heatmap}}" width="450px">
+
+        <p>Más luminoso es que son más parecidos</p>
+
+    </div>
+    <div class="six columns">
+        <h4>Agreement promedio</h4>
+        <table>
+
+            <thead>
+                <th scope="col">Anotador</th>
+                <th scope="col">Avg. Agreement</th>
+            </thead>
+
+            <tbody>
+                {% for annotator, agreement in avg_agreement.items %}
+                    <tr>
+                        <th scope="row">{{annotator}}</th>
+                        <td>{{agreement|floatformat:-3}}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
 

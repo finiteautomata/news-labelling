@@ -194,6 +194,7 @@ class FullAnalysisView(LoginRequiredMixin, View):
 
         agreements = pd.DataFrame(columns=usernames)
         users = self.users
+
         for i, u1 in enumerate(users):
             agreements.loc[u1.username, u1.username] = 1.0
             for j in range(i+1, len(users)):
@@ -203,6 +204,9 @@ class FullAnalysisView(LoginRequiredMixin, View):
                 agreements.loc[u2.username, u1.username] = alpha
         agreements = agreements.astype(float)
         avg_agreement = (agreements.sum(axis=1)-1)/ (len(agreements)-1)
+
+        agreements = agreements.loc[usernames, usernames]
+
         sns.heatmap(agreements, fmt=".2f", annot=True, cbar=False)
         buf = io.BytesIO()
         buf.seek(0)

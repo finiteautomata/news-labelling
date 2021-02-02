@@ -353,5 +353,7 @@ class CategoryReport:
                 (comment, list(votes["positive"]), list(votes["negative"]))
                 for comment, votes in comment_votes.items()
             ]
+
+            triplet_comments = sorted(triplet_comments, key=lambda x: len(x[1]))
             # Sort comments by positive votes
             yield (article, triplet_comments)

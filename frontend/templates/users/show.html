@@ -23,13 +23,46 @@
     <h3>Artículos completados</h3>
 
     <ol>
-        {% for article_label in article_labels %}
-            <li>
-                <a href="{% url 'label_view' user.username article_label.article.id %}">
-                    {{article_label.article.title|truncatechars:50}}
-                </a>
-            </li>
-        {% endfor %}
+        <table>
+            <thead>
+                <tr>
+                    <th>
+                        Artículo
+                    </th>
+                    <th>
+                        Fecha de etiqueta
+                    </th>
+
+                    <th>
+                        Batch
+                    </th>
+
+                </tr>
+
+            </thead>
+            <tbody>
+
+                {% for article_label in article_labels %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'label_view' user.username article_label.article.id %}">
+                                {{article_label.article.title|truncatechars:50}}
+                            </a>
+                        </td>
+
+                        <td>
+                            {{article_label.created_at}}
+                        </td>
+
+                        <td>
+                            {{article_label.article.batch.name}}
+                        </td>
+                    </tr>
+                {% endfor %}
+
+            </tbody>
+
+        </table>
 
     </ol>
 

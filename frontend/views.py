@@ -76,7 +76,8 @@ class UserView(LoginRequiredMixin, View):
     @method_decorator(staff_member_required)
     def get(self, request, username):
         user = get_object_or_404(User, username=username)
-        article_labels = user.article_labels.all()
+        article_labels = user.article_labels.prefetch_related(
+            'article', 'article__batch').order_by('-created_at')
 
         return render(request, 'users/show.html', {
             "user": user,

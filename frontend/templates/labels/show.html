@@ -13,7 +13,15 @@
 {% block content %}
 
 <div class="row">
+  <h3>
+    Batch {{article_label.article.batch.name}}
+  </h3>
   <h2>Etiquetas de {{username}}</h2>
+
+  <p>
+    Etiquetó el {{article_label.created_at}}
+  </p>
+
 
   {% if article_label.feedback %}
 

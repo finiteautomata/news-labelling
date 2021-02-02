@@ -203,8 +203,9 @@ class FullAnalysisView(LoginRequiredMixin, View):
                 agreements.loc[u2.username, u1.username] = alpha
         agreements = agreements.astype(float)
         avg_agreement = (agreements.sum(axis=1)-1)/ (len(agreements)-1)
-        sns.heatmap(agreements, fmt=".2f", annot=True)
+        sns.heatmap(agreements, fmt=".2f", annot=True, cbar=False)
         buf = io.BytesIO()
+        buf.seek(0)
         plt.savefig(buf, format="png")
         buf.seek(0)
         encoded_image = base64.b64encode(buf.read())

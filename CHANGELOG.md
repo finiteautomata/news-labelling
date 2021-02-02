@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.4.1
+- Faster metrics calculation
+
 ## 0.4.0
 
 - Reassign skipped articles

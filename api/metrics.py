@@ -39,9 +39,42 @@ class DataFrameCalculator:
             try:
                 with open(path_to_df, "rb") as f:
                     self.df_comments, self.last_label_date = pickle.load(f)
+
+                self._update_df()
             except Exception as e:
                 # Some error, forget about it!
-                pass
+                self._build_from_scratch()
+
+    def _update_df(self):
+        """
+        Update dataframe
+        """
+        article_labels = ArticleLabel.objects.prefetch_related(
+            'comment_labels', 'comment_labels__comment', 'user'
+        ).filter(updated_at__gt=self.last_label_date)
+        if article_labels.count() > 0:
+            self.__update_with_labels(article_labels)
+            self.save()
+
+
+    def _build_from_scratch(self):
+        """
+        Build DF from scratch
+        """
+        keys = ["HATE", "CALLS"]+ list(CommentLabel.type_mapping)
+        comments = Comment.objects.exclude(labels=None).only()
+
+        idx = pd.MultiIndex.from_product(
+            [keys, self.usernames],
+            names=["categoria", "etiquetador"]
+        )
+
+        self.df_comments = pd.DataFrame(index=idx, columns=[c.id for c in comments])
+        article_labels = ArticleLabel.objects.prefetch_related(
+            'comment_labels', 'comment_labels__comment', 'user'
+        )
+        self.__update_with_labels(article_labels)
+        self.save()
 
     def save(self):
         """
@@ -78,28 +111,6 @@ class DataFrameCalculator:
         """
         Get full dataframe
         """
-        if self.df_comments is None:
-            keys = ["HATE", "CALLS"]+ list(CommentLabel.type_mapping)
-            comments = Comment.objects.exclude(labels=None).only()
-
-            idx = pd.MultiIndex.from_product(
-                [keys, self.usernames],
-                names=["categoria", "etiquetador"]
-            )
-
-            self.df_comments = pd.DataFrame(index=idx, columns=[c.id for c in comments])
-            article_labels = ArticleLabel.objects.prefetch_related(
-                'comment_labels', 'comment_labels__comment', 'user'
-            )
-            self.__update_with_labels(article_labels)
-            self.save()
-        else:
-            article_labels = ArticleLabel.objects.prefetch_related(
-                'comment_labels', 'comment_labels__comment', 'user'
-            ).filter(updated_at__gt=self.last_label_date)
-            if article_labels.count() > 0:
-                self.__update_with_labels(article_labels)
-                self.save()
         return self.df_comments
 
 class AgreementCalculator:

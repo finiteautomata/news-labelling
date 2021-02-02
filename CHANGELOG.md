@@ -1,4 +1,8 @@
 # CHANGELOG
+## 0.4.3
+
+- Fix dashboard full analysis layout
+
 ## 0.4.2
 - Even faster metrics
 - Add full analysis dashboard

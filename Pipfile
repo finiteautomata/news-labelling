@@ -11,6 +11,7 @@ pylint-django = "*"
 jupyterlab = "*"
 pandas = "*"
 seaborn = "*"
+ipywidgets = "*"
 
 [packages]
 djangorestframework = "*"

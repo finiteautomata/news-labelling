@@ -15,9 +15,12 @@ def no_null_columns(df):
     """
     return df[df.columns[df.notna().all()]]
 
-
-path = "data/dataframe_comments.pkl"
-
+dir_path = os.path.dirname(os.path.abspath(__file__))
+path_to_df = os.path.join(
+    dir_path,
+    "..",
+    "data/dataframe_comments.pkl"
+)
 class DataFrameCalculator:
     """
     Object that calculates dataframe for comments and users annotation
@@ -32,9 +35,9 @@ class DataFrameCalculator:
         self.df_comments = None
         self.last_label_date = None
 
-        if os.path.exists(path):
+        if os.path.exists(path_to_df):
             try:
-                with open(path, "rb") as f:
+                with open(path_to_df, "rb") as f:
                     self.df_comments, self.last_label_date = pickle.load(f)
             except Exception as e:
                 # Some error, forget about it!
@@ -46,7 +49,7 @@ class DataFrameCalculator:
         """
         if self.df_comments is None or not self.last_label_date:
             raise ValueError("Date and DF must be not null")
-        with open(path, "wb") as f:
+        with open(path_to_df, "wb") as f:
             pickle.dump((self.df_comments, self.last_label_date), f)
 
     def __update_with_labels(self, article_labels):
@@ -129,7 +132,7 @@ class AgreementCalculator:
             self.article_labels = self.article_labels.filter(article__in=articles)
 
         if users:
-            self.users = [u.username for u in users]
+            self.users = users
             self.article_labels = self.article_labels.filter(user__in=users)
         self.dataframe_calculator = DataFrameCalculator()
 
@@ -165,7 +168,7 @@ class AgreementCalculator:
             ret = ret.loc[on.upper()]
 
             if self.users:
-                ret = ret.loc[self.users]
+                ret = ret.loc[[u.username for u in self.users]]
 
         if self.comment_ids:
             ret = ret[ret.columns.intersection(self.comment_ids)]

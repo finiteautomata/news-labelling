@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load debug_tags %}
+{% block  head %}
+<link rel="stylesheet" href="{% static 'base/guidelines.css' %}"/>
+{% endblock %}
+
+{% block title %}
+Análisis Completo
+{% endblock %}
+
+{% block content %}
+
+<h1>Análisis Completo</h1>
+
+<div class="row">
+
+    <div class="six columns">
+
+        <table>
+            <tbody>
+
+                <tr>
+                    <th scope="row">Total Comentarios</th>
+                    <td> {{num_comments}}</td>
+                </tr>
+
+            </tbody>
+        </table>
+
+        <img src="data:image/png;base64,{{heatmap}}" width="auto">
+
+        <h4>Agreement promedio</h4>
+        <table>
+
+            <thead>
+                <th scope="col">Anotador</th>
+                <th scope="col">Avg. Agreement</th>
+            </thead>
+
+            <tbody>
+                {% for annotator, agreement in avg_agreement.items %}
+                    <tr>
+                        <th scope="row">{{annotator}}</th>
+                        <td>{{agreement|floatformat:-2}}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="six columns">
+
+
+        <table>
+
+            <thead>
+                <th scope="col">Categoría</th>
+                <th scope="col">Alpha</th>
+                <th scope="col">Soporte</th>
+            </thead>
+
+            <tbody>
+                {% for category, category_report in report.items %}
+                    <tr>
+                        <th scope="row">{{category}}</th>
+                        <td>{{category_report.0|floatformat:-2}}</td>
+                        <td>{{category_report.1}}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+
+
+
+{%endblock %}

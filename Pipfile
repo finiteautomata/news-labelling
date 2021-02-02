@@ -21,6 +21,8 @@ nltk = "*"
 markdown = "*"
 krippendorff = "*"
 pandas = "*"
+matplotlib = "*"
+seaborn = "*"
 
 [requires]
 python_version = "3.8"

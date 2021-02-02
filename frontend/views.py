@@ -1,3 +1,10 @@
+import io
+import urllib
+import base64
+import pandas as pd
+import seaborn as sns
+import matplotlib
+import matplotlib.pyplot as plt
 from django.views import View
 from django.utils.decorators import method_decorator
 from django.contrib.admin.views.decorators import staff_member_required
@@ -8,6 +15,8 @@ from api.models import Article, Assignment, CommentLabel, ArticleLabel, Batch, C
 from api.metrics import AgreementCalculator
 from .ranking import RankingCalculator
 from .report import AnnotationReport
+
+matplotlib.use('Agg')
 
 class Index(LoginRequiredMixin, RankingCalculator, View):
     """
@@ -136,6 +145,84 @@ class DashboardView(LoginRequiredMixin, View):
         return render(request, 'users/index.html', {
             "report": report,
         })
+
+class FullAnalysisView(LoginRequiredMixin, View):
+    """
+    Analysis of all annotations so far
+    """
+
+    @property
+    def users(self):
+        if not hasattr(self, "_users"):
+            self._users = User.objects.exclude(assignment=None)
+        return self._users
+
+    @property
+    def articles(self):
+        if not hasattr(self, "_articles"):
+            self._articles = Article.objects.exclude(batch__name="training")
+        return self._articles
+
+    @property
+    def calculator(self):
+        if not hasattr(self, "_calculator"):
+            self._calculator = AgreementCalculator(
+                articles=self.articles,
+                users=self.users
+            )
+        return self._calculator
+
+
+
+    def get_agreements_report(self):
+        """
+        Return
+        """
+        report = {}
+        categories = ["HATE", "CALLS"] + list(CommentLabel.type_mapping)
+
+        for category in categories:
+            report[category] = self.calculator.get_agreement(category)
+
+        return report
+
+    def get_pairwise_agreements(self):
+        """
+        Plot heatmap
+        """
+        usernames = sorted([u.username for u in self.users])
+
+        agreements = pd.DataFrame(columns=usernames)
+        users = self.users
+        for i, u1 in enumerate(users):
+            agreements.loc[u1.username, u1.username] = 1.0
+            for j in range(i+1, len(users)):
+                u2 = users[j]
+                alpha, _ = self.calculator.get_agreement("hate", users=[u1.username, u2.username])
+                agreements.loc[u1.username, u2.username] = alpha
+                agreements.loc[u2.username, u1.username] = alpha
+        agreements = agreements.astype(float)
+        avg_agreement = (agreements.sum(axis=1)-1)/ (len(agreements)-1)
+        sns.heatmap(agreements, fmt=".2f", annot=True)
+        buf = io.BytesIO()
+        plt.savefig(buf, format="png")
+        buf.seek(0)
+        encoded_image = base64.b64encode(buf.read())
+        encoded_image = urllib.parse.quote(encoded_image)
+        return encoded_image, avg_agreement
+
+    @method_decorator(staff_member_required)
+    def get(self, request):
+        #num_comments = Comment.objects.filter(article__batch=batch).count()
+        heatmap, avg_agreement = self.get_pairwise_agreements()
+        report = self.get_agreements_report()
+        return render(request, 'dashboard/full_analysis.html', {
+            "report": report,
+            "users": self.users,
+            "heatmap": heatmap,
+            "avg_agreement": avg_agreement,
+        })
+
 
 
 class CompletedView(LoginRequiredMixin, View):

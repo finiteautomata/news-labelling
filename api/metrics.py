@@ -43,7 +43,10 @@ class DataFrameCalculator:
                 self._update_df()
             except Exception as e:
                 # Some error, forget about it!
-                self._build_from_scratch()
+                pass
+
+        if not self.df_comments:
+            self._build_from_scratch()
 
     def _update_df(self):
         """

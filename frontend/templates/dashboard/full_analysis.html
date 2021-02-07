@@ -35,22 +35,8 @@ Análisis Completo
         </table>
     </div>
     <div class="six columns">
-        <table>
-            <h4>% de comentarios marcados como odiosos</h4>
-            <thead>
-                <th scope="col">Anotador</th>
-                <th scope="col">Bias. Agreement</th>
-            </thead>
-
-            <tbody>
-                {% for annotator, bias in biases.items %}
-                    <tr>
-                        <th scope="row">{{annotator}}</th>
-                        <td>{{bias|floatformat:-2}}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <h3>Heatmap de biases</h3>
+        <img src="data:image/png;base64,{{bias_heatmap}}" width="600px">
     </div>
 
 </div>
@@ -60,7 +46,7 @@ Análisis Completo
 
         <h3>Heatmap agreements</h3>
 
-        <img src="data:image/png;base64,{{heatmap}}" width="450px">
+        <img src="data:image/png;base64,{{agreement_heatmap}}" width="450px">
 
         <p>Más luminoso es que son más parecidos</p>
 

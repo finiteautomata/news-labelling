@@ -153,6 +153,7 @@ class AgreementCalculator:
     def usernames(self):
         return sorted(user.username for user in self.users)
 
+    @property
     def keys(self):
         """
         Return analysis keys
@@ -262,6 +263,24 @@ class AgreementCalculator:
 
         return df.sum(axis=1, skipna=True) / support
 
+    def get_bias_all(self, zscore=False):
+        """
+        Get bias towards all classes
+        """
+        df = pd.DataFrame(index=self.keys, columns=self.usernames)
+
+        for key in self.keys:
+            agrees = self.get_bias_towards(key)
+            #for user in users:
+            #    df.loc[key, user.username] = agrees[user.username]
+            df.loc[key] = agrees
+
+        if zscore:
+            mean = df.mean(axis=1)
+            std = df.std(axis=1)
+            df = df.subtract(mean, axis=0)
+            df = df.divide(std, axis=0)
+        return df.fillna(0)
 
     def get_category_report(self, category):
         """

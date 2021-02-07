@@ -186,6 +186,18 @@ class FullAnalysisView(LoginRequiredMixin, View):
 
         return report
 
+    def save_plot_as_bytes_io(self):
+        """
+        Saves current image
+        """
+        buf = io.BytesIO()
+        buf.seek(0)
+        plt.savefig(buf, format="png")
+        buf.seek(0)
+        encoded_image = base64.b64encode(buf.read())
+        encoded_image = urllib.parse.quote(encoded_image)
+        return encoded_image
+
     def get_pairwise_agreements(self):
         """
         Plot heatmap
@@ -208,26 +220,34 @@ class FullAnalysisView(LoginRequiredMixin, View):
         agreements = agreements.loc[usernames, usernames]
 
         sns.heatmap(agreements, fmt=".2f", annot=True, cbar=False)
-        buf = io.BytesIO()
-        buf.seek(0)
-        plt.savefig(buf, format="png")
-        buf.seek(0)
-        encoded_image = base64.b64encode(buf.read())
-        encoded_image = urllib.parse.quote(encoded_image)
-        return encoded_image, avg_agreement
+
+        return self.save_plot_as_bytes_io(), avg_agreement
+
+    def bias_heatmap(self):
+        """
+        Calculates bias towards each class
+        """
+        non_normalized = self.calculator.get_bias_all(zscore=False)
+        heatmap = self.calculator.get_bias_all(zscore=True)
+
+        sns.heatmap(heatmap, annot=non_normalized, fmt=".3f", cbar=False)
+        plt.title("Z-scores de annotator bias por clase")
+
+        return self.save_plot_as_bytes_io()
+
 
     @method_decorator(staff_member_required)
     def get(self, request):
         #num_comments = Comment.objects.filter(article__batch=batch).count()
-        heatmap, avg_agreement = self.get_pairwise_agreements()
+        bias_heatmap = self.bias_heatmap()
+        agreement_heatmap, avg_agreement = self.get_pairwise_agreements()
         report = self.get_agreements_report()
-        biases = self.calculator.get_bias_towards("hate")
         return render(request, 'dashboard/full_analysis.html', {
             "report": report,
             "users": self.users,
-            "heatmap": heatmap,
+            "agreement_heatmap": agreement_heatmap,
             "avg_agreement": avg_agreement,
-            "biases": biases,
+            "bias_heatmap": bias_heatmap,
         })
 
 

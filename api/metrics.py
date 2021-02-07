@@ -45,7 +45,7 @@ class DataFrameCalculator:
                 # Some error, forget about it!
                 pass
 
-        if not self.df_comments:
+        if self.df_comments is None:
             self._build_from_scratch()
 
     def _update_df(self):
@@ -58,7 +58,6 @@ class DataFrameCalculator:
         if article_labels.count() > 0:
             self.__update_with_labels(article_labels)
             self.save()
-
 
     def _build_from_scratch(self):
         """
@@ -153,6 +152,12 @@ class AgreementCalculator:
     @property
     def usernames(self):
         return sorted(user.username for user in self.users)
+
+    def keys(self):
+        """
+        Return analysis keys
+        """
+        return ["HATE", "CALLS"]+ list(CommentLabel.type_mapping)
 
     def get_labelled_articles(self):
         """
@@ -255,7 +260,7 @@ class AgreementCalculator:
 
         support = df.notna().sum(axis=1)
 
-        return df.fillna(0).sum(axis=1) / support
+        return df.sum(axis=1, skipna=True) / support
 
 
     def get_category_report(self, category):

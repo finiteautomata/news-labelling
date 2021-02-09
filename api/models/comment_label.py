@@ -63,6 +63,21 @@ class CommentLabel(models.Model):
         """
         return [t for t, field in CommentLabel.type_mapping.items() if getattr(self, field)]
 
+    def labels(self):
+        """
+        Returns all labels
+        """
+        if self.is_hateful:
+            ret = ["HATE"]
+            if self.calls_for_action:
+                ret.append("CALLS")
+
+            ret += self.hateful_against()
+
+            return ret
+        return []
+
+
     def __repr__(self):
         """
         Representation

@@ -4,6 +4,8 @@ def label_article(user, article, is_interesting, comments=None):
     """
     Label article
     """
+    if not user.assignment_set.filter(article=article).exists():
+        user.assignment_set.create(article=article)
     article_label = user.article_labels.create(article=article, is_interesting=is_interesting)
 
     if is_interesting:

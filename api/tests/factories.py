@@ -133,6 +133,27 @@ class CommentLabelFactory(factory.django.DjangoModelFactory):
     against_criminals = False
     against_others = False
 
+    @classmethod
+    def create_from_labels(cls, comment, user, labels):
+        mapping = CommentLabel.type_mapping.copy()
+        mapping["HATE"] = "is_hateful"
+        mapping["CALLS"] = "calls_for_action"
+
+        article_label = ArticleLabel.objects.get(
+            article=comment.article,
+            user=user
+        )
+        ret = CommentLabel(
+            comment=comment, article_label=article_label,
+            is_hateful=False, calls_for_action=False,
+        )
+
+        for label in labels:
+            setattr(ret, mapping[label], True)
+        ret.save()
+        return ret
+
+
 class ArticleLabelFactory(factory.django.DjangoModelFactory):
     """
     Article Label Factory

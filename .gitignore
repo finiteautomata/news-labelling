@@ -131,3 +131,4 @@ dumps/*
 *.sqlite3
 *.sqlite3*
 .vscode/*
+output/*

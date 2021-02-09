@@ -95,4 +95,3 @@ class CommentSerializer:
                     ret[name].append(annotator_name)
 
         return ret
-

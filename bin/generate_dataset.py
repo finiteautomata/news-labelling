@@ -32,7 +32,7 @@ def print_comment_stats(comments):
     print(f"Ratio de comentarios odiosos sobre totales = {hateful / len(comments):.2f}")
     print("="*80 + "\n")
 
-def generate_dataset(comments_path, articles_path):
+def generate_dataset(comments_path, articles_path, show_ids=False):
     """
     Generates dataset
     """
@@ -57,7 +57,7 @@ def generate_dataset(comments_path, articles_path):
     print(f"Artículos con alguna anotación: {annotated_articles.filter(num_labels__gte=1).count()}")
     print(f"Artículos que no pasaron a tercera anotación: {skipped}")
 
-    serializer = CommentSerializer()
+    serializer = CommentSerializer(anonymize=(not show_ids))
     article_serializer = ArticleSerializer()
 
     articles = []

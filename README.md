@@ -46,11 +46,21 @@ python bin/assign_batch.py <username> <batch_name>
 ```
 
 
+7. Generar dataset
+
+```
+python bin/generate_dataset.py output/comments.json output/articles.json
+# Crea dataset con tweet ids, sólo para uso interno
+python bin/generate_dataset.py output/comments_not_anon.json output/articles.json --show_ids
+```
+
 ## Running
 
 ```
 uwsgi --http :8001 --module news_labelling.wsgi --logto logs/labelling.log
 ```
+
+
 
 ## Create demo database
 

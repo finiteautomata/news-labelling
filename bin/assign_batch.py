@@ -28,7 +28,12 @@ def assign_batch(
         sys.exit(1)
 
     try:
-        user = User.objects.get(username=username)
+        if username == "random":
+            annotators = User.objects.exclude(assignment=None).filter(is_active=True)
+            candidates = [u for u in annotators if not batch.is_assigned_to(u)]
+            user = random.choice(candidates)
+        else:
+            user = User.objects.get(username=username)
     except ObjectDoesNotExist:
         print(f"{username} is not a valid username")
         sys.exit(1)
@@ -40,7 +45,7 @@ def assign_batch(
 
     batch_assignment = batch.assign_to(user)
 
-    print(f"Batch '{batch_name}' assigned to {username}")
+    print(f"Batch '{batch_name}' assigned to {user.username}")
     summary = batch_assignment.summary
     print(f"Articles {summary['articles']} -- Comments {summary['comments']}")
 

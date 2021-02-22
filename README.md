@@ -38,6 +38,13 @@ python bin/load_articles.py <json>
 python bin/load_batches.py --remove # Use --remove if need to remove previous batches
 ```
 
+Para usar nuevos artículos
+
+
+```
+python bin/load_batches.py --remaining --batch_size 15
+```
+
 
 6. Asignar artículos
 

@@ -83,6 +83,7 @@ class AnnotationReport:
         users = User.objects.filter(username__in=usernames)
 
         for batch in Batch.objects.all():
+            df.loc[batch.name] = None
             for user in users:
                 if batch.is_assigned_to(user):
                     batch_assignment = BatchAssignment(batch, user)

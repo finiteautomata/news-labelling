@@ -1,4 +1,11 @@
 # CHANGELOG
+
+## 0.4.4
+
+- Random batch assign
+- Improved dashboard
+- Generate dataset
+
 ## 0.4.3
 
 - Fix dashboard full analysis layout

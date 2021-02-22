@@ -43,7 +43,7 @@ class Assigner:
                 assignment = article.assignment_set.get(user=user)
 
                 return self._reassign(article, user, assignment, reassign_threshold)
-            elif times_annotated == 2:
+            elif times_annotated >= 2:
                 # Article was annotated twice, but not by user
                 return self._assign_only_hateful(article, user)
 

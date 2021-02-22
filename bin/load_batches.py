@@ -39,7 +39,39 @@ def load_batch_from_file(path, batch_name):
     return tweet_ids
 
 
-def load_batches(random_seed=2020, remove=False, demo=False, interview=False, batch_size=20):
+def create_batches(article_ids, batch_size):
+    """
+    Create batch from article_ids
+    """
+    batch_ids = [article_ids[i:i+batch_size] for i in range(len(article_ids))[::batch_size]]
+
+    batches = []
+
+    next_batch = 1
+    for batch in Batch.objects.all():
+        try:
+            next_batch = max(int(batch.name) + 1, next_batch)
+        except ValueError:
+            pass
+
+    with transaction.atomic():
+        for i, ids in enumerate(batch_ids):
+            articles = Article.objects.filter(tweet_id__in=ids)
+            assert articles.count() == len(ids)
+            assert len(ids) > 0
+            batch = Batch.create_from_articles(str(next_batch + i), articles)
+
+            print(f"Batch {batch.name} created")
+            batches.append(batch)
+
+    print(f"{len(batches)} batches created for {len(article_ids)} articles")
+
+def load_batches(random_seed=2020, remaining=False, remove=False, demo=False,
+                 interview=False, batch_size=20):
+    """
+    Generate batches from loaded articles
+    """
+
     random.seed(random_seed)
 
     article_ids = [art.tweet_id for art in Article.objects.all().only('tweet_id')]
@@ -59,6 +91,12 @@ def load_batches(random_seed=2020, remove=False, demo=False, interview=False, ba
         load_batch_from_file("data/demo_ids.json", "demo")
     elif interview:
         load_batch_from_file("data/interview_ids.json", "interview")
+    elif remaining:
+        remaining_articles = Article.objects.filter(batch=None).order_by('created_at')
+
+        remaining_ids = [art.tweet_id for art in remaining_articles]
+
+        create_batches(remaining_ids, batch_size)
     else:
         training_ids = load_batch_from_file("data/training_ids.json", "training")
         print("Creating other batches")
@@ -69,26 +107,8 @@ def load_batches(random_seed=2020, remove=False, demo=False, interview=False, ba
         """
         Create batch ids
         """
-        batch_ids = [remaining_ids[i:i+batch_size] for i in range(len(remaining_ids))[::batch_size]]
 
-        batches = []
-
-        with transaction.atomic():
-            for i, ids in enumerate(batch_ids):
-                articles = Article.objects.filter(tweet_id__in=ids)
-                assert articles.count() == len(ids)
-                assert len(ids) > 0
-                batch = Batch.create_from_articles(str(i+1), articles)
-
-                print(f"Batch {batch.name} created")
-                batches.append(batch)
-
-        print(f"{len(batches)} batches created for {len(remaining_ids)} articles")
-
-
-
-
-
+        create_batches(remaining_ids, batch_size)
 
 if __name__ == '__main__':
     fire.Fire(load_batches)

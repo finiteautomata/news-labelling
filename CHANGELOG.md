@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.4.5
+
+- Stochastic assignation of short assignments
+
 ## 0.4.4
 
 - Random batch assign

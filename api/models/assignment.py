@@ -1,3 +1,4 @@
+import random
 from django.contrib.auth.models import User
 from django.db import models, transaction
 import django.dispatch
@@ -30,11 +31,25 @@ class Assignment(models.Model, Completable):
     reassigned = models.BooleanField(default=False)
 
     @classmethod
-    def next_assignment_of(cls, user):
+    def next_assignment_of(cls, user, short_probability=0.4):
         """
         Returns next assignment of user
+
+        Arguments:
+        ---------
+
+        user: a User
+            The user of whom we want the next assignment
+        short_probability: p in (0, 1)
+            Probability of having
+
         """
-        return cls.objects.filter(user=user, done=False).first()
+        undone_assignments = cls.objects.filter(user=user, done=False)
+        short_assignments = undone_assignments.exclude(comments=None)
+
+        if short_assignments.exists() and random.uniform(0, 1) <= short_probability:
+            return short_assignments[0]
+        return undone_assignments.first()
 
 
     class Meta:

@@ -1,3 +1,4 @@
+import math
 from django.test import TestCase
 from django.db import IntegrityError
 from django.core.exceptions import ValidationError
@@ -192,6 +193,38 @@ class AssignmentTest(TestCase):
             assignment.comments_to_label(),
             articles_to_label,
         )
+
+    def test_next_assignment(self):
+        """
+        Can create assignment with two comments
+        """
+
+        article = ArticleFactory()
+        another_article = ArticleFactory()
+
+        Assignment.objects.create(user=self.user, article=article)
+        short_assignment = Assignment.objects.create(user=self.user, article=another_article)
+        short_assignment.set_comments(another_article.comment_set.all()[:1])
+        """
+        Hagamos un test probabilístico.
+
+        Recordemos que P(mu - 3σ < mean(X) < mu + 3σ) ~ 0.997
+        """
+        count = 0
+        n = 300
+        p = 0.5
+        for _ in range(n):
+            assignment = Assignment.next_assignment_of(self.user, short_probability=p)
+            if assignment.article == another_article:
+                count += 1
+
+        sigma = math.sqrt(p * (1-p) / n)
+        mean = count / n
+        self.assertTrue(
+            (p - 3 * sigma) <= mean <= (p + 3 * sigma),
+            f"{mean} is not near {p:.3f} -- {sigma:.3f}"
+        )
+
 
 class AssignerTest(TestCase):
 

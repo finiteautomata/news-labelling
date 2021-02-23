@@ -126,13 +126,13 @@ class FullAnalysisView(LoginRequiredMixin, View):
 
         return report
 
-    def save_plot_as_bytes_io(self):
+    def save_plot_as_bytes_io(self, axplot):
         """
         Saves current image
         """
         buf = io.BytesIO()
         buf.seek(0)
-        plt.savefig(buf, format="png")
+        axplot.figure.savefig(buf, format="png")
         buf.seek(0)
         encoded_image = base64.b64encode(buf.read())
         encoded_image = urllib.parse.quote(encoded_image)
@@ -159,9 +159,9 @@ class FullAnalysisView(LoginRequiredMixin, View):
 
         agreements = agreements.loc[usernames, usernames]
 
-        sns.heatmap(agreements, fmt=".2f", annot=True, cbar=False)
+        fig = sns.heatmap(agreements, fmt=".2f", annot=True, cbar=False)
 
-        return self.save_plot_as_bytes_io(), avg_agreement
+        return self.save_plot_as_bytes_io(fig), avg_agreement
 
     def bias_heatmap(self):
         """
@@ -170,17 +170,18 @@ class FullAnalysisView(LoginRequiredMixin, View):
         non_normalized = self.calculator.get_bias_all(zscore=False)
         heatmap = self.calculator.get_bias_all(zscore=True)
 
-        sns.heatmap(heatmap, annot=non_normalized, fmt=".3f", cbar=False)
+        fig = sns.heatmap(heatmap, annot=non_normalized, fmt=".3f", cbar=False)
         plt.title("Z-scores de annotator bias por clase")
 
-        return self.save_plot_as_bytes_io()
+        return self.save_plot_as_bytes_io(fig)
 
 
     @method_decorator(staff_member_required)
     def get(self, request):
         #num_comments = Comment.objects.filter(article__batch=batch).count()
-        bias_heatmap = self.bias_heatmap()
         agreement_heatmap, avg_agreement = self.get_pairwise_agreements()
+        bias_heatmap = self.bias_heatmap()
+
         report = self.get_agreements_report()
         return render(request, 'dashboard/full_analysis.html', {
             "report": report,

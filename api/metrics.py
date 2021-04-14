@@ -6,7 +6,7 @@ from tqdm.auto import tqdm
 import pandas as pd
 import numpy as np
 import krippendorff
-from api.models import ArticleLabel, CommentLabel, Comment
+from api.models import ArticleLabel, CommentLabel, Comment, comment
 
 
 def no_null_columns(df):
@@ -87,6 +87,27 @@ class DataFrameCalculator:
         with open(path_to_df, "wb") as f:
             pickle.dump((self.df_comments, self.last_label_date), f)
 
+    def preprocess_comment_label(self, comment_label):
+        """
+        Sacar 'OTROS'
+        """
+
+        if comment_label.is_hateful and comment_label.against_others:
+            """
+            Si no hay ningún otroflag => sacamos
+            """
+            comment_label.against_others = False
+
+            if not any(
+                getattr(comment_label, field)
+                for k, field in CommentLabel.type_mapping.items()
+            ):
+                comment_label.is_hateful = False
+                comment_label.calls_for_action = False
+
+
+        return comment_label
+
     def __update_with_labels(self, article_labels):
         max_date = None
         for article_label in tqdm(article_labels, total=article_labels.count()):
@@ -100,6 +121,8 @@ class DataFrameCalculator:
                 """
                 Seteo odio primero
                 """
+                comment_label = self.preprocess_comment_label(comment_label)
+
                 self.df_comments.loc[("HATE", username), comment_label.comment_id] = comment_label.is_hateful
                 self.df_comments.loc[("CALLS", username), comment_label.comment_id] = comment_label.calls_for_action
 
@@ -121,18 +144,18 @@ class AgreementCalculator:
     """
 
 
-    def __init__(self, batch=None, articles=None, users=None):
+    def __init__(self, batch=None, articles=None, comment_ids=None, users=None):
         """
         Constructor
         """
 
-        if all(opt is None for opt in [batch, articles, users]):
-            raise ValueError("Must bring batch, articles or users")
+        if all(opt is None for opt in [batch, articles, users, comment_ids]):
+            raise ValueError("Must bring batch, articles, comments or users")
 
         self.article_labels = ArticleLabel.objects.prefetch_related(
                 'comment_labels', 'comment_labels__comment', 'user'
         )
-
+        self.users = None
         self.comment_ids = None
 
         if batch:
@@ -143,7 +166,8 @@ class AgreementCalculator:
         elif articles:
             self.comment_ids = [c.id for c in Comment.objects.filter(article__in=articles)]
             self.article_labels = self.article_labels.filter(article__in=articles)
-
+        elif comment_ids:
+            self.comment_ids = comment_ids
         if users:
             self.users = users
             self.article_labels = self.article_labels.filter(user__in=users)
@@ -267,9 +291,10 @@ class AgreementCalculator:
         """
         Get bias towards all classes
         """
-        df = pd.DataFrame(index=self.keys, columns=self.usernames)
+        keys = [k for k in self.keys if k != "OTROS"]
+        df = pd.DataFrame(index=keys, columns=self.usernames)
 
-        for key in self.keys:
+        for key in keys:
             agrees = self.get_bias_towards(key)
             #for user in users:
             #    df.loc[key, user.username] = agrees[user.username]

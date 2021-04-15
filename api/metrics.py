@@ -123,12 +123,18 @@ class DataFrameCalculator:
                 """
                 comment_label = self.preprocess_comment_label(comment_label)
 
-                self.df_comments.loc[("HATE", username), comment_label.comment_id] = comment_label.is_hateful
-                self.df_comments.loc[("CALLS", username), comment_label.comment_id] = comment_label.calls_for_action
 
-                for name, field in CommentLabel.type_mapping.items():
-                    val = getattr(comment_label, field)
-                    self.df_comments.loc[(name, username), comment_label.comment_id] = val
+                self.df_comments.loc[("HATE", username), comment_label.comment_id] = comment_label.is_hateful
+
+                if comment_label.is_hateful:
+                    """
+                    Si no es hateful, no le damos bola a todo el resto => es como si no etiquetase
+                    """
+                    self.df_comments.loc[("CALLS", username), comment_label.comment_id] = comment_label.calls_for_action
+
+                    for name, field in CommentLabel.type_mapping.items():
+                        val = getattr(comment_label, field)
+                        self.df_comments.loc[(name, username), comment_label.comment_id] = val
 
         self.last_label_date = max_date
 

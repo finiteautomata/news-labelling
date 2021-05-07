@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from api.models import CommentLabel
 
 field_translation = {
-    "HATE": "HATE",
+    "HATEFUL": "HATEFUL",
     "CALLS": "CALLS",
     "MUJER": "WOMEN",
     "LGBTI": "LGBTI",
@@ -15,13 +15,16 @@ field_translation = {
 }
 
 field_mapping = {
-    "HATE": "is_hateful",
+    "HATEFUL": "is_hateful",
     "CALLS": "calls_for_action",
 }
 
 for name_spanish, name_english in field_translation.items():
     if name_english not in field_mapping:
         field_mapping[name_english] = CommentLabel.type_mapping[name_spanish]
+
+
+hate_categories = [x for x in field_mapping.keys() if x not in ['HATEFUL', 'CALLS']]
 
 def ignore_label(comment_label):
     """
@@ -39,9 +42,21 @@ class CommentSerializer:
     This is our serializer for
     """
 
-    def __init__(self, annotators=None, anonymize=True):
+    def __init__(self, annotators=None, anonymize=True, raw=False):
         """
         Constructor
+
+        Arguments:
+        ----------
+
+        annotators: list[str]
+            List of annotators
+
+        anonymize: bool (default True)
+            Remove tweet ids
+
+        raw: bool (default False)
+            Returns only the annotations without assignation
         """
         if annotators:
             self.annotators = annotators
@@ -56,6 +71,25 @@ class CommentSerializer:
         self.ignored_labels = 0
         self.anonymize = anonymize
         self.anonymize_annotator = True
+        self.raw = raw
+
+    def assign(self, raw_comment):
+        """
+        Process raw comment
+        """
+        ret = raw_comment.copy()
+        ret["HATEFUL"] = int(len(raw_comment['HATEFUL']) >= 2)
+
+        for cat in hate_categories + ["CALLS"]:
+            ret[cat] = 0
+
+        if ret["HATEFUL"]:
+            ret["CALLS"] = int(len(raw_comment['CALLS']) >= 2)
+
+            for category in hate_categories:
+                ret[category] = int(len(raw_comment[category]) > 0)
+
+        return ret
 
     def serialize(self, comment):
         """
@@ -66,14 +100,14 @@ class CommentSerializer:
             **{
                 "id": comment.id,
                 "text": comment.text,
-                "article_id": article.tweet_id,
+                "article_id": str(article.tweet_id),
                 "annotators": [],
             },
             **{key:[] for key in field_mapping}
         }
 
         if not self.anonymize:
-            ret["tweet_id"] = comment.tweet_id
+            ret["tweet_id"] = str(comment.tweet_id)
 
         for label in comment.labels.prefetch_related('article_label', 'article_label__user').all():
             username = label.article_label.user.username
@@ -94,4 +128,6 @@ class CommentSerializer:
                 if getattr(label, field):
                     ret[name].append(annotator_name)
 
+        if not self.raw:
+            return self.assign(ret)
         return ret

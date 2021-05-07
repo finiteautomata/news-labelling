@@ -7,7 +7,7 @@ class ArticleSerializer:
     def serialize(self, article):
         date = datetime.strftime(article.created_at, '%Y-%m-%dT%H:%M:%S.%fZ')
         ret = {
-            "tweet_id": article.tweet_id,
+            "tweet_id": str(article.tweet_id),
             "title": article.title,
             "tweet_text": article.text,
             "body": article.body,

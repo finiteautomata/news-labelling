@@ -25,7 +25,7 @@ def label_article(user, article, is_interesting, comments=None):
 
     return article.assignment_set.get(user=user)
 
-keys = ["HATE", "CALLS"] + list(CommentLabel.type_mapping)
+keys = ["HATEFUL", "CALLS"] + list(CommentLabel.type_mapping)
 keys.remove("OTROS")
 
 def assert_comment_label(serialized_label, labels):
@@ -85,7 +85,7 @@ class CommentSerializerTest(TestCase):
                 [],
             ])
 
-        serializer = CommentSerializer()
+        serializer = CommentSerializer(raw=True)
 
         for comment in self.article.comment_set.all():
             serialized_comment = serializer.serialize(comment)
@@ -130,11 +130,11 @@ class CommentSerializerTest(TestCase):
 
         self.setUpHatefulComment()
 
-        serializer = CommentSerializer()
+        serializer = CommentSerializer(raw=True)
         serialized_comment = serializer.serialize(self.comments[0])
 
         assert_comment_label(serialized_comment, {
-            "HATE": 2,
+            "HATEFUL": 2,
             "MUJER": 2,
             "ASPECTO": 1,
         })
@@ -173,7 +173,7 @@ class CommentSerializerTest(TestCase):
         serializer = CommentSerializer(anonymize=False)
         serialized_comment = serializer.serialize(comment)
 
-        self.assertEqual(serialized_comment["tweet_id"], comment.tweet_id)
+        self.assertEqual(serialized_comment["tweet_id"], str(comment.tweet_id))
 
 
     def test_ignore_labelled_as_others(self):
@@ -183,9 +183,9 @@ class CommentSerializerTest(TestCase):
 
         comment = self.comments[2]
 
-        serializer = CommentSerializer(anonymize=False)
+        serializer = CommentSerializer(anonymize=False, raw=True)
         serialized_comment = serializer.serialize(comment)
 
         assert_comment_label(serialized_comment, {
-            "HATE": 0,
+            "HATEFUL": 0,
         })

@@ -32,10 +32,10 @@ def ignore_label(comment_label):
 
     Ignoramos si usó "OTROS" y nada más
     """
-    return comment_label.is_hateful and all(
-        not getattr(comment_label, field) for key, field in field_mapping.items()
-        if key not in {"HATE", "CALLS"}
-    )
+    characteristics = {
+        key:getattr(comment_label, field_mapping[key]) for key in hate_categories
+    }
+    return comment_label.is_hateful and all(not v for v in characteristics.values())
 
 class CommentSerializer:
     """

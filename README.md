@@ -56,9 +56,9 @@ python bin/assign_batch.py <username> <batch_name>
 7. Generar dataset
 
 ```
-python bin/generate_dataset.py output/comments.json output/articles.json
+python bin/generate_dataset.py output/dataset.json --show_ids
 # Crea dataset con tweet ids, sólo para uso interno
-python bin/generate_dataset.py output/comments_not_anon.json output/articles.json --show_ids
+python bin/generate_dataset.py output/dataset.raw.json --show_ids --raw
 ```
 
 ## Running

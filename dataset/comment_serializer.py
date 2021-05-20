@@ -108,6 +108,7 @@ class CommentSerializer:
 
         if not self.anonymize:
             ret["tweet_id"] = str(comment.tweet_id)
+            ret["user_id"] = str(comment.user_id)
 
         for label in comment.labels.prefetch_related('article_label', 'article_label__user').all():
             username = label.article_label.user.username

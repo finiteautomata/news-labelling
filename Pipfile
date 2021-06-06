@@ -12,6 +12,7 @@ jupyterlab = "*"
 pandas = "*"
 seaborn = "*"
 ipywidgets = "*"
+sklearn = "*"
 
 [packages]
 djangorestframework = "*"
@@ -23,6 +24,7 @@ krippendorff = "*"
 pandas = "*"
 matplotlib = "*"
 seaborn = "*"
+sklearn = "*"
 
 [requires]
 python_version = "3.8"

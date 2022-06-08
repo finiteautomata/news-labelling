@@ -135,6 +135,12 @@ class DataFrameCalculator:
                     for name, field in CommentLabel.type_mapping.items():
                         val = getattr(comment_label, field)
                         self.df_comments.loc[(name, username), comment_label.comment_id] = val
+                else:
+                    ## PARCHE JM: 2022 -- sacar luego
+                    self.df_comments.loc[("CALLS", username), comment_label.comment_id] = False
+
+                    for name, field in CommentLabel.type_mapping.items():
+                        self.df_comments.loc[(name, username), comment_label.comment_id] = False
 
         self.last_label_date = max_date
 
